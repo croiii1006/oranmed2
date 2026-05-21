@@ -1960,7 +1960,7 @@ function PlanFormStep({
         </h2>
       </header>
 
-      <div className="rounded-2xl border border-border/40 bg-card/40 p-6 backdrop-blur-sm">
+      <div className="rounded-2xl border border-border/40 bg-card/40 p-6 backdrop-blur-sm py-[19px]">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <Field label="发布时间">
             <Input
@@ -2002,7 +2002,7 @@ function PlanFormStep({
           </div>
         </div>
 
-        <div className="mt-6 rounded-xl border border-border/20 bg-white/60 px-5 py-4 backdrop-blur-md dark:bg-gray-900/60">
+        <div className="mt-6 rounded-xl border border-border/20 bg-white/60 px-5 backdrop-blur-md dark:bg-gray-900/60 my-0 py-[6px]">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-foreground">本次发布</div>
             <div className="text-[11px] text-muted-foreground">
