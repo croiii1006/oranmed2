@@ -1550,23 +1550,10 @@ function OranGenInlinePanel({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">OranGen 生成</span>
-        <button
-          type="button"
-          onClick={onSwitchMode}
-          className="text-muted-foreground underline-offset-2 hover:underline"
-        >
-          切换资产来源
-        </button>
-      </div>
       <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Sparkles className="h-3.5 w-3.5 text-accent" />
           <span>基于 Brief 自动生成 {Math.max(creatorIds.length, 1)} 条素材（每位达人 1 条）</span>
-        </div>
-        <div className="mt-3 rounded-xl bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
-          {brief.goal || '未填写任务目标'}
         </div>
 
         {/* 上传商品白底图 */}
@@ -1614,7 +1601,12 @@ function OranGenInlinePanel({
 
         {phase === 'idle' ? (
           <div className="mt-4 flex items-center justify-end gap-2">
-            <Button size="sm" onClick={start} className="rounded-full">
+            <Button
+              size="sm"
+              onClick={start}
+              variant="outline"
+              className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
+            >
               <Wand2 className="mr-1 h-3.5 w-3.5" />
               开始生成
             </Button>
