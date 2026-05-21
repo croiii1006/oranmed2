@@ -455,14 +455,16 @@ function NewTaskView({
                             : 'border-border/30 hover:-translate-y-0.5 hover:border-foreground/10 hover:bg-background/80 hover:shadow-[0_16px_34px_rgba(15,23,42,0.06)]',
                         )}
                       >
-                        {/* Match score badge — percentage with dynamic color depth */}
-                        <div
-                          className="pointer-events-none absolute left-2.5 top-2.5 z-30 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
-                          style={{ color: matchStyles.color, backgroundColor: matchStyles.bg }}
-                        >
-                          <span className="inline-block h-1 w-1 rounded-full" style={{ backgroundColor: matchStyles.color }} />
-                          <span>{c.matchScore}%</span>
-                        </div>
+                        {/* Match score badge — hidden in manual mode */}
+                        {pickMode === 'ai' ? (
+                          <div
+                            className="pointer-events-none absolute left-2.5 top-2.5 z-30 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
+                            style={{ color: matchStyles.color, backgroundColor: matchStyles.bg }}
+                          >
+                            <span className="inline-block h-1 w-1 rounded-full" style={{ backgroundColor: matchStyles.color }} />
+                            <span>{c.matchScore}%</span>
+                          </div>
+                        ) : null}
                         {selected ? (
                           <div className="absolute right-2.5 top-2.5 z-30 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
                             <CheckCircle2 className="h-3 w-3" strokeWidth={3} />
