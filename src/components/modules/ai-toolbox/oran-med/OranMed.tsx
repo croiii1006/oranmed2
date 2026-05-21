@@ -1545,12 +1545,23 @@ function OranGenInlinePanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   type Phase = 'idle' | 'crawling' | 'select-video' | 'prompt-gen' | 'prompt-edit' | 'rendering' | 'result' | 'done';
+  type HistoryEntry =
+    | { id: string; kind: 'matched'; label: string }
+    | { id: string; kind: 'picked'; label: string; video: OranRefVideo }
+    | { id: string; kind: 'prompt'; label: string; prompt: string; video: OranRefVideo }
+    | { id: string; kind: 'video'; label: string; url: string };
+
   const [phase, setPhase] = useState<Phase>(hasAssets ? 'done' : 'idle');
   const [selectedVideo, setSelectedVideo] = useState<OranRefVideo | null>(null);
   const [prompt, setPrompt] = useState('');
   const [renderStep, setRenderStep] = useState(0);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const renderSteps = ['提取达人风格与镜头语言', '渲染分镜与场景', '合成口播与背景音', '合成最终短视频素材'];
+
+  const addHistory = (entry: HistoryEntry) => setHistory((h) => [...h, entry]);
+  const toggleExpand = (id: string) => setExpanded((e) => ({ ...e, [id]: !e[id] }));
 
   const handleFile = (file?: File | null) => {
     if (!file) return;
@@ -1560,25 +1571,36 @@ function OranGenInlinePanel({
 
   const start = () => {
     setPhase('crawling');
-    setTimeout(() => setPhase('select-video'), 1400);
+    setTimeout(() => {
+      addHistory({ id: `h-matched-${Date.now()}`, kind: 'matched', label: `已匹配 ${ORAN_REFERENCE_VIDEOS.length} 个对标爆款视频` });
+      setPhase('select-video');
+    }, 1400);
   };
 
   const handlePickVideo = (v: OranRefVideo) => {
     setSelectedVideo(v);
+    addHistory({ id: `h-picked-${Date.now()}`, kind: 'picked', label: `已选定对标视频：${v.title}`, video: v });
     setPhase('prompt-gen');
     setTimeout(() => {
-      setPrompt(buildOranPrompt(brief, v));
+      const p = buildOranPrompt(brief, v);
+      setPrompt(p);
+      addHistory({ id: `h-prompt-${Date.now()}`, kind: 'prompt', label: '已生成复刻 Prompt', prompt: p, video: v });
       setPhase('prompt-edit');
     }, 1200);
   };
 
   const handleConfirmPrompt = () => {
+    // update last prompt history with edited content
+    setHistory((h) => h.map((e) => (e.kind === 'prompt' && selectedVideo?.id === e.video.id ? { ...e, prompt } : e)));
     setPhase('rendering');
     setRenderStep(0);
     renderSteps.forEach((_, i) => {
       setTimeout(() => setRenderStep(i + 1), 900 * (i + 1));
     });
-    setTimeout(() => setPhase('result'), 900 * (renderSteps.length + 1));
+    setTimeout(() => {
+      addHistory({ id: `h-video-${Date.now()}`, kind: 'video', label: '已合成复刻视频', url: ORAN_RESULT_VIDEO });
+      setPhase('result');
+    }, 900 * (renderSteps.length + 1));
   };
 
   const handleAddToAssets = () => {
@@ -1590,6 +1612,8 @@ function OranGenInlinePanel({
     setSelectedVideo(null);
     setPrompt('');
     setRenderStep(0);
+    setHistory([]);
+    setExpanded({});
     setPhase('idle');
   };
 
@@ -1687,6 +1711,77 @@ function OranGenInlinePanel({
           </div>
         )}
       </div>
+
+      {/* Run history (collapsible) */}
+      {history.length > 0 && (
+        <div className="rounded-2xl border border-border/40 bg-card/40 p-2 backdrop-blur-sm">
+          <div className="space-y-1">
+            {history.map((entry) => {
+              const open = !!expanded[entry.id];
+              return (
+                <div key={entry.id} className="overflow-hidden rounded-lg border border-border/30 bg-background/40">
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(entry.id)}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-muted/30"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                    <span className="flex-1 truncate text-foreground">{entry.label}</span>
+                    <ChevronDown
+                      className={cn('h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
+                    />
+                  </button>
+                  {open && (
+                    <div className="border-t border-border/30 bg-muted/10 p-3">
+                      {entry.kind === 'matched' && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {ORAN_REFERENCE_VIDEOS.map((v) => (
+                            <div key={v.id} className="overflow-hidden rounded-md border border-border/30 bg-black">
+                              <div className="relative aspect-[9/14]">
+                                <video src={v.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                                <div className="absolute right-1 top-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
+                                  命中 {v.hit}%
+                                </div>
+                              </div>
+                              <div className="p-1 text-[10px] text-foreground">
+                                <div className="truncate">{v.title}</div>
+                                <div className="text-muted-foreground">{v.views} · {v.tag}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {entry.kind === 'picked' && (
+                        <div className="flex gap-3">
+                          <div className="aspect-[9/14] w-24 shrink-0 overflow-hidden rounded-md bg-black">
+                            <video src={entry.video.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                          </div>
+                          <div className="min-w-0 flex-1 text-xs text-muted-foreground">
+                            <div className="text-foreground">{entry.video.title}</div>
+                            <div className="mt-1">播放 {entry.video.views} · 命中率 {entry.video.hit}%</div>
+                            <div className="mt-1">类型：{entry.video.tag}</div>
+                          </div>
+                        </div>
+                      )}
+                      {entry.kind === 'prompt' && (
+                        <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed text-foreground/80">
+                          {entry.prompt}
+                        </pre>
+                      )}
+                      {entry.kind === 'video' && (
+                        <div className="overflow-hidden rounded-md border border-border/30 bg-black">
+                          <video src={entry.url} controls playsInline className="aspect-video w-full object-contain" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
 
       {/* Phase: select-video */}
       {phase === 'select-video' && (
