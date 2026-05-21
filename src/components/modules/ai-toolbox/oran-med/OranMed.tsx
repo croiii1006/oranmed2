@@ -1673,7 +1673,7 @@ function TaskCard({ index, icon, title, hint, status, children, defaultOpen }: T
 
 // ============== Card 1: Brief ==============
 function BriefCard() {
-  const { currentTask, updateBrief, saveBrief } = useOranMed();
+  const { currentTask, updateBrief, saveBrief, setCreators } = useOranMed();
   const { brief, briefSaved } = currentTask;
   const status = briefSaved ? 'done' : 'active';
   const hint = briefSaved
