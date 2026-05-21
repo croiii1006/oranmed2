@@ -193,12 +193,20 @@ export function OranMedProvider({ children }: { children: ReactNode }) {
 
   const deleteTask = useCallback(
     (id: string) => {
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-      if (id === currentTaskId) {
-        const draft = newDraftTask();
-        setTasks((prev) => [draft, ...prev]);
-        setCurrentTaskId(draft.id);
-      }
+      setTasks((prev) => {
+        const next = prev.filter((t) => t.id !== id);
+        if (id === currentTaskId) {
+          const fallback = next.find((t) => t.status === 'draft');
+          if (fallback) {
+            setCurrentTaskId(fallback.id);
+            return next;
+          }
+          const draft = newDraftTask();
+          setCurrentTaskId(draft.id);
+          return [draft, ...next];
+        }
+        return next;
+      });
     },
     [currentTaskId],
   );
