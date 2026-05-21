@@ -1276,12 +1276,11 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
             />
           )}
 
-          {assetMode === 'local' ? (
+          {assetMode && assets.length > 0 ? (
             <div className="flex justify-end">
               <Button
                 size="sm"
                 variant="outline"
-                disabled={assets.length === 0}
                 onClick={() => setStep('plan')}
                 className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
               >
@@ -1494,6 +1493,38 @@ function LocalUploadZone({
 }
 
 // ============== OranGen inline panel ==============
+const ORAN_REFERENCE_VIDEOS = [
+  { id: 'ref-1', url: '/orangen-reference-videos/dr-melaxin-hit-1.mp4', title: '热视频 · 高转化开场', views: '180万', hit: 96, tag: '高转化开场' },
+  { id: 'ref-2', url: '/orangen-reference-videos/dr-melaxin-hit-2.mp4', title: '热视频 · 真人口播', views: '220万', hit: 91, tag: '功效种草' },
+  { id: 'ref-3', url: '/orangen-reference-videos/dr-melaxin-hit-3.mp4', title: '自制 · 细节特写', views: '23.5万', hit: 82, tag: '轻口播' },
+  { id: 'ref-4', url: '/orangen-reference-videos/dr-melaxin-hit-4.mp4', title: '自制 · 前后对比', views: '80万', hit: 78, tag: '高曝光' },
+  { id: 'ref-5', url: '/orangen-reference-videos/dr-melaxin-hit-5.mp4', title: '自制 · 转化切片', views: '50万', hit: 73, tag: '钩子测试' },
+  { id: 'ref-6', url: '/orangen-reference-videos/dr-melaxin-hit-6.mp4', title: '自制 · 爆点切片', views: '20万', hit: 76, tag: '低成本复刻' },
+];
+const ORAN_RESULT_VIDEO = '/generated-videos/replicate-melaxin.mp4';
+
+type OranRefVideo = typeof ORAN_REFERENCE_VIDEOS[number];
+
+function buildOranPrompt(brief: { brandName: string; brandCategory: string; brandTags: string; goal: string }, video: OranRefVideo) {
+  const tags = (brief.brandTags || '高保湿,温和,敏感肌').split(/[,，、]/).map((t) => t.trim()).filter(Boolean);
+  return [
+    `品牌：${brief.brandName || 'Dr.Melaxin'} · 品类：${brief.brandCategory || '美妆个护'}`,
+    `对标爆款：${video.title}（${video.tag}，命中率 ${video.hit}%）`,
+    '',
+    '【开场 0-3s】',
+    '高密度产品镜头快速切入，第一秒直接抛出核心利益点，制造停留钩子。',
+    '',
+    '【中段 3-15s】',
+    `结合卖点 ${tags.slice(0, 3).join(' / ') || '高保湿 / 温和 / 敏感肌'}，用真人口播 + 使用画面交叉呈现，强调使用前后差异。`,
+    '',
+    '【转化 15-25s】',
+    `承接目标「${brief.goal || '种草拉新 + 站内转化'}」，加入限时利益点与号召性话术，引导用户点击主页购物车。`,
+    '',
+    '【画面风格】',
+    '高饱和暖色调，镜头节奏 2-3 秒一切，配合节拍鼓点 BGM。',
+  ].join('\n');
+}
+
 function OranGenInlinePanel({
   brief,
   creatorIds,
@@ -1512,40 +1543,54 @@ function OranGenInlinePanel({
   onSwitchMode: () => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const steps = [
-    { key: 'brief', label: '读取 Brief 与目标人群', agent: 'Brief 解析' },
-    { key: 'benchmark', label: '匹配对标爆款视频', agent: 'TikTok 爆款专家' },
-    { key: 'memory', label: '构建品牌记忆库特征向量', agent: '记忆库专家' },
-    { key: 'style', label: '提取达人风格与镜头语言', agent: '风格专家' },
-    { key: 'prompt', label: '设计每位达人专属 Prompt', agent: 'Prompt 专家' },
-    { key: 'scene', label: '渲染分镜与场景', agent: '设计专家' },
-    { key: 'audio', label: '合成口播与背景音', agent: '音频专家' },
-    { key: 'compose', label: '合成最终短视频素材', agent: '视频专家' },
-  ] as const;
 
-  type Phase = 'idle' | typeof steps[number]['key'] | 'done';
+  type Phase = 'idle' | 'crawling' | 'select-video' | 'prompt-gen' | 'prompt-edit' | 'rendering' | 'result' | 'done';
   const [phase, setPhase] = useState<Phase>(hasAssets ? 'done' : 'idle');
+  const [selectedVideo, setSelectedVideo] = useState<OranRefVideo | null>(null);
+  const [prompt, setPrompt] = useState('');
+  const [renderStep, setRenderStep] = useState(0);
 
-  const order: Record<string, number> = { idle: 0 };
-  steps.forEach((s, i) => (order[s.key] = i + 1));
-  order.done = steps.length + 1;
-
-  const start = () => {
-    setPhase(steps[0].key);
-    const stepDelay = 900;
-    steps.slice(1).forEach((s, i) => {
-      setTimeout(() => setPhase(s.key), stepDelay * (i + 1));
-    });
-    setTimeout(() => {
-      setPhase('done');
-      onGenerated(Math.max(creatorIds.length, 1));
-    }, stepDelay * steps.length);
-  };
+  const renderSteps = ['提取达人风格与镜头语言', '渲染分镜与场景', '合成口播与背景音', '合成最终短视频素材'];
 
   const handleFile = (file?: File | null) => {
     if (!file) return;
     const url = URL.createObjectURL(file);
     onProductImageChange({ name: file.name, url });
+  };
+
+  const start = () => {
+    setPhase('crawling');
+    setTimeout(() => setPhase('select-video'), 1400);
+  };
+
+  const handlePickVideo = (v: OranRefVideo) => {
+    setSelectedVideo(v);
+    setPhase('prompt-gen');
+    setTimeout(() => {
+      setPrompt(buildOranPrompt(brief, v));
+      setPhase('prompt-edit');
+    }, 1200);
+  };
+
+  const handleConfirmPrompt = () => {
+    setPhase('rendering');
+    setRenderStep(0);
+    renderSteps.forEach((_, i) => {
+      setTimeout(() => setRenderStep(i + 1), 900 * (i + 1));
+    });
+    setTimeout(() => setPhase('result'), 900 * (renderSteps.length + 1));
+  };
+
+  const handleAddToAssets = () => {
+    onGenerated(Math.max(creatorIds.length, 1));
+    setPhase('done');
+  };
+
+  const reset = () => {
+    setSelectedVideo(null);
+    setPrompt('');
+    setRenderStep(0);
+    setPhase('idle');
   };
 
   return (
@@ -1556,7 +1601,7 @@ function OranGenInlinePanel({
           <span>基于 Brief 自动生成 {Math.max(creatorIds.length, 1)} 条素材（每位达人 1 条）</span>
         </div>
 
-        {/* 上传商品白底图 */}
+        {/* 上传 + 卖点 */}
         <div className="mt-3 flex items-start gap-3">
           <input
             ref={fileInputRef}
@@ -1565,7 +1610,6 @@ function OranGenInlinePanel({
             className="hidden"
             onChange={(e) => handleFile(e.target.files?.[0])}
           />
-          {/* 左：上传方形区 */}
           {productImage ? (
             <div className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border/40 bg-muted/20">
               <img src={productImage.url} alt={productImage.name} className="h-full w-full object-cover" />
@@ -1594,14 +1638,9 @@ function OranGenInlinePanel({
               上传商品白底图
             </button>
           )}
-
-          {/* 右：自动同步的卖点标签 */}
           <div className="min-w-0 flex-1 self-stretch">
             {(() => {
-              const tags = (brief.brandTags || '')
-                .split(/[,，、]/)
-                .map((t) => t.trim())
-                .filter(Boolean);
+              const tags = (brief.brandTags || '').split(/[,，、]/).map((t) => t.trim()).filter(Boolean);
               if (tags.length === 0) {
                 return (
                   <div className="flex h-full min-h-[6rem] items-center text-xs text-muted-foreground/60">
@@ -1625,8 +1664,9 @@ function OranGenInlinePanel({
           </div>
         </div>
 
-        {phase === 'idle' ? (
-          <div className="mt-4 flex items-center justify-end gap-2">
+        {/* Phase: idle */}
+        {phase === 'idle' && (
+          <div className="mt-4 flex items-center justify-end">
             <Button
               size="sm"
               onClick={start}
@@ -1637,15 +1677,103 @@ function OranGenInlinePanel({
               开始生成
             </Button>
           </div>
-        ) : (
-          <div className="mt-4 space-y-2">
-            {steps.map((s) => {
-              const idx = order[s.key as keyof typeof order];
-              const cur = order[phase];
-              const done = cur > idx;
-              const active = cur === idx;
+        )}
+
+        {/* Phase: crawling */}
+        {phase === 'crawling' && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-border/30 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
+            TikTok 爆款专家正在匹配对标爆款视频…
+          </div>
+        )}
+      </div>
+
+      {/* Phase: select-video */}
+      {phase === 'select-video' && (
+        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="text-xs font-medium text-foreground">选择对标爆款视频</div>
+            <span className="text-[10px] text-muted-foreground/60">点击任意视频开始复刻</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {ORAN_REFERENCE_VIDEOS.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => handlePickVideo(v)}
+                className="group overflow-hidden rounded-lg border border-border/40 bg-muted/10 text-left transition-all hover:border-[#FF5500]/40 hover:shadow-md"
+              >
+                <div className="relative aspect-[9/14] bg-black">
+                  <video src={v.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                  <div className="absolute right-1 top-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
+                    命中 {v.hit}%
+                  </div>
+                </div>
+                <div className="p-1.5">
+                  <div className="truncate text-[11px] text-foreground">{v.title}</div>
+                  <div className="mt-0.5 flex items-center justify-between text-[10px] text-muted-foreground">
+                    <span>{v.views}</span>
+                    <span>{v.tag}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Phase: prompt-gen */}
+      {phase === 'prompt-gen' && (
+        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
+            Prompt 专家正在为「{selectedVideo?.title}」设计专属复刻 Prompt…
+          </div>
+        </div>
+      )}
+
+      {/* Phase: prompt-edit */}
+      {phase === 'prompt-edit' && (
+        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-xs font-medium text-foreground">复刻 Prompt（可编辑）</div>
+            <button
+              type="button"
+              onClick={() => setPhase('select-video')}
+              className="text-[10px] text-muted-foreground underline-offset-2 hover:underline"
+            >
+              重新选择视频
+            </button>
+          </div>
+          <Textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            className="min-h-[180px] resize-y text-xs leading-relaxed"
+          />
+          <div className="mt-3 flex items-center justify-end">
+            <Button
+              size="sm"
+              onClick={handleConfirmPrompt}
+              variant="outline"
+              className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
+            >
+              <Wand2 className="mr-1 h-3.5 w-3.5" />
+              确认开始复刻
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Phase: rendering */}
+      {phase === 'rendering' && (
+        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
+          <div className="mb-2 text-xs font-medium text-foreground">视频专家正在合成…</div>
+          <div className="space-y-2">
+            {renderSteps.map((label, i) => {
+              const done = renderStep > i;
+              const active = renderStep === i;
               return (
-                <div key={s.key} className="flex items-center gap-2 text-xs">
+                <div key={label} className="flex items-center gap-2 text-xs">
                   <span
                     className={cn(
                       'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[9px]',
@@ -1658,29 +1786,58 @@ function OranGenInlinePanel({
                   >
                     {done ? <CheckCircle2 className="h-3 w-3" /> : active ? '·' : ''}
                   </span>
-                  <span className={cn('truncate', done || active ? 'text-foreground' : 'text-muted-foreground')}>
-                    {s.label}
-                  </span>
-                  <span className="ml-auto shrink-0 text-[10px] text-muted-foreground/70">{s.agent}</span>
+                  <span className={cn(done || active ? 'text-foreground' : 'text-muted-foreground')}>{label}</span>
                   {active ? <span className="ml-1 h-1 w-1 animate-pulse rounded-full bg-accent" /> : null}
                 </div>
               );
             })}
-            {phase === 'done' ? (
-              <div className="mt-3 flex items-center justify-between rounded-lg bg-emerald-50/60 px-3 py-2 text-xs text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-                <span>生成完成 · 右侧查看素材</span>
-                <button
-                  type="button"
-                  onClick={start}
-                  className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
-                >
-                  再生成一批
-                </button>
-              </div>
-            ) : null}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Phase: result */}
+      {phase === 'result' && (
+        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-xs font-medium text-foreground">复刻视频预览</div>
+            <button
+              type="button"
+              onClick={reset}
+              className="text-[10px] text-muted-foreground underline-offset-2 hover:underline"
+            >
+              再生成一批
+            </button>
+          </div>
+          <div className="overflow-hidden rounded-lg border border-border/30 bg-black">
+            <video src={ORAN_RESULT_VIDEO} controls autoPlay playsInline className="aspect-video w-full object-contain" />
+          </div>
+          <div className="mt-3 flex items-center justify-end gap-2">
+            <Button
+              size="sm"
+              onClick={handleAddToAssets}
+              variant="outline"
+              className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
+            >
+              <Check className="mr-1 h-3.5 w-3.5" />
+              添加到素材
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Phase: done */}
+      {phase === 'done' && (
+        <div className="flex items-center justify-between rounded-lg bg-emerald-50/60 px-3 py-2 text-xs text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+          <span>生成完成 · 右侧查看素材</span>
+          <button
+            type="button"
+            onClick={reset}
+            className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
+          >
+            再生成一批
+          </button>
+        </div>
+      )}
     </div>
   );
 }
