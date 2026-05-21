@@ -2024,19 +2024,50 @@ function PlanFormStep({
                     const c = CREATORS.find((cc) => cc.id === id);
                     if (!c) return null;
                     return (
-                      <div key={id} className="flex items-center gap-2 rounded-full border border-border/40 bg-background/60 py-1 pl-1 pr-3">
-                        {c.avatarUrl ? (
-                          <img src={c.avatarUrl} alt={c.name} className="h-7 w-7 rounded-full object-cover" />
-                        ) : (
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#FF5500]/20 to-[#FF5500]/5 text-[11px] font-medium text-[#FF5500]">
-                            {c.name.slice(0, 1)}
+                      <Popover key={id}>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="flex items-center gap-2 rounded-full border border-border/40 bg-background/60 py-1 pl-1 pr-3 transition-colors hover:border-accent/60 hover:bg-background"
+                          >
+                            {c.avatarUrl ? (
+                              <img src={c.avatarUrl} alt={c.name} className="h-7 w-7 rounded-full object-cover" />
+                            ) : (
+                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#FF5500]/20 to-[#FF5500]/5 text-[11px] font-medium text-[#FF5500]">
+                                {c.name.slice(0, 1)}
+                              </div>
+                            )}
+                            <div className="min-w-0 text-left">
+                              <div className="text-xs leading-tight text-foreground">{c.name}</div>
+                              <div className="text-[10px] leading-tight text-muted-foreground">{c.tier} · {c.platform}</div>
+                            </div>
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-4" align="start">
+                          <div className="flex items-center gap-3">
+                            {c.avatarUrl ? (
+                              <img src={c.avatarUrl} alt={c.name} className="h-12 w-12 rounded-full object-cover" />
+                            ) : (
+                              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#FF5500]/20 to-[#FF5500]/5 text-sm font-medium text-[#FF5500]">
+                                {c.name.slice(0, 1)}
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-sm font-medium text-foreground">{c.name}</div>
+                              <div className="truncate text-[11px] text-muted-foreground">{c.handle} · {c.platform}</div>
+                            </div>
+                            <Badge variant="secondary" className="text-[10px]">匹配 {c.matchScore}</Badge>
                           </div>
-                        )}
-                        <div className="min-w-0">
-                          <div className="text-xs leading-tight text-foreground">{c.name}</div>
-                          <div className="text-[10px] leading-tight text-muted-foreground">{c.tier} · {c.platform}</div>
-                        </div>
-                      </div>
+                          <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 rounded-lg border border-border/40 bg-muted/30 p-3 text-[11px]">
+                            <DetailRow label="层级" value={c.tier} />
+                            <DetailRow label="平台" value={c.platform} />
+                            <DetailRow label="粉丝量" value={c.followers} />
+                            <DetailRow label="平均播放" value={c.avgPlay} />
+                            <DetailRow label="标签" value={c.tags.join(' · ') || '—'} span2 />
+                            <DetailRow label="推荐理由" value={c.matchReason || '—'} span2 />
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     );
                   })
                 )}
