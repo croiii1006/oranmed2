@@ -234,7 +234,7 @@ function NewTaskView({
             ORAN MED
           </h1>
           <p className="mt-4 text-sm text-muted-foreground font-light tracking-[0.1em]">
-            输入 Brief 或选择记忆库，AI 将为你匹配平台达人并输出内容与发布计划。
+            上传Brief 文件或直接粘贴文本，AI 将为你智能解析、匹配平台达人并输出内容与发布计划。
           </p>
         </div>
 
