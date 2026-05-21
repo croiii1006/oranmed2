@@ -1700,7 +1700,7 @@ function BriefCard() {
           />
         </Field>
         <Field label="目标平台" required>
-          <Select value={brief.platform} onValueChange={(v) => updateBrief({ platform: v as Platform })}>
+          <Select value={brief.platform} onValueChange={(v) => { if (v !== brief.platform) setCreators([]); updateBrief({ platform: v as Platform }); }}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
