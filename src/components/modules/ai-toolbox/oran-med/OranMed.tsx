@@ -219,33 +219,6 @@ function NewTaskView({
               creatorsOpen ? 'w-[420px]' : 'w-full',
             )}
           >
-            {/* Template pill — sits on top of the card */}
-            <div className="relative z-10 flex justify-end -mb-5 pr-2">
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setTplOpen((v) => !v)}
-                  className="flex items-center gap-3 rounded-2xl bg-muted/70 px-6 py-2 text-sm text-muted-foreground shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-colors hover:bg-muted"
-                >
-                  <span className="font-light tracking-wide">Brief 模板</span>
-                  <ChevronDown className={cn('h-4 w-4 transition-transform', tplOpen && 'rotate-180')} />
-                </button>
-                {tplOpen ? (
-                  <div className="absolute right-0 top-full z-30 mt-1.5 w-72 overflow-hidden rounded-xl border border-border/40 bg-popover p-1 shadow-lg">
-                    {BRIEF_TEMPLATES.map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => handlePickTemplate(t.id)}
-                        className="block w-full rounded-md px-3 py-2 text-left text-xs text-muted-foreground hover:bg-accent/10 hover:text-foreground"
-                      >
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
 
             {/* Brief input card */}
             <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
