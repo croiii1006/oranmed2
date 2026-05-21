@@ -3312,9 +3312,18 @@ function TaskDetailDialog({
                             onClick={() => setView({ kind: 'creator', id: c.id })}
                             className="flex w-full items-center justify-between rounded-lg border border-border/40 px-3 py-2 text-left text-xs transition-colors hover:border-foreground/30 hover:bg-muted/30"
                           >
-                            <div className="min-w-0">
-                              <div className="truncate font-medium text-foreground">{c.name} <span className="ml-1 text-[10px] text-muted-foreground">{c.handle}</span></div>
-                              <div className="mt-0.5 text-[10px] text-muted-foreground">{c.tier} · {c.followers} 粉丝 · 匹配度 {c.matchScore}</div>
+                            <div className="flex min-w-0 items-center gap-2">
+                              {c.avatarUrl ? (
+                                <img src={c.avatarUrl} alt={c.name} className="h-8 w-8 shrink-0 rounded-full object-cover" />
+                              ) : (
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/60 text-[11px] font-light text-foreground/60">
+                                  {c.name.slice(0, 1)}
+                                </div>
+                              )}
+                              <div className="min-w-0">
+                                <div className="truncate font-medium text-foreground">{c.name} <span className="ml-1 text-[10px] text-muted-foreground">{c.handle}</span></div>
+                                <div className="mt-0.5 text-[10px] text-muted-foreground">{c.tier} · {c.followers} 粉丝 · 匹配度 {c.matchScore}</div>
+                              </div>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <Badge variant="secondary" className="text-[10px]">{c.platform}</Badge>
