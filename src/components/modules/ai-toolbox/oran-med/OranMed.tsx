@@ -3447,7 +3447,19 @@ function TaskDetailDialog({
 
               {view.kind === 'asset' && activeAsset && (
                 <div className="space-y-4">
-                  <div className={cn('h-40 w-full rounded-xl bg-gradient-to-br', activeAsset.thumbnailColor)} />
+                  {activeAsset.source === 'orangen' ? (
+                    <video
+                      src={ORAN_RESULT_VIDEO}
+                      controls
+                      muted
+                      playsInline
+                      className="h-60 w-full rounded-xl object-cover"
+                    />
+                  ) : (
+                    <div className={cn('flex h-40 w-full items-center justify-center rounded-xl bg-gradient-to-br', activeAsset.thumbnailColor)}>
+                      <ImageIcon className="h-8 w-8 text-white/80" />
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs">
                     <DetailRow label="标题" value={activeAsset.title} span2 />
                     <DetailRow label="来源" value={activeAsset.source === 'local' ? '本地上传' : 'ORAN GEN'} />
