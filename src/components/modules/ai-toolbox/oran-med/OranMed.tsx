@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   CheckCircle2,
-  ChevronDown,
+  
   ChevronRight,
   ClipboardList,
   Database,
@@ -110,11 +110,6 @@ function OranMedInner() {
 }
 
 // ============== New task ==============
-const BRIEF_TEMPLATES = [
-  { id: 'tmpl-skincare', label: '美妆护肤 · 新品种草', content: '本次推广目标：新品玻色因精华上市种草，提升 25-35 岁都市女性用户的认知与搜索。希望达人以专业测评 + 真实使用感受的方式呈现，结合成分解析与肤感体验，引导评论区互动与加购。' },
-  { id: 'tmpl-food', label: '食品饮料 · 节日营销', content: '围绕节日场景打造礼赠话题，突出包装颜值与口味亮点。期望达人结合开箱、试吃、送礼等场景演绎，植入自然，强调限时优惠。' },
-  { id: 'tmpl-3c', label: '3C 数码 · 上市评测', content: '新品上市评测投放，强调差异化卖点与使用场景。期望达人输出深度评测内容，覆盖性能、外观、生态，提供购买建议。' },
-];
 
 function NewTaskView({
   onOpenWorkbench,
@@ -126,7 +121,6 @@ function NewTaskView({
   const { currentTask, tasks, updateBrief, saveBrief, toggleCreator } = useOranMed();
   const historyCount = tasks.length;
   const { brief, selectedCreatorIds } = currentTask;
-  const [tplOpen, setTplOpen] = useState(false);
   const [creatorsOpen, setCreatorsOpen] = useState(false);
   const [matching, setMatching] = useState(false);
   const [pickMode, setPickMode] = useState<'ai' | 'manual'>('ai');
@@ -147,12 +141,6 @@ function NewTaskView({
       brief.brandCategory.trim(),
   );
 
-  const handlePickTemplate = (id: string) => {
-    const t = BRIEF_TEMPLATES.find((x) => x.id === id);
-    if (!t) return;
-    updateBrief({ goal: t.content });
-    setTplOpen(false);
-  };
 
   const openCreators = (mode: 'ai' | 'manual') => {
     const patch: Partial<typeof brief> = {};
@@ -219,33 +207,6 @@ function NewTaskView({
               creatorsOpen ? 'w-[420px]' : 'w-full',
             )}
           >
-            {/* Template pill — sits on top of the card */}
-            <div className="relative z-10 flex justify-end -mb-5 pr-2">
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setTplOpen((v) => !v)}
-                  className="flex items-center gap-3 rounded-2xl bg-muted/70 px-6 py-2 text-sm text-muted-foreground shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-colors hover:bg-muted"
-                >
-                  <span className="font-light tracking-wide">Brief 模板</span>
-                  <ChevronDown className={cn('h-4 w-4 transition-transform', tplOpen && 'rotate-180')} />
-                </button>
-                {tplOpen ? (
-                  <div className="absolute right-0 top-full z-30 mt-1.5 w-72 overflow-hidden rounded-xl border border-border/40 bg-popover p-1 shadow-lg">
-                    {BRIEF_TEMPLATES.map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => handlePickTemplate(t.id)}
-                        className="block w-full rounded-md px-3 py-2 text-left text-xs text-muted-foreground hover:bg-accent/10 hover:text-foreground"
-                      >
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
 
             {/* Brief input card */}
             <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
@@ -2019,7 +1980,7 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
           const statusDot = STATUS_DOT[t.status];
           const firstCreator = CREATORS.find((c) => c.id === t.selectedCreatorIds[0]);
           const avatarLabel = (firstCreator?.name || t.brief.brandName || 'M').slice(0, 1);
-          const briefPreview = t.brief.goal?.trim() || '输入 Brief 内容，或选择 Brief 模板';
+          const briefPreview = t.brief.goal?.trim() || '输入 Brief 内容';
           return (
             <button
               key={t.id}
