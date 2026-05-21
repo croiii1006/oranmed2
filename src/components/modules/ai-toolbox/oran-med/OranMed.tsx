@@ -1561,10 +1561,16 @@ function OranGenInlinePanel({
         </div>
 
         {phase === 'idle' ? (
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex items-center justify-end gap-2">
+            {onReopen ? (
+              <Button size="sm" variant="outline" onClick={onReopen} className="rounded-full">
+                <Sparkles className="mr-1 h-3.5 w-3.5" />
+                打开 ORAN GEN 工作台
+              </Button>
+            ) : null}
             <Button size="sm" onClick={start} className="rounded-full">
               <Wand2 className="mr-1 h-3.5 w-3.5" />
-              开始生成
+              快速模拟生成
             </Button>
           </div>
         ) : (
