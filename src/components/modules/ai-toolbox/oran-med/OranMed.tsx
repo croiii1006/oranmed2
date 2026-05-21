@@ -2010,78 +2010,80 @@ function PlanFormStep({
             </div>
           </div>
 
-          {/* 达人头像 */}
-          <div className="mt-4">
-            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-foreground/70">
-              达人 · {task.selectedCreatorIds.length} 位
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {task.selectedCreatorIds.length === 0 ? (
-                <div className="text-xs text-muted-foreground">未选择</div>
-              ) : (
-                task.selectedCreatorIds.map((id) => {
-                  const c = CREATORS.find((cc) => cc.id === id);
-                  if (!c) return null;
-                  return (
-                    <div key={id} className="flex items-center gap-2 rounded-full border border-border/40 bg-background/60 py-1 pl-1 pr-3">
-                      {c.avatarUrl ? (
-                        <img src={c.avatarUrl} alt={c.name} className="h-7 w-7 rounded-full object-cover" />
-                      ) : (
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#FF5500]/20 to-[#FF5500]/5 text-[11px] font-medium text-[#FF5500]">
-                          {c.name.slice(0, 1)}
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <div className="text-xs leading-tight text-foreground">{c.name}</div>
-                        <div className="text-[10px] leading-tight text-muted-foreground">{c.tier} · {c.platform}</div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {/* 资产缩略图 */}
-          <div className="mt-4">
-            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-foreground/70">
-              资产 · {task.assets.length} 项
-            </div>
-            {task.assets.length === 0 ? (
-              <div className="text-xs text-muted-foreground">无</div>
-            ) : (
+          <div className="mt-4 flex gap-6">
+            {/* 左侧：达人 + 发布信息 */}
+            <div className="flex-1 min-w-0">
+              <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-foreground/70">
+                达人 · {task.selectedCreatorIds.length} 位
+              </div>
               <div className="flex flex-wrap gap-2">
-                {task.assets.map((a) => {
-                  const creator = CREATORS.find((cc) => cc.id === a.creatorId);
-                  const isOranGen = a.source === 'orangen';
-                  return (
-                    <div key={a.id} className="w-[96px] overflow-hidden rounded-md border border-border/40 bg-background/60">
-                      <div className={cn('relative aspect-[9/14]', !isOranGen && a.thumbnailColor)}>
-                        {isOranGen ? (
-                          <video
-                            src={ORAN_RESULT_VIDEO}
-                            className="h-full w-full object-cover"
-                            muted
-                            playsInline
-                            preload="metadata"
-                          />
+                {task.selectedCreatorIds.length === 0 ? (
+                  <div className="text-xs text-muted-foreground">未选择</div>
+                ) : (
+                  task.selectedCreatorIds.map((id) => {
+                    const c = CREATORS.find((cc) => cc.id === id);
+                    if (!c) return null;
+                    return (
+                      <div key={id} className="flex items-center gap-2 rounded-full border border-border/40 bg-background/60 py-1 pl-1 pr-3">
+                        {c.avatarUrl ? (
+                          <img src={c.avatarUrl} alt={c.name} className="h-7 w-7 rounded-full object-cover" />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <ImageIcon className="h-5 w-5 text-white/70" />
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#FF5500]/20 to-[#FF5500]/5 text-[11px] font-medium text-[#FF5500]">
+                            {c.name.slice(0, 1)}
                           </div>
                         )}
-                        <div className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[9px] text-white">
-                          {isOranGen ? 'OranGen' : '本地'}
+                        <div className="min-w-0">
+                          <div className="text-xs leading-tight text-foreground">{c.name}</div>
+                          <div className="text-[10px] leading-tight text-muted-foreground">{c.tier} · {c.platform}</div>
                         </div>
                       </div>
-                      <div className="px-1.5 py-1 text-[10px] leading-tight">
-                        <div className="truncate text-muted-foreground">{creator?.name ?? '未指派'}</div>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
-            )}
+            </div>
+
+            {/* 右侧：资产缩略图 */}
+            <div className="flex-1 min-w-0">
+              <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-foreground/70">
+                资产 · {task.assets.length} 项
+              </div>
+              {task.assets.length === 0 ? (
+                <div className="text-xs text-muted-foreground">无</div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {task.assets.map((a) => {
+                    const creator = CREATORS.find((cc) => cc.id === a.creatorId);
+                    const isOranGen = a.source === 'orangen';
+                    return (
+                      <div key={a.id} className="w-[80px] overflow-hidden rounded-md border border-border/40 bg-background/60">
+                        <div className={cn('relative aspect-[9/14]', !isOranGen && a.thumbnailColor)}>
+                          {isOranGen ? (
+                            <video
+                              src={ORAN_RESULT_VIDEO}
+                              className="h-full w-full object-cover"
+                              muted
+                              playsInline
+                              preload="metadata"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <ImageIcon className="h-5 w-5 text-white/70" />
+                            </div>
+                          )}
+                          <div className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[9px] text-white">
+                            {isOranGen ? 'OranGen' : '本地'}
+                          </div>
+                        </div>
+                        <div className="px-1 py-0.5 text-[10px] leading-tight">
+                          <div className="truncate text-muted-foreground">{creator?.name ?? '未指派'}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
