@@ -1243,7 +1243,6 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
             <AssetModeChoices
               onPick={(m) => {
                 setAssetMode(m);
-                if (m === 'orangen') setOrangenTakeover(true);
               }}
             />
           ) : assetMode === 'local' ? (
