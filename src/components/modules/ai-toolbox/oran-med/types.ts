@@ -32,6 +32,8 @@ export interface Creator {
   matchScore: number;
   matchReason: string;
   avatarUrl?: string;
+  region?: string;
+  gender?: 'male' | 'female';
 }
 
 export type AssetSource = 'local' | 'orangen';
