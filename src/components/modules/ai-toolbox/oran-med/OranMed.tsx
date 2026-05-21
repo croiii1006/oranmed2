@@ -1276,12 +1276,11 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
             />
           )}
 
-          {assetMode === 'local' ? (
+          {assetMode && assets.length > 0 ? (
             <div className="flex justify-end">
               <Button
                 size="sm"
                 variant="outline"
-                disabled={assets.length === 0}
                 onClick={() => setStep('plan')}
                 className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
               >
