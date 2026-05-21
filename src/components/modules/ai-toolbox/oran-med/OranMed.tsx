@@ -1712,12 +1712,17 @@ function OranGenInlinePanel({
         )}
       </div>
 
-      {/* Run history (collapsible) */}
+      {/* Run history (collapsible, merges with active step UI) */}
       {history.length > 0 && (
         <div className="rounded-2xl border border-border/40 bg-card/40 p-2 backdrop-blur-sm">
           <div className="space-y-1">
-            {history.map((entry) => {
-              const open = !!expanded[entry.id];
+            {history.map((entry, idx) => {
+              const isLast = idx === history.length - 1;
+              const needsAction =
+                (entry.kind === 'matched' && phase === 'select-video') ||
+                (entry.kind === 'prompt' && phase === 'prompt-edit') ||
+                (entry.kind === 'video' && phase === 'result');
+              const open = expanded[entry.id] ?? (isLast && needsAction);
               return (
                 <div key={entry.id} className="overflow-hidden rounded-lg border border-border/30 bg-background/40">
                   <button
@@ -1734,22 +1739,38 @@ function OranGenInlinePanel({
                   {open && (
                     <div className="border-t border-border/30 bg-muted/10 p-3">
                       {entry.kind === 'matched' && (
-                        <div className="grid grid-cols-3 gap-2">
-                          {ORAN_REFERENCE_VIDEOS.map((v) => (
-                            <div key={v.id} className="overflow-hidden rounded-md border border-border/30 bg-black">
-                              <div className="relative aspect-[9/14]">
-                                <video src={v.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
-                                <div className="absolute right-1 top-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
-                                  命中 {v.hit}%
-                                </div>
-                              </div>
-                              <div className="p-1 text-[10px] text-foreground">
-                                <div className="truncate">{v.title}</div>
-                                <div className="text-muted-foreground">{v.views} · {v.tag}</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <>
+                          {phase === 'select-video' && (
+                            <div className="mb-2 text-[10px] text-muted-foreground/70">点击任意视频开始复刻</div>
+                          )}
+                          <div className="grid grid-cols-3 gap-2">
+                            {ORAN_REFERENCE_VIDEOS.map((v) => {
+                              const clickable = phase === 'select-video';
+                              const Wrap: any = clickable ? 'button' : 'div';
+                              return (
+                                <Wrap
+                                  key={v.id}
+                                  {...(clickable ? { type: 'button', onClick: () => handlePickVideo(v) } : {})}
+                                  className={cn(
+                                    'overflow-hidden rounded-md border border-border/30 bg-black text-left',
+                                    clickable && 'transition-all hover:border-[#FF5500]/50 hover:shadow-md',
+                                  )}
+                                >
+                                  <div className="relative aspect-[9/14]">
+                                    <video src={v.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                                    <div className="absolute right-1 top-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
+                                      命中 {v.hit}%
+                                    </div>
+                                  </div>
+                                  <div className="bg-background/60 p-1 text-[10px] text-foreground">
+                                    <div className="truncate">{v.title}</div>
+                                    <div className="text-muted-foreground">{v.views} · {v.tag}</div>
+                                  </div>
+                                </Wrap>
+                              );
+                            })}
+                          </div>
+                        </>
                       )}
                       {entry.kind === 'picked' && (
                         <div className="flex gap-3">
@@ -1764,14 +1785,63 @@ function OranGenInlinePanel({
                         </div>
                       )}
                       {entry.kind === 'prompt' && (
-                        <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed text-foreground/80">
-                          {entry.prompt}
-                        </pre>
+                        phase === 'prompt-edit' && isLast ? (
+                          <>
+                            <Textarea
+                              value={prompt}
+                              onChange={(e) => setPrompt(e.target.value)}
+                              className="min-h-[180px] resize-y text-xs leading-relaxed"
+                            />
+                            <div className="mt-3 flex items-center justify-end">
+                              <Button
+                                size="sm"
+                                onClick={handleConfirmPrompt}
+                                variant="outline"
+                                className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
+                              >
+                                <Wand2 className="mr-1 h-3.5 w-3.5" />
+                                确认开始复刻
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
+                          <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed text-foreground/80">
+                            {entry.prompt}
+                          </pre>
+                        )
                       )}
                       {entry.kind === 'video' && (
-                        <div className="overflow-hidden rounded-md border border-border/30 bg-black">
-                          <video src={entry.url} controls playsInline className="aspect-video w-full object-contain" />
-                        </div>
+                        <>
+                          <div className="overflow-hidden rounded-md border border-border/30 bg-black">
+                            <video
+                              src={entry.url}
+                              controls
+                              autoPlay={phase === 'result' && isLast}
+                              playsInline
+                              className="aspect-video w-full object-contain"
+                            />
+                          </div>
+                          {phase === 'result' && isLast && (
+                            <div className="mt-3 flex items-center justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={reset}
+                                className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
+                              >
+                                再生成一批
+                              </button>
+                              <Button
+                                size="sm"
+                                onClick={handleAddToAssets}
+                                variant="outline"
+                                className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
+                              >
+                                <Check className="mr-1 h-3.5 w-3.5" />
+                                添加到素材
+                              </Button>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
@@ -1782,42 +1852,7 @@ function OranGenInlinePanel({
         </div>
       )}
 
-
-      {/* Phase: select-video */}
-      {phase === 'select-video' && (
-        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="text-xs font-medium text-foreground">选择对标爆款视频</div>
-            <span className="text-[10px] text-muted-foreground/60">点击任意视频开始复刻</span>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {ORAN_REFERENCE_VIDEOS.map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                onClick={() => handlePickVideo(v)}
-                className="group overflow-hidden rounded-lg border border-border/40 bg-muted/10 text-left transition-all hover:border-[#FF5500]/40 hover:shadow-md"
-              >
-                <div className="relative aspect-[9/14] bg-black">
-                  <video src={v.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
-                  <div className="absolute right-1 top-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
-                    命中 {v.hit}%
-                  </div>
-                </div>
-                <div className="p-1.5">
-                  <div className="truncate text-[11px] text-foreground">{v.title}</div>
-                  <div className="mt-0.5 flex items-center justify-between text-[10px] text-muted-foreground">
-                    <span>{v.views}</span>
-                    <span>{v.tag}</span>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Phase: prompt-gen */}
+      {/* Phase: prompt-gen (loading) */}
       {phase === 'prompt-gen' && (
         <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -1827,39 +1862,7 @@ function OranGenInlinePanel({
         </div>
       )}
 
-      {/* Phase: prompt-edit */}
-      {phase === 'prompt-edit' && (
-        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="text-xs font-medium text-foreground">复刻 Prompt（可编辑）</div>
-            <button
-              type="button"
-              onClick={() => setPhase('select-video')}
-              className="text-[10px] text-muted-foreground underline-offset-2 hover:underline"
-            >
-              重新选择视频
-            </button>
-          </div>
-          <Textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[180px] resize-y text-xs leading-relaxed"
-          />
-          <div className="mt-3 flex items-center justify-end">
-            <Button
-              size="sm"
-              onClick={handleConfirmPrompt}
-              variant="outline"
-              className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
-            >
-              <Wand2 className="mr-1 h-3.5 w-3.5" />
-              确认开始复刻
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Phase: rendering */}
+      {/* Phase: rendering (loading) */}
       {phase === 'rendering' && (
         <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
           <div className="mb-2 text-xs font-medium text-foreground">视频专家正在合成…</div>
@@ -1886,36 +1889,6 @@ function OranGenInlinePanel({
                 </div>
               );
             })}
-          </div>
-        </div>
-      )}
-
-      {/* Phase: result */}
-      {phase === 'result' && (
-        <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="text-xs font-medium text-foreground">复刻视频预览</div>
-            <button
-              type="button"
-              onClick={reset}
-              className="text-[10px] text-muted-foreground underline-offset-2 hover:underline"
-            >
-              再生成一批
-            </button>
-          </div>
-          <div className="overflow-hidden rounded-lg border border-border/30 bg-black">
-            <video src={ORAN_RESULT_VIDEO} controls autoPlay playsInline className="aspect-video w-full object-contain" />
-          </div>
-          <div className="mt-3 flex items-center justify-end gap-2">
-            <Button
-              size="sm"
-              onClick={handleAddToAssets}
-              variant="outline"
-              className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
-            >
-              <Check className="mr-1 h-3.5 w-3.5" />
-              添加到素材
-            </Button>
           </div>
         </div>
       )}
