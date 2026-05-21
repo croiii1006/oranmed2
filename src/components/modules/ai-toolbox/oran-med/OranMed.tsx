@@ -280,7 +280,7 @@ function NewTaskView({
                     className="flex-1 min-w-0 border-0 bg-transparent text-base font-normal leading-7 tracking-[0.01em] text-neutral-700 placeholder:text-muted-foreground/65 outline-none focus:ring-0"
                   />
                 </div>
-                <Select value={brief.platform} onValueChange={(v) => updateBrief({ platform: v as Platform })}>
+                <Select value={brief.platform} onValueChange={(v) => { if (v !== brief.platform) setCreators([]); updateBrief({ platform: v as Platform }); }}>
                   <SelectTrigger className="h-8 w-auto gap-1.5 rounded-full border border-border/60 bg-muted/70 px-3 text-xs font-light text-muted-foreground shadow-none hover:bg-muted hover:border-accent/50 focus:ring-0">
                     <SelectValue />
                   </SelectTrigger>
