@@ -236,7 +236,7 @@ function NewTaskView({
           >
 
             {/* Brief input card */}
-            <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+            <div className="relative flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
               {/* Header: orange dot + Brief title input + platform pill */}
               <div className="mb-3 flex items-center gap-3">
                 <span className="relative flex h-3 w-3 items-center justify-center flex-shrink-0">
