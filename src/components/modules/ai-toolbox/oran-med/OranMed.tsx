@@ -1499,12 +1499,14 @@ function OranGenInlinePanel({
   hasAssets,
   onGenerated,
   onSwitchMode,
+  onReopen,
 }: {
   brief: { goal: string; brandName: string; brandCategory: string };
   creatorIds: string[];
   hasAssets: boolean;
   onGenerated: (count: number) => void;
   onSwitchMode: () => void;
+  onReopen?: () => void;
 }) {
   const steps = [
     { key: 'brief', label: '读取 Brief 与目标人群', agent: 'Brief 解析' },
