@@ -3,13 +3,14 @@ import { useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   CheckCircle2,
-  
+  ChevronDown,
   ChevronRight,
   ClipboardList,
   Database,
   FileText,
   Image as ImageIcon,
   ListChecks,
+  ListFilter,
   Play,
   Plus,
   Sparkles,
@@ -18,6 +19,7 @@ import {
   Users,
   Wand2,
 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OranMedProvider, useOranMed } from './context/OranMedContext';
 import { CREATORS } from './data/creators';
 import {
@@ -392,17 +394,19 @@ function NewTaskView({
                     <span className="text-sm font-light tracking-wide text-foreground/70">
                       {pickMode === 'ai' ? 'AI 推荐达人' : '手动选择达人'}
                     </span>
-                    <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
-                      {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
-                    </span>
                     {pickMode === 'manual' && !matching ? (
-                      <ManualFilterBar
+                      <ManualFilterDropdown
+                        count={recommendedCreators.length}
                         territory={manualTerritory}
                         gender={manualGender}
                         onTerritory={setManualTerritory}
                         onGender={setManualGender}
                       />
-                    ) : null}
+                    ) : (
+                      <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
+                        {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
+                      </span>
+                    )}
                   </div>
                   <span className="text-[11px] font-light text-muted-foreground">
                     {matching ? '基于 Brief 与人群分析中' : `已选 ${selectedCreatorIds.length} 位`}
@@ -573,12 +577,14 @@ function PlainField({
   );
 }
 
-function ManualFilterBar({
+function ManualFilterDropdown({
+  count,
   territory,
   gender,
   onTerritory,
   onGender,
 }: {
+  count: number;
   territory: 'all' | 'cn' | 'overseas';
   gender: 'all' | 'male' | 'female';
   onTerritory: (v: 'all' | 'cn' | 'overseas') => void;
@@ -586,22 +592,47 @@ function ManualFilterBar({
 }) {
   const chip = (active: boolean) =>
     cn(
-      'rounded-full border px-2 py-0.5 text-[10px] font-light transition-colors',
+      'rounded-full border px-3 py-1 text-xs font-light transition-colors',
       active
-        ? 'border-foreground/30 bg-foreground text-background'
-        : 'border-border/50 bg-background/60 text-muted-foreground hover:border-foreground/20 hover:text-foreground',
+        ? 'border-foreground bg-foreground text-background'
+        : 'border-border/60 bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground',
     );
+  const territoryLabel =
+    territory === 'all' ? '全部达人' : territory === 'cn' ? '中国达人' : '海外达人';
   return (
-    <div className="ml-1 flex items-center gap-1.5">
-      <span className="text-[10px] font-light text-muted-foreground/60">区域</span>
-      <button type="button" className={chip(territory === 'all')} onClick={() => onTerritory('all')}>全部</button>
-      <button type="button" className={chip(territory === 'cn')} onClick={() => onTerritory('cn')}>中国</button>
-      <button type="button" className={chip(territory === 'overseas')} onClick={() => onTerritory('overseas')}>海外</button>
-      <span className="ml-1 text-[10px] font-light text-muted-foreground/60">性别</span>
-      <button type="button" className={chip(gender === 'all')} onClick={() => onGender('all')}>全部</button>
-      <button type="button" className={chip(gender === 'male')} onClick={() => onGender('male')}>男</button>
-      <button type="button" className={chip(gender === 'female')} onClick={() => onGender('female')}>女</button>
-    </div>
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/80 px-3 py-1 text-xs font-light text-foreground/80 shadow-sm hover:border-foreground/30"
+        >
+          <ListFilter className="h-3.5 w-3.5" />
+          <span>{territoryLabel}</span>
+          <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{count}</span>
+          <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-60 rounded-2xl p-4">
+        <div className="space-y-3">
+          <div>
+            <div className="mb-1.5 text-xs text-muted-foreground">区域</div>
+            <div className="flex flex-wrap gap-1.5">
+              <button type="button" className={chip(territory === 'all')} onClick={() => onTerritory('all')}>全部</button>
+              <button type="button" className={chip(territory === 'cn')} onClick={() => onTerritory('cn')}>中国</button>
+              <button type="button" className={chip(territory === 'overseas')} onClick={() => onTerritory('overseas')}>海外</button>
+            </div>
+          </div>
+          <div>
+            <div className="mb-1.5 text-xs text-muted-foreground">性别</div>
+            <div className="flex flex-wrap gap-1.5">
+              <button type="button" className={chip(gender === 'all')} onClick={() => onGender('all')}>全部</button>
+              <button type="button" className={chip(gender === 'male')} onClick={() => onGender('male')}>男</button>
+              <button type="button" className={chip(gender === 'female')} onClick={() => onGender('female')}>女</button>
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
