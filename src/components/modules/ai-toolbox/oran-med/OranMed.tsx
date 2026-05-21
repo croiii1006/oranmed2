@@ -447,7 +447,6 @@ function NewTaskView({
                       const bg = `hsla(24, ${s}%, ${l}%, 0.12)`;
                       return { color, bg };
                     })();
-                    const genderLabel = c.gender === 'female' ? '女性' : '男性';
                     return (
                       <button
                         key={c.id}
@@ -500,24 +499,26 @@ function NewTaskView({
                           <div className="flex h-full flex-col justify-between">
                             <div className="space-y-1">
                               <div className="text-[10px] font-medium tracking-[0.08em] text-foreground/45">
-                                CREATOR INFO
+                                KOL · {c.platform}
                               </div>
                               <div className="text-[13px] font-semibold text-foreground">{c.followers} 粉丝</div>
                               <div className="text-[11px] text-muted-foreground">均播 {c.avgPlay}</div>
                             </div>
 
                             <div className="space-y-1.5">
-                              {pickMode === 'ai' && c.matchReason ? (
-                                <div className="space-y-0.5">
-                                  <div className="text-[9px] font-medium tracking-[0.08em] text-foreground/45">匹配原因</div>
-                                  <div className="line-clamp-2 text-[11px] leading-snug text-foreground/75">{c.matchReason}</div>
+                              {c.tags && c.tags.length > 0 ? (
+                                <div className="flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
+                                  {c.tags.slice(0, 2).map((t) => (
+                                    <span key={t} className="rounded-full bg-background/80 px-2 py-0.5">{t}</span>
+                                  ))}
                                 </div>
                               ) : null}
-                              <div className="flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
-                                {c.region ? <span className="rounded-full bg-background/80 px-2 py-0.5">{c.region}</span> : null}
-                                <span className="rounded-full bg-background/80 px-2 py-0.5">{genderLabel}</span>
-                              </div>
-                              <div className="truncate text-[11px] text-foreground/75">{c.tags[0] ?? c.platform}</div>
+                              {pickMode === 'ai' && c.matchReason ? (
+                                <div className="flex items-start gap-1 text-[11px] leading-snug text-foreground/75">
+                                  <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-accent" />
+                                  <span className="line-clamp-2">{c.matchReason}</span>
+                                </div>
+                              ) : null}
                             </div>
                           </div>
                         </div>
