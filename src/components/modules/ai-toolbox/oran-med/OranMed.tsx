@@ -126,7 +126,7 @@ function NewTaskView({
   const [pickMode, setPickMode] = useState<'ai' | 'manual'>('ai');
   const [stage, setStage] = useState<'entry' | 'brief'>('entry');
   const [rawInput, setRawInput] = useState('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [parsing, setParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
