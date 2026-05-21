@@ -549,6 +549,62 @@ function NewTaskView({
 }
 
 // Custom 4-point sparkle with orange gradient
+function PlainField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+      <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="min-w-0 w-full border-0 bg-transparent py-0 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
+      />
+    </div>
+  );
+}
+
+function ManualFilterBar({
+  territory,
+  gender,
+  onTerritory,
+  onGender,
+}: {
+  territory: 'all' | 'cn' | 'overseas';
+  gender: 'all' | 'male' | 'female';
+  onTerritory: (v: 'all' | 'cn' | 'overseas') => void;
+  onGender: (v: 'all' | 'male' | 'female') => void;
+}) {
+  const chip = (active: boolean) =>
+    cn(
+      'rounded-full border px-2 py-0.5 text-[10px] font-light transition-colors',
+      active
+        ? 'border-foreground/30 bg-foreground text-background'
+        : 'border-border/50 bg-background/60 text-muted-foreground hover:border-foreground/20 hover:text-foreground',
+    );
+  return (
+    <div className="ml-1 flex items-center gap-1.5">
+      <span className="text-[10px] font-light text-muted-foreground/60">区域</span>
+      <button type="button" className={chip(territory === 'all')} onClick={() => onTerritory('all')}>全部</button>
+      <button type="button" className={chip(territory === 'cn')} onClick={() => onTerritory('cn')}>中国</button>
+      <button type="button" className={chip(territory === 'overseas')} onClick={() => onTerritory('overseas')}>海外</button>
+      <span className="ml-1 text-[10px] font-light text-muted-foreground/60">性别</span>
+      <button type="button" className={chip(gender === 'all')} onClick={() => onGender('all')}>全部</button>
+      <button type="button" className={chip(gender === 'male')} onClick={() => onGender('male')}>男</button>
+      <button type="button" className={chip(gender === 'female')} onClick={() => onGender('female')}>女</button>
+    </div>
+  );
+}
+
 function SparkleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
