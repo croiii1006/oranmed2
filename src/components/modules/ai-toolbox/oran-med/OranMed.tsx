@@ -1503,7 +1503,7 @@ function OranGenInlinePanel({
   onGenerated,
   onSwitchMode,
 }: {
-  brief: { goal: string; brandName: string; brandCategory: string };
+  brief: { goal: string; brandName: string; brandCategory: string; brandTags: string };
   creatorIds: string[];
   hasAssets: boolean;
   productImage: { name: string; url: string } | null;
@@ -1557,7 +1557,7 @@ function OranGenInlinePanel({
         </div>
 
         {/* 上传商品白底图 */}
-        <div className="mt-3">
+        <div className="mt-3 flex items-start gap-3">
           <input
             ref={fileInputRef}
             type="file"
@@ -1565,38 +1565,64 @@ function OranGenInlinePanel({
             className="hidden"
             onChange={(e) => handleFile(e.target.files?.[0])}
           />
+          {/* 左：上传方形区 */}
           {productImage ? (
-            <div className="flex items-center gap-3 rounded-xl border border-border/40 bg-muted/20 p-2">
-              <img src={productImage.url} alt={productImage.name} className="h-12 w-12 rounded-lg object-cover" />
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-xs text-foreground">{productImage.name}</div>
-                <div className="text-[10px] text-muted-foreground">商品白底图已上传</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
-              >
-                更换
-              </button>
+            <div className="group relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border/40 bg-muted/20">
+              <img src={productImage.url} alt={productImage.name} className="h-full w-full object-cover" />
               <button
                 type="button"
                 onClick={() => onProductImageChange(null)}
-                className="rounded-full p-1 text-muted-foreground hover:bg-muted/40"
+                className="absolute right-1 top-1 rounded-full bg-background/80 p-1 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
               >
                 <Trash2 className="h-3 w-3" />
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute inset-x-0 bottom-0 bg-background/80 py-0.5 text-[10px] text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+              >
+                更换
               </button>
             </div>
           ) : (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border/60 bg-muted/10 px-3 py-3 text-xs text-muted-foreground transition-colors hover:border-accent/40 hover:bg-muted/30 hover:text-foreground"
+              className="flex h-24 w-24 shrink-0 flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-border/60 bg-muted/10 text-[11px] text-muted-foreground transition-colors hover:border-accent/40 hover:bg-muted/30 hover:text-foreground"
             >
-              <Upload className="h-3.5 w-3.5" />
-              上传商品白底图（可选，用于风格参考）
+              <Plus className="h-4 w-4" />
+              上传商品白底图
             </button>
           )}
+
+          {/* 右：自动同步的卖点标签 */}
+          <div className="min-w-0 flex-1 self-stretch">
+            {(() => {
+              const tags = (brief.brandTags || '')
+                .split(/[,，、]/)
+                .map((t) => t.trim())
+                .filter(Boolean);
+              if (tags.length === 0) {
+                return (
+                  <div className="flex h-full min-h-[6rem] items-center text-xs text-muted-foreground/60">
+                    Brief 卖点为空，将自动跳过此参考
+                  </div>
+                );
+              }
+              return (
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map((t) => (
+                    <span
+                      key={t}
+                      className="inline-flex items-center rounded-full border border-[#FF5500]/20 bg-[#FF5500]/5 px-2.5 py-1 text-[11px] text-[#FF5500]"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
         </div>
 
         {phase === 'idle' ? (
