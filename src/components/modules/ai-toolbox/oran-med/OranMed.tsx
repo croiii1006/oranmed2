@@ -573,7 +573,7 @@ function EntryStage({
   const hasInput = Boolean(rawInput.trim() || uploadedFiles.length > 0);
   return (
     <div className="w-full max-w-3xl">
-      <div className="relative h-[460px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+      <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
         {/* Upload trigger — fixed size, doesn't grow with files */}
         <button
           type="button"
