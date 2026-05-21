@@ -905,35 +905,53 @@ function EntryStage({
     files.filter((f) => ACCEPT_RE.test(f.name) || ACCEPT_RE.test(f.type));
 
   return (
-    <div className="w-full max-w-3xl">
-      <div className="relative h-[430px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+    <div
+      className="w-full max-w-3xl"
+      onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
+      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; setDragOver(true); }}
+      onDragLeave={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+        setDragOver(false);
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragOver(false);
+        const dropped = Array.from(e.dataTransfer.files ?? []);
+        mergeFiles(filterAccepted(dropped));
+      }}
+    >
+      <div className={cn(
+        "relative h-[430px] flex flex-col rounded-[28px] border bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150 transition-colors",
+        dragOver ? "border-accent/70 ring-2 ring-accent/30" : "border-white/40",
+      )}>
+        {dragOver ? (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[28px] bg-accent/10 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2 text-accent">
+              <Upload className="h-8 w-8" />
+              <div className="text-sm font-light tracking-wide">松开以上传文件</div>
+              <div className="text-[11px] font-light text-muted-foreground">支持 PDF / 图片 / Word / 文本</div>
+            </div>
+          </div>
+        ) : null}
         {/* Upload trigger — fixed size, doesn't grow with files */}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={parsing}
-          onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
-          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; setDragOver(true); }}
-          onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(false); }}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setDragOver(false);
-            const dropped = Array.from(e.dataTransfer.files ?? []);
-            mergeFiles(filterAccepted(dropped));
-          }}
           className={cn(
             'group flex flex-shrink-0 items-center gap-3 rounded-xl border border-dashed px-4 py-3 text-left transition-colors disabled:opacity-50',
-            dragOver
-              ? 'border-accent bg-accent/10'
-              : 'border-border/60 bg-muted/30 hover:border-accent/50 hover:bg-muted/50',
+            'border-border/60 bg-muted/30 hover:border-accent/50 hover:bg-muted/50',
           )}
         >
-          <Upload className={cn('h-4 w-4', dragOver ? 'text-accent' : 'text-muted-foreground')} />
+          <Upload className="h-4 w-4 text-muted-foreground" />
+
           <div className="flex-1 min-w-0">
             <div className="text-sm font-light text-foreground/80">
-              {dragOver ? '松开以上传' : '上传 Brief 文件'}
-              {!dragOver && uploadedFiles.length > 0 ? (
+              上传 Brief 文件
+              {uploadedFiles.length > 0 ? (
                 <span className="ml-2 text-[11px] font-light text-muted-foreground">
                   已选 {uploadedFiles.length} 个
                 </span>
@@ -941,7 +959,7 @@ function EntryStage({
             </div>
             <div className="text-[11px] font-light text-muted-foreground/70">支持 PDF / 图片 / Word / 文本 · 可多选 · 可拖拽</div>
           </div>
-          {uploadedFiles.length > 0 && !dragOver ? (
+          {uploadedFiles.length > 0 ? (
             <span
               onClick={(e) => {
                 e.stopPropagation();
@@ -953,6 +971,7 @@ function EntryStage({
             </span>
           ) : null}
         </button>
+
         <input
           ref={fileInputRef}
           type="file"
