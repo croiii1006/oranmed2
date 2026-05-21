@@ -3192,6 +3192,10 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
         onOpen={() => {
           if (detailTask) {
             loadTask(detailTask.id);
+            if (detailTask.status === 'rejected') {
+              // Move back to draft so the user can edit and resubmit
+              setTimeout(() => setStatus('draft'), 0);
+            }
             setDetailId(null);
             onOpenWorkflow();
           }
