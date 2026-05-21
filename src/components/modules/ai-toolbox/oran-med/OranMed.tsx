@@ -691,7 +691,8 @@ function MetaField({
     if (!el) return;
     const widths = Array.from(el.children).map((c) => (c as HTMLElement).offsetWidth);
     setTagWidths(widths);
-  }, [tags]);
+  }, [value]);
+
 
 
   if (type === 'date') {
