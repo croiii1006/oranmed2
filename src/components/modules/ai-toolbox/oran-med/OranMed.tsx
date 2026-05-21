@@ -537,6 +537,135 @@ function MetaField({
   );
 }
 
+function EntryStage({
+  rawInput,
+  setRawInput,
+  uploadedFile,
+  setUploadedFile,
+  fileInputRef,
+  parsing,
+  onSmartParse,
+  onManual,
+}: {
+  rawInput: string;
+  setRawInput: (v: string) => void;
+  uploadedFile: File | null;
+  setUploadedFile: (f: File | null) => void;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  parsing: boolean;
+  onSmartParse: () => void;
+  onManual: () => void;
+}) {
+  const hasInput = Boolean(rawInput.trim() || uploadedFile);
+  return (
+    <div className="w-full max-w-3xl">
+      <div className="relative flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+        {/* Upload area */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={parsing}
+          className="group flex items-center gap-3 rounded-xl border border-dashed border-border/60 bg-muted/30 px-4 py-3 text-left transition-colors hover:border-accent/50 hover:bg-muted/50 disabled:opacity-50"
+        >
+          <Upload className="h-4 w-4 text-muted-foreground" />
+          <div className="flex-1 min-w-0">
+            {uploadedFile ? (
+              <div className="truncate text-sm font-light text-foreground">{uploadedFile.name}</div>
+            ) : (
+              <>
+                <div className="text-sm font-light text-foreground/80">上传 Brief 文件</div>
+                <div className="text-[11px] font-light text-muted-foreground/70">支持 PDF / 图片 / Word / 文本</div>
+              </>
+            )}
+          </div>
+          {uploadedFile ? (
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                setUploadedFile(null);
+              }}
+              className="text-[11px] font-light text-muted-foreground hover:text-foreground"
+            >
+              移除
+            </span>
+          ) : null}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx,.txt,image/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) setUploadedFile(f);
+            e.target.value = '';
+          }}
+        />
+
+        {/* Divider */}
+        <div className="my-4 flex items-center gap-3 text-[11px] font-light text-muted-foreground/60">
+          <span className="h-px flex-1 bg-border/50" />
+          <span>或粘贴文字</span>
+          <span className="h-px flex-1 bg-border/50" />
+        </div>
+
+        {/* Paste textarea */}
+        <div className="flex flex-col rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+          <Textarea
+            value={rawInput}
+            onChange={(e) => setRawInput(e.target.value)}
+            disabled={parsing}
+            placeholder="粘贴 Brief 内容，例如品牌背景、推广目标、卖点、调性、人群、预算等…"
+            className="min-h-[180px] resize-none border-0 bg-transparent p-0 text-[15px] font-normal leading-[1.7] text-foreground/85 placeholder:text-muted-foreground/65 shadow-none focus-visible:ring-0 caret-accent"
+          />
+        </div>
+
+        {/* Loading overlay */}
+        {parsing ? (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-[28px] bg-background/70 backdrop-blur-sm">
+            <div
+              className="grid gap-x-1.5 gap-y-1.5"
+              style={{ gridTemplateColumns: 'repeat(8, minmax(0, 1fr))' }}
+            >
+              {Array.from({ length: 32 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="h-1 w-1 rounded-full bg-neutral-400"
+                  style={{ animation: `dot-glow 3.2s ease-in-out ${i * 0.09}s infinite` }}
+                />
+              ))}
+            </div>
+            <div className="mt-6 text-[12px] font-light tracking-[0.12em] text-muted-foreground">
+              AI 正在智能解析 Brief…
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {/* Bottom actions */}
+      <div className="mt-5 flex items-center justify-end gap-4 px-1">
+        <button
+          type="button"
+          onClick={onManual}
+          disabled={parsing}
+          className="text-sm font-light text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          手动创建
+        </button>
+        <button
+          type="button"
+          onClick={onSmartParse}
+          disabled={!hasInput || parsing}
+          className="flex items-center gap-2.5 rounded-full bg-card px-6 py-2.5 text-sm font-light text-foreground/70 shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <SparkleIcon />
+          <span>智能解析</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ============== Workflow (after Brief saved) ==============
 function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: () => void }) {
   const {
