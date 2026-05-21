@@ -235,11 +235,11 @@ export function CreatorSelectionDialog({
                         </div>
                       ) : null}
 
-                      <div className="relative z-10 h-[58px] w-[58px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-focus-visible:scale-[1.04] group-focus-visible:opacity-15">
+                      <div className="relative z-10 h-[58px] w-[58px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-hover:blur-md group-focus-visible:scale-[1.04] group-focus-visible:opacity-15 group-focus-visible:blur-md">
                         <img src={item.avatarUrl} alt={item.name} className="h-full w-full object-cover" />
                       </div>
 
-                      <div className="relative z-10 mt-2.5 min-w-0 transition-opacity duration-200 group-hover:opacity-10 group-focus-visible:opacity-10">
+                      <div className="relative z-10 mt-2.5 min-w-0 transition-all duration-200 group-hover:opacity-10 group-hover:blur-md group-focus-visible:opacity-10 group-focus-visible:blur-md">
                         <div className="truncate text-[13px] font-light tracking-[-0.01em] text-foreground sm:text-sm">
                           {item.name}
                         </div>
