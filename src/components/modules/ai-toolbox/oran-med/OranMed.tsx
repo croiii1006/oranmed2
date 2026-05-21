@@ -3348,19 +3348,39 @@ function TaskDetailDialog({
                       <p className="text-xs text-muted-foreground">尚未上传或生成内容</p>
                     ) : (
                       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                        {task.assets.map((a) => (
-                          <button
-                            key={a.id}
-                            onClick={() => setView({ kind: 'asset', id: a.id })}
-                            className="overflow-hidden rounded-lg border border-border/40 text-left transition-all hover:border-foreground/30 hover:shadow-sm"
-                          >
-                            <div className={cn('h-16 w-full bg-gradient-to-br', a.thumbnailColor)} />
-                            <div className="px-2 py-1.5">
-                              <div className="truncate text-[11px] font-medium text-foreground">{a.title}</div>
-                              <div className="text-[10px] text-muted-foreground">{a.source === 'local' ? '本地上传' : 'ORAN GEN'} · {a.status}</div>
-                            </div>
-                          </button>
-                        ))}
+                        {task.assets.map((a) => {
+                          const isOranGen = a.source === 'orangen';
+                          return (
+                            <button
+                              key={a.id}
+                              onClick={() => setView({ kind: 'asset', id: a.id })}
+                              className="overflow-hidden rounded-lg border border-border/40 text-left transition-all hover:border-foreground/30 hover:shadow-sm"
+                            >
+                              <div className={cn('relative h-24 w-full overflow-hidden', !isOranGen && 'bg-gradient-to-br', !isOranGen && a.thumbnailColor)}>
+                                {isOranGen ? (
+                                  <video
+                                    src={ORAN_RESULT_VIDEO}
+                                    className="h-full w-full object-cover"
+                                    muted
+                                    playsInline
+                                    preload="metadata"
+                                  />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center">
+                                    <ImageIcon className="h-5 w-5 text-white/70" />
+                                  </div>
+                                )}
+                                <div className="absolute left-1.5 top-1.5 rounded bg-black/60 px-1.5 py-0.5 text-[9px] text-white">
+                                  {isOranGen ? 'OranGen' : '本地'}
+                                </div>
+                              </div>
+                              <div className="px-2 py-1.5">
+                                <div className="truncate text-[11px] font-medium text-foreground">{a.title}</div>
+                                <div className="text-[10px] text-muted-foreground">{isOranGen ? 'ORAN GEN' : '本地上传'} · {a.status}</div>
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </section>
