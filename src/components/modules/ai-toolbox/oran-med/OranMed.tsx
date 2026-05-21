@@ -486,6 +486,7 @@ function NewTaskView({
             </div>
           ) : null}
         </div>
+        )}
       </div>
     </div>
   );
