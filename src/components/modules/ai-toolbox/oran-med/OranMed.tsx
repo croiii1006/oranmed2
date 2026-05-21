@@ -3138,9 +3138,17 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
                   <span className="text-[10px] font-light text-muted-foreground/70">
                     {formatDate(t.updatedAt)} · {t.brief.brandName || '未命名品牌'}
                   </span>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-background bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-                    {avatarLabel}
-                  </div>
+                  {firstCreator?.avatarUrl ? (
+                    <img
+                      src={firstCreator.avatarUrl}
+                      alt={firstCreator.name}
+                      className="h-11 w-11 rounded-full border-2 border-background object-cover shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+                    />
+                  ) : (
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-background bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                      {avatarLabel}
+                    </div>
+                  )}
                 </div>
               </div>
             </button>
@@ -3304,9 +3312,18 @@ function TaskDetailDialog({
                             onClick={() => setView({ kind: 'creator', id: c.id })}
                             className="flex w-full items-center justify-between rounded-lg border border-border/40 px-3 py-2 text-left text-xs transition-colors hover:border-foreground/30 hover:bg-muted/30"
                           >
-                            <div className="min-w-0">
-                              <div className="truncate font-medium text-foreground">{c.name} <span className="ml-1 text-[10px] text-muted-foreground">{c.handle}</span></div>
-                              <div className="mt-0.5 text-[10px] text-muted-foreground">{c.tier} · {c.followers} 粉丝 · 匹配度 {c.matchScore}</div>
+                            <div className="flex min-w-0 items-center gap-2">
+                              {c.avatarUrl ? (
+                                <img src={c.avatarUrl} alt={c.name} className="h-8 w-8 shrink-0 rounded-full object-cover" />
+                              ) : (
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/60 text-[11px] font-light text-foreground/60">
+                                  {c.name.slice(0, 1)}
+                                </div>
+                              )}
+                              <div className="min-w-0">
+                                <div className="truncate font-medium text-foreground">{c.name} <span className="ml-1 text-[10px] text-muted-foreground">{c.handle}</span></div>
+                                <div className="mt-0.5 text-[10px] text-muted-foreground">{c.tier} · {c.followers} 粉丝 · 匹配度 {c.matchScore}</div>
+                              </div>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <Badge variant="secondary" className="text-[10px]">{c.platform}</Badge>
@@ -3379,9 +3396,13 @@ function TaskDetailDialog({
               {view.kind === 'creator' && activeCreator && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/20 p-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60">
-                      {activeCreator.name.slice(0, 1)}
-                    </div>
+                    {activeCreator.avatarUrl ? (
+                      <img src={activeCreator.avatarUrl} alt={activeCreator.name} className="h-12 w-12 rounded-full object-cover" />
+                    ) : (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60">
+                        {activeCreator.name.slice(0, 1)}
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-medium text-foreground">{activeCreator.name}</div>
                       <div className="truncate text-[11px] text-muted-foreground">{activeCreator.handle} · {activeCreator.platform}</div>
