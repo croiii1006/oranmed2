@@ -2050,12 +2050,12 @@ function PlanFormStep({
             {task.assets.length === 0 ? (
               <div className="text-xs text-muted-foreground">无</div>
             ) : (
-              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+              <div className="flex flex-wrap gap-2">
                 {task.assets.map((a) => {
                   const creator = CREATORS.find((cc) => cc.id === a.creatorId);
                   const isOranGen = a.source === 'orangen';
                   return (
-                    <div key={a.id} className="overflow-hidden rounded-md border border-border/40 bg-background/60">
+                    <div key={a.id} className="w-[96px] overflow-hidden rounded-md border border-border/40 bg-background/60">
                       <div className={cn('relative aspect-[9/14]', !isOranGen && a.thumbnailColor)}>
                         {isOranGen ? (
                           <video
@@ -2074,8 +2074,7 @@ function PlanFormStep({
                           {isOranGen ? 'OranGen' : '本地'}
                         </div>
                       </div>
-                      <div className="p-1 text-[10px]">
-                        <div className="truncate text-foreground">{a.title}</div>
+                      <div className="px-1.5 py-1 text-[10px] leading-tight">
                         <div className="truncate text-muted-foreground">{creator?.name ?? '未指派'}</div>
                       </div>
                     </div>
