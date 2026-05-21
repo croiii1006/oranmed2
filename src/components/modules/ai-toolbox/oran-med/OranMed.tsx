@@ -3396,9 +3396,13 @@ function TaskDetailDialog({
               {view.kind === 'creator' && activeCreator && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/20 p-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60">
-                      {activeCreator.name.slice(0, 1)}
-                    </div>
+                    {activeCreator.avatarUrl ? (
+                      <img src={activeCreator.avatarUrl} alt={activeCreator.name} className="h-12 w-12 rounded-full object-cover" />
+                    ) : (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60">
+                        {activeCreator.name.slice(0, 1)}
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-medium text-foreground">{activeCreator.name}</div>
                       <div className="truncate text-[11px] text-muted-foreground">{activeCreator.handle} · {activeCreator.platform}</div>
