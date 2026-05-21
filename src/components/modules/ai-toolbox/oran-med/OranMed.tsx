@@ -314,7 +314,16 @@ function NewTaskView({
             </div>
 
             {/* Bottom actions */}
-            <div className="mt-5 flex items-center justify-end px-1">
+            <div className="mt-5 flex items-center justify-between px-1">
+              {!creatorsOpen ? (
+                <button
+                  type="button"
+                  onClick={() => setStage('entry')}
+                  className="text-sm font-light text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  ← 返回上一步
+                </button>
+              ) : <span />}
               {!creatorsOpen ? (
                 <div className="flex items-center gap-4">
                   {!isBriefComplete ? (
