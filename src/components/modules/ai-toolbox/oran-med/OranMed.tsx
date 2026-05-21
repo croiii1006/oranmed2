@@ -221,7 +221,19 @@ function NewTaskView({
           </p>
         </div>
 
-        {/* Two-panel layout: brief shifts left when creators open */}
+        {stage === 'entry' ? (
+          <EntryStage
+            rawInput={rawInput}
+            setRawInput={setRawInput}
+            uploadedFile={uploadedFile}
+            setUploadedFile={setUploadedFile}
+            fileInputRef={fileInputRef}
+            parsing={parsing}
+            onSmartParse={handleSmartParse}
+            onManual={handleManual}
+          />
+        ) : (
+        /* Two-panel layout: brief shifts left when creators open */
         <div
           className={cn(
             'flex w-full items-stretch justify-center gap-6 transition-all duration-500 ease-out',
