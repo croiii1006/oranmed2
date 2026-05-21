@@ -297,14 +297,7 @@ function NewTaskView({
             </div>
 
             {/* Bottom actions */}
-            <div className="mt-5 flex items-center justify-between px-1">
-              <button
-                type="button"
-                className="flex items-center gap-2 px-1 py-1 text-sm font-light text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <Database className="h-4 w-4" />
-                <span>记忆库</span>
-              </button>
+            <div className="mt-5 flex items-center justify-end px-1">
               {!creatorsOpen ? (
                 <div className="flex items-center gap-4">
                   {!isBriefComplete ? (
