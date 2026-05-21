@@ -3231,6 +3231,7 @@ function TaskDetailDialog({
   }, [open, task?.id]);
 
   const isDraft = task?.status === 'draft';
+  const isRejected = task?.status === 'rejected';
 
   const activeCreator = view.kind === 'creator' ? CREATORS.find((c) => c.id === view.id) : null;
   const activeAsset = view.kind === 'asset' ? task?.assets.find((a) => a.id === view.id) : null;
