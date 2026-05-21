@@ -20,7 +20,7 @@ import {
   Users,
   Wand2,
 } from 'lucide-react';
-import { OranGenTakeover } from './OranGenTakeover';
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OranMedProvider, useOranMed } from './context/OranMedContext';
 import { CREATORS } from './data/creators';
