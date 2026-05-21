@@ -1358,31 +1358,6 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
         onOpen={() => setDetailOpen(false)}
       />
 
-      {orangenTakeover ? (
-        <OranGenTakeover
-          prefill={{
-            category: brief.brandCategory || brief.platform,
-            sellingPoints: [brief.brandTags, brief.styleRequirements, brief.goal].filter(Boolean).join('；'),
-          }}
-          onClose={() => setOrangenTakeover(false)}
-          onFinish={() => {
-            const count = Math.max(selectedCreatorIds.length, 1);
-            for (let i = 0; i < count; i++) {
-              const cid = selectedCreatorIds[(assets.length + i) % Math.max(selectedCreatorIds.length, 1)] ?? '';
-              addAsset({
-                id: `a_${Date.now().toString(36)}${i}${Math.random().toString(36).slice(2, 4)}`,
-                creatorId: cid,
-                title: `OranGen · ${CREATORS.find((c) => c.id === cid)?.name ?? '素材'} ${i + 1}`,
-                source: 'orangen',
-                thumbnailColor: ASSET_PALETTE[(assets.length + i) % ASSET_PALETTE.length],
-                status: 'ready',
-              });
-            }
-            setOrangenTakeover(false);
-            toast.success('已加入素材库', { description: `${count} 条 ORAN GEN 生成素材已就绪` });
-          }}
-        />
-      ) : null}
     </div>
   );
 }
