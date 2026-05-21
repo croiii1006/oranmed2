@@ -1545,12 +1545,23 @@ function OranGenInlinePanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   type Phase = 'idle' | 'crawling' | 'select-video' | 'prompt-gen' | 'prompt-edit' | 'rendering' | 'result' | 'done';
+  type HistoryEntry =
+    | { id: string; kind: 'matched'; label: string }
+    | { id: string; kind: 'picked'; label: string; video: OranRefVideo }
+    | { id: string; kind: 'prompt'; label: string; prompt: string; video: OranRefVideo }
+    | { id: string; kind: 'video'; label: string; url: string };
+
   const [phase, setPhase] = useState<Phase>(hasAssets ? 'done' : 'idle');
   const [selectedVideo, setSelectedVideo] = useState<OranRefVideo | null>(null);
   const [prompt, setPrompt] = useState('');
   const [renderStep, setRenderStep] = useState(0);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const renderSteps = ['提取达人风格与镜头语言', '渲染分镜与场景', '合成口播与背景音', '合成最终短视频素材'];
+
+  const addHistory = (entry: HistoryEntry) => setHistory((h) => [...h, entry]);
+  const toggleExpand = (id: string) => setExpanded((e) => ({ ...e, [id]: !e[id] }));
 
   const handleFile = (file?: File | null) => {
     if (!file) return;
@@ -1560,25 +1571,36 @@ function OranGenInlinePanel({
 
   const start = () => {
     setPhase('crawling');
-    setTimeout(() => setPhase('select-video'), 1400);
+    setTimeout(() => {
+      addHistory({ id: `h-matched-${Date.now()}`, kind: 'matched', label: `已匹配 ${ORAN_REFERENCE_VIDEOS.length} 个对标爆款视频` });
+      setPhase('select-video');
+    }, 1400);
   };
 
   const handlePickVideo = (v: OranRefVideo) => {
     setSelectedVideo(v);
+    addHistory({ id: `h-picked-${Date.now()}`, kind: 'picked', label: `已选定对标视频：${v.title}`, video: v });
     setPhase('prompt-gen');
     setTimeout(() => {
-      setPrompt(buildOranPrompt(brief, v));
+      const p = buildOranPrompt(brief, v);
+      setPrompt(p);
+      addHistory({ id: `h-prompt-${Date.now()}`, kind: 'prompt', label: '已生成复刻 Prompt', prompt: p, video: v });
       setPhase('prompt-edit');
     }, 1200);
   };
 
   const handleConfirmPrompt = () => {
+    // update last prompt history with edited content
+    setHistory((h) => h.map((e) => (e.kind === 'prompt' && selectedVideo?.id === e.video.id ? { ...e, prompt } : e)));
     setPhase('rendering');
     setRenderStep(0);
     renderSteps.forEach((_, i) => {
       setTimeout(() => setRenderStep(i + 1), 900 * (i + 1));
     });
-    setTimeout(() => setPhase('result'), 900 * (renderSteps.length + 1));
+    setTimeout(() => {
+      addHistory({ id: `h-video-${Date.now()}`, kind: 'video', label: '已合成复刻视频', url: ORAN_RESULT_VIDEO });
+      setPhase('result');
+    }, 900 * (renderSteps.length + 1));
   };
 
   const handleAddToAssets = () => {
@@ -1590,6 +1612,8 @@ function OranGenInlinePanel({
     setSelectedVideo(null);
     setPrompt('');
     setRenderStep(0);
+    setHistory([]);
+    setExpanded({});
     setPhase('idle');
   };
 
