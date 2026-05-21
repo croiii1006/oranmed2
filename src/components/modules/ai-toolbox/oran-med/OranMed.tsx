@@ -747,31 +747,32 @@ function MetaField({
     setEditingText('');
   };
 
-  // Estimate which tags fit in the single row.
-  // Per-tag width ≈ chars * 12 (CJK ~12px) + 30 (padding + × + gap).
-  // Reserve input ~70px and (if needed) +N chip ~38px.
-  const estimateTagWidth = (t: string) => t.length * 12 + 30;
-  const INPUT_RESERVE = 70;
-  const MORE_RESERVE = 38;
+  // Measure real DOM widths of rendered tags; fall back to char-based estimate
+  // if widths aren't ready (first render).
+  const estimateTagWidth = (t: string) => t.length * 14 + 28;
+  const INPUT_RESERVE = 60; // input min-width
+  const MORE_RESERVE = 34;  // "+N" chip
+  const GAP = 6;
 
   let visibleCount = tags.length;
   if (rowWidth > 0 && tags.length > 0) {
     let used = 0;
     visibleCount = 0;
     for (let i = 0; i < tags.length; i++) {
-      const w = estimateTagWidth(tags[i]);
+      const w = (tagWidths[i] ?? estimateTagWidth(tags[i]));
       const remaining = tags.length - i - 1;
-      const reserve = INPUT_RESERVE + (remaining > 0 ? MORE_RESERVE : 0);
-      if (used + w + reserve <= rowWidth) {
-        used += w;
+      const reserve = INPUT_RESERVE + (remaining > 0 ? MORE_RESERVE + GAP : 0);
+      const gapBefore = i > 0 ? GAP : 0;
+      if (used + gapBefore + w + GAP + reserve <= rowWidth) {
+        used += gapBefore + w;
         visibleCount++;
       } else {
         break;
       }
     }
-    // Always show at least 1 tag to avoid empty row when one tag is long.
     if (visibleCount === 0) visibleCount = 1;
   }
+
 
   const hiddenCount = Math.max(0, tags.length - visibleCount);
   const visibleTags = tags.slice(0, visibleCount);
