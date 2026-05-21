@@ -225,8 +225,8 @@ function NewTaskView({
           <EntryStage
             rawInput={rawInput}
             setRawInput={setRawInput}
-            uploadedFile={uploadedFile}
-            setUploadedFile={setUploadedFile}
+            uploadedFiles={uploadedFiles}
+            setUploadedFiles={setUploadedFiles}
             fileInputRef={fileInputRef}
             parsing={parsing}
             onSmartParse={handleSmartParse}
