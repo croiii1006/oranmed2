@@ -126,7 +126,7 @@ function NewTaskView({
   const [pickMode, setPickMode] = useState<'ai' | 'manual'>('ai');
   const [stage, setStage] = useState<'entry' | 'brief'>('entry');
   const [rawInput, setRawInput] = useState('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [parsing, setParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -145,7 +145,7 @@ function NewTaskView({
   );
 
   const handleSmartParse = () => {
-    if (!rawInput.trim() && !uploadedFile) return;
+    if (!rawInput.trim() && uploadedFiles.length === 0) return;
     setParsing(true);
     setTimeout(() => {
       updateBrief({
@@ -225,8 +225,8 @@ function NewTaskView({
           <EntryStage
             rawInput={rawInput}
             setRawInput={setRawInput}
-            uploadedFile={uploadedFile}
-            setUploadedFile={setUploadedFile}
+            uploadedFiles={uploadedFiles}
+            setUploadedFiles={setUploadedFiles}
             fileInputRef={fileInputRef}
             parsing={parsing}
             onSmartParse={handleSmartParse}
@@ -545,8 +545,8 @@ function MetaField({
 function EntryStage({
   rawInput,
   setRawInput,
-  uploadedFile,
-  setUploadedFile,
+  uploadedFiles,
+  setUploadedFiles,
   fileInputRef,
   parsing,
   onSmartParse,
@@ -554,74 +554,109 @@ function EntryStage({
 }: {
   rawInput: string;
   setRawInput: (v: string) => void;
-  uploadedFile: File | null;
-  setUploadedFile: (f: File | null) => void;
+  uploadedFiles: File[];
+  setUploadedFiles: React.Dispatch<React.SetStateAction<File[]>>;
   fileInputRef: React.RefObject<HTMLInputElement>;
   parsing: boolean;
   onSmartParse: () => void;
   onManual: () => void;
 }) {
-  const hasInput = Boolean(rawInput.trim() || uploadedFile);
+  const hasInput = Boolean(rawInput.trim() || uploadedFiles.length > 0);
   return (
     <div className="w-full max-w-3xl">
-      <div className="relative flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
-        {/* Upload area */}
+      <div className="relative h-[460px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+        {/* Upload trigger — fixed size, doesn't grow with files */}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={parsing}
-          className="group flex items-center gap-3 rounded-xl border border-dashed border-border/60 bg-muted/30 px-4 py-3 text-left transition-colors hover:border-accent/50 hover:bg-muted/50 disabled:opacity-50"
+          className="group flex flex-shrink-0 items-center gap-3 rounded-xl border border-dashed border-border/60 bg-muted/30 px-4 py-3 text-left transition-colors hover:border-accent/50 hover:bg-muted/50 disabled:opacity-50"
         >
           <Upload className="h-4 w-4 text-muted-foreground" />
           <div className="flex-1 min-w-0">
-            {uploadedFile ? (
-              <div className="truncate text-sm font-light text-foreground">{uploadedFile.name}</div>
-            ) : (
-              <>
-                <div className="text-sm font-light text-foreground/80">上传 Brief 文件</div>
-                <div className="text-[11px] font-light text-muted-foreground/70">支持 PDF / 图片 / Word / 文本</div>
-              </>
-            )}
+            <div className="text-sm font-light text-foreground/80">
+              上传 Brief 文件
+              {uploadedFiles.length > 0 ? (
+                <span className="ml-2 text-[11px] font-light text-muted-foreground">
+                  已选 {uploadedFiles.length} 个
+                </span>
+              ) : null}
+            </div>
+            <div className="text-[11px] font-light text-muted-foreground/70">支持 PDF / 图片 / Word / 文本 · 可多选</div>
           </div>
-          {uploadedFile ? (
+          {uploadedFiles.length > 0 ? (
             <span
               onClick={(e) => {
                 e.stopPropagation();
-                setUploadedFile(null);
+                setUploadedFiles([]);
               }}
               className="text-[11px] font-light text-muted-foreground hover:text-foreground"
             >
-              移除
+              清空
             </span>
           ) : null}
         </button>
         <input
           ref={fileInputRef}
           type="file"
+          multiple
           accept=".pdf,.doc,.docx,.txt,image/*"
           className="hidden"
           onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) setUploadedFile(f);
+            const list = Array.from(e.target.files ?? []);
+            if (list.length) {
+              setUploadedFiles((prev) => {
+                const existing = new Set(prev.map((f) => `${f.name}_${f.size}`));
+                const merged = [...prev];
+                for (const f of list) {
+                  if (!existing.has(`${f.name}_${f.size}`)) merged.push(f);
+                }
+                return merged;
+              });
+            }
             e.target.value = '';
           }}
         />
 
+        {/* File chips — scrollable in a fixed-height strip, doesn't push layout */}
+        {uploadedFiles.length > 0 ? (
+          <div className="mt-2 flex-shrink-0 max-h-[60px] overflow-y-auto">
+            <div className="flex flex-wrap gap-1.5">
+              {uploadedFiles.map((f, i) => (
+                <span
+                  key={`${f.name}_${f.size}_${i}`}
+                  className="inline-flex max-w-[220px] items-center gap-1.5 rounded-full bg-muted/60 px-2.5 py-1 text-[11px] font-light text-foreground/70"
+                >
+                  <FileText className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                  <span className="truncate">{f.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setUploadedFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="ml-0.5 flex-shrink-0 text-muted-foreground/60 hover:text-foreground"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         {/* Divider */}
-        <div className="my-4 flex items-center gap-3 text-[11px] font-light text-muted-foreground/60">
+        <div className="my-4 flex flex-shrink-0 items-center gap-3 text-[11px] font-light text-muted-foreground/60">
           <span className="h-px flex-1 bg-border/50" />
           <span>或粘贴文字</span>
           <span className="h-px flex-1 bg-border/50" />
         </div>
 
-        {/* Paste textarea */}
-        <div className="flex flex-col rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+        {/* Paste textarea — fills remaining height */}
+        <div className="flex-1 min-h-0 flex flex-col rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
           <Textarea
             value={rawInput}
             onChange={(e) => setRawInput(e.target.value)}
             disabled={parsing}
             placeholder="粘贴 Brief 内容，例如品牌背景、推广目标、卖点、调性、人群、预算等…"
-            className="min-h-[180px] resize-none border-0 bg-transparent p-0 text-[15px] font-normal leading-[1.7] text-foreground/85 placeholder:text-muted-foreground/65 shadow-none focus-visible:ring-0 caret-accent"
+            className="flex-1 min-h-0 resize-none border-0 bg-transparent p-0 text-[15px] font-normal leading-[1.7] text-foreground/85 placeholder:text-muted-foreground/65 shadow-none focus-visible:ring-0 caret-accent"
           />
         </div>
 
