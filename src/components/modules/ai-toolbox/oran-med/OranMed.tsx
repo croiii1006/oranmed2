@@ -2002,7 +2002,7 @@ function PlanFormStep({
           </div>
         </div>
 
-        <div className="mt-6 rounded-xl border border-border/20 bg-white/60 px-5 backdrop-blur-md dark:bg-gray-900/60 my-0 py-[6px]">
+        <div className="mt-6 rounded-xl border-border/20 px-5 backdrop-blur-md my-0 py-[6px] shadow-md border-2 bg-[#f2f2f2]/[0.68]">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-foreground">本次发布</div>
             <div className="text-[11px] text-muted-foreground">
