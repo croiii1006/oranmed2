@@ -1712,6 +1712,77 @@ function OranGenInlinePanel({
         )}
       </div>
 
+      {/* Run history (collapsible) */}
+      {history.length > 0 && (
+        <div className="rounded-2xl border border-border/40 bg-card/40 p-2 backdrop-blur-sm">
+          <div className="space-y-1">
+            {history.map((entry) => {
+              const open = !!expanded[entry.id];
+              return (
+                <div key={entry.id} className="overflow-hidden rounded-lg border border-border/30 bg-background/40">
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(entry.id)}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-muted/30"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                    <span className="flex-1 truncate text-foreground">{entry.label}</span>
+                    <ChevronDown
+                      className={cn('h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
+                    />
+                  </button>
+                  {open && (
+                    <div className="border-t border-border/30 bg-muted/10 p-3">
+                      {entry.kind === 'matched' && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {ORAN_REFERENCE_VIDEOS.map((v) => (
+                            <div key={v.id} className="overflow-hidden rounded-md border border-border/30 bg-black">
+                              <div className="relative aspect-[9/14]">
+                                <video src={v.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                                <div className="absolute right-1 top-1 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] text-white">
+                                  命中 {v.hit}%
+                                </div>
+                              </div>
+                              <div className="p-1 text-[10px] text-foreground">
+                                <div className="truncate">{v.title}</div>
+                                <div className="text-muted-foreground">{v.views} · {v.tag}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {entry.kind === 'picked' && (
+                        <div className="flex gap-3">
+                          <div className="aspect-[9/14] w-24 shrink-0 overflow-hidden rounded-md bg-black">
+                            <video src={entry.video.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                          </div>
+                          <div className="min-w-0 flex-1 text-xs text-muted-foreground">
+                            <div className="text-foreground">{entry.video.title}</div>
+                            <div className="mt-1">播放 {entry.video.views} · 命中率 {entry.video.hit}%</div>
+                            <div className="mt-1">类型：{entry.video.tag}</div>
+                          </div>
+                        </div>
+                      )}
+                      {entry.kind === 'prompt' && (
+                        <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed text-foreground/80">
+                          {entry.prompt}
+                        </pre>
+                      )}
+                      {entry.kind === 'video' && (
+                        <div className="overflow-hidden rounded-md border border-border/30 bg-black">
+                          <video src={entry.url} controls playsInline className="aspect-video w-full object-contain" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+
       {/* Phase: select-video */}
       {phase === 'select-video' && (
         <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm">
