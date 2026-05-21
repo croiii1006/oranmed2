@@ -2977,12 +2977,12 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-normal transition-all',
             filterStatus === 'all'
-              ? 'border-foreground/20 bg-foreground/90 text-background shadow-sm'
+              ? 'border-border/60 bg-muted text-foreground shadow-sm'
               : 'border-border/40 bg-muted/30 text-muted-foreground hover:bg-muted/60 hover:text-foreground'
           )}
         >
           <span>全部</span>
-          <span className={cn('inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1 text-[10px] font-medium', filterStatus === 'all' ? 'bg-background/25 text-background' : 'bg-foreground/10 text-foreground/70')}>{tasks.length}</span>
+          <span className={cn('inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1 text-[10px] font-medium', filterStatus === 'all' ? 'bg-foreground/10 text-foreground/70' : 'bg-foreground/10 text-foreground/70')}>{tasks.length}</span>
         </button>
         {statusOrder.map((s) => (
           <button
