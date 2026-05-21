@@ -496,7 +496,7 @@ function NewTaskView({
                           </div>
                         </div>
 
-                        <div className="pointer-events-none absolute inset-1.5 z-10 rounded-[15px] bg-white/78 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                        <div className="pointer-events-none absolute inset-0 z-10 rounded-[18px] bg-white/78 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
                           <div className="flex h-full flex-col justify-between">
                             <div className="space-y-1">
                               <div className="text-[10px] font-medium tracking-[0.08em] text-foreground/45">
