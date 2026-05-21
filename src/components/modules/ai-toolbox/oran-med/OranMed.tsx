@@ -382,15 +382,27 @@ function NewTaskView({
           {creatorsOpen ? (
             <div className="min-w-0 flex-1 flex flex-col animate-in fade-in slide-in-from-right-6 duration-500">
               <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-7 py-7 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
-                <div className="mb-5 flex items-center justify-between">
+                <div className="mb-5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
-                    <SparkleIcon />
+                    {pickMode === 'ai' ? (
+                      <SparkleIcon />
+                    ) : (
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    )}
                     <span className="text-sm font-light tracking-wide text-foreground/70">
                       {pickMode === 'ai' ? 'AI 推荐达人' : '手动选择达人'}
                     </span>
                     <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
                       {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
                     </span>
+                    {pickMode === 'manual' && !matching ? (
+                      <ManualFilterBar
+                        territory={manualTerritory}
+                        gender={manualGender}
+                        onTerritory={setManualTerritory}
+                        onGender={setManualGender}
+                      />
+                    ) : null}
                   </div>
                   <span className="text-[11px] font-light text-muted-foreground">
                     {matching ? '基于 Brief 与人群分析中' : `已选 ${selectedCreatorIds.length} 位`}
