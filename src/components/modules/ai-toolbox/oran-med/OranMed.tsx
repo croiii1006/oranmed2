@@ -3289,14 +3289,19 @@ function TaskDetailDialog({
                   <section>
                     <h4 className="mb-2 text-xs font-medium text-muted-foreground">Brief</h4>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs">
-                      <DetailRow label="投放目标" value={task.brief.goal || '—'} span2 />
-                      <DetailRow label="目标受众" value={task.brief.audience || '—'} span2 />
+                      <DetailRow label="标题" value={task.brief.title || '—'} span2 />
+                      <DetailRow label="平台" value={task.brief.platform} />
+                      <DetailRow label="品牌" value={task.brief.brandName || '—'} />
                       <DetailRow label="品类" value={task.brief.brandCategory || '—'} />
                       <DetailRow label="预算" value={task.brief.budget || '—'} />
-                      <DetailRow label="预期发布" value={task.brief.expectedPublishDate || '—'} />
-                      <DetailRow label="期望达人数" value={String(task.brief.targetCreatorCount)} />
+                      <DetailRow label="目标受众" value={task.brief.audience || '—'} span2 />
+                      <DetailRow label="期望发布" value={task.brief.expectedPublishDate || '—'} />
+                      <DetailRow label="内容风格" value={task.brief.styleRequirements || '—'} />
+                      <DetailRow label="品牌卖点" value={task.brief.brandTags || '—'} span2 />
+                      <DetailRow label="发布要求" value={task.brief.publishRequirements || '—'} span2 />
                     </div>
                   </section>
+
 
                   <section>
                     <h4 className="mb-2 text-xs font-medium text-muted-foreground">
