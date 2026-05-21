@@ -30,6 +30,7 @@ export interface Creator {
   tags: string[];
   matchScore: number;
   matchReason: string;
+  avatarUrl?: string;
 }
 
 export type AssetSource = 'local' | 'orangen';

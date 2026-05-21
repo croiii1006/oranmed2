@@ -439,7 +439,11 @@ function NewTaskView({
                         ) : null}
 
                         <div className="relative z-10 flex h-[58px] w-[58px] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60 transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-focus-visible:scale-[1.04] group-focus-visible:opacity-15">
-                          {c.name.slice(0, 1)}
+                          {c.avatarUrl ? (
+                            <img src={c.avatarUrl} alt={c.name} className="h-full w-full object-cover" />
+                          ) : (
+                            c.name.slice(0, 1)
+                          )}
                         </div>
 
                         <div className="relative z-10 mt-2.5 min-w-0 transition-opacity duration-200 group-hover:opacity-10 group-focus-visible:opacity-10">
