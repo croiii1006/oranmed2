@@ -141,8 +141,14 @@ function NewTaskView({
       brief.brandTags.trim() &&
       brief.budget.trim() &&
       brief.brandName.trim() &&
-      brief.brandCategory.trim(),
+      brief.brandCategory.trim() &&
+      (brief.publishRequirements ?? '').trim(),
   );
+
+  // Manual selection filters
+  const [manualTerritory, setManualTerritory] = useState<'all' | 'cn' | 'overseas'>('all');
+  const [manualGender, setManualGender] = useState<'all' | 'male' | 'female'>('all');
+  const CN_REGIONS = new Set(['CN', 'CHINA', '中国', '中国大陆']);
 
   const handleSmartParse = () => {
     if (!rawInput.trim() && uploadedFiles.length === 0) return;
