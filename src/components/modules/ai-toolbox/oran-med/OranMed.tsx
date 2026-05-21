@@ -121,7 +121,7 @@ function NewTaskView({
   onOpenWorkbench: () => void;
   onGoWorkflow: () => void;
 }) {
-  const { currentTask, tasks, updateBrief, saveBrief, toggleCreator } = useOranMed();
+  const { currentTask, tasks, updateBrief, saveBrief, toggleCreator, setCreators } = useOranMed();
   const historyCount = tasks.length;
   const { brief, selectedCreatorIds } = currentTask;
   const [creatorsOpen, setCreatorsOpen] = useState(false);
