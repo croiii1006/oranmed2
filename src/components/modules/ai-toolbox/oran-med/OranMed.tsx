@@ -2003,12 +2003,86 @@ function PlanFormStep({
         </div>
 
         <div className="mt-6 rounded-xl bg-sky-50/60 px-5 py-4 dark:bg-sky-950/30">
-          <div className="text-sm font-medium text-foreground">本次发布</div>
-          <div className="mt-3 grid grid-cols-1 gap-3 text-xs text-muted-foreground sm:grid-cols-2">
-            <div>达人：<span className="text-foreground/80">{creatorNames || '未选择'}{task.selectedCreatorIds.length > 3 ? ` 等 ${task.selectedCreatorIds.length} 位` : ''}</span></div>
-            <div>资产来源：<span className="text-foreground/80">{assetSource}</span></div>
-            <div>资产：<span className="text-foreground/80">{task.assets.length} 项</span></div>
-            <div>预算：<span className="text-foreground/80">{task.brief.budget || '未设置'}</span></div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium text-foreground">本次发布</div>
+            <div className="text-[11px] text-muted-foreground">
+              {assetSource} · 预算 <span className="text-foreground/80">{task.brief.budget || '未设置'}</span>
+            </div>
+          </div>
+
+          {/* 达人头像 */}
+          <div className="mt-4">
+            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-foreground/70">
+              达人 · {task.selectedCreatorIds.length} 位
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {task.selectedCreatorIds.length === 0 ? (
+                <div className="text-xs text-muted-foreground">未选择</div>
+              ) : (
+                task.selectedCreatorIds.map((id) => {
+                  const c = CREATORS.find((cc) => cc.id === id);
+                  if (!c) return null;
+                  return (
+                    <div key={id} className="flex items-center gap-2 rounded-full border border-border/40 bg-background/60 py-1 pl-1 pr-3">
+                      {c.avatarUrl ? (
+                        <img src={c.avatarUrl} alt={c.name} className="h-7 w-7 rounded-full object-cover" />
+                      ) : (
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#FF5500]/20 to-[#FF5500]/5 text-[11px] font-medium text-[#FF5500]">
+                          {c.name.slice(0, 1)}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="text-xs leading-tight text-foreground">{c.name}</div>
+                        <div className="text-[10px] leading-tight text-muted-foreground">{c.tier} · {c.platform}</div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* 资产缩略图 */}
+          <div className="mt-4">
+            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-foreground/70">
+              资产 · {task.assets.length} 项
+            </div>
+            {task.assets.length === 0 ? (
+              <div className="text-xs text-muted-foreground">无</div>
+            ) : (
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                {task.assets.map((a) => {
+                  const creator = CREATORS.find((cc) => cc.id === a.creatorId);
+                  const isOranGen = a.source === 'orangen';
+                  return (
+                    <div key={a.id} className="overflow-hidden rounded-md border border-border/40 bg-background/60">
+                      <div className={cn('relative aspect-[9/14]', !isOranGen && a.thumbnailColor)}>
+                        {isOranGen ? (
+                          <video
+                            src={ORAN_RESULT_VIDEO}
+                            className="h-full w-full object-cover"
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <ImageIcon className="h-5 w-5 text-white/70" />
+                          </div>
+                        )}
+                        <div className="absolute left-1 top-1 rounded bg-black/60 px-1 text-[9px] text-white">
+                          {isOranGen ? 'OranGen' : '本地'}
+                        </div>
+                      </div>
+                      <div className="p-1 text-[10px]">
+                        <div className="truncate text-foreground">{a.title}</div>
+                        <div className="truncate text-muted-foreground">{creator?.name ?? '未指派'}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
