@@ -145,7 +145,7 @@ function NewTaskView({
   );
 
   const handleSmartParse = () => {
-    if (!rawInput.trim() && !uploadedFile) return;
+    if (!rawInput.trim() && uploadedFiles.length === 0) return;
     setParsing(true);
     setTimeout(() => {
       updateBrief({
