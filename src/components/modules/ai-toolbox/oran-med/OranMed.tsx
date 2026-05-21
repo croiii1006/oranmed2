@@ -20,6 +20,7 @@ import {
   Users,
   Wand2,
 } from 'lucide-react';
+import { OranGenTakeover } from './OranGenTakeover';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OranMedProvider, useOranMed } from './context/OranMedContext';
 import { CREATORS } from './data/creators';
@@ -1156,6 +1157,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
 
   const [step, setStep] = useState<'asset' | 'plan'>('asset');
   const [detailOpen, setDetailOpen] = useState(false);
+  const [orangenTakeover, setOrangenTakeover] = useState(false);
   const [planForm, setPlanForm] = useState({
     scheduledAt: '',
     platform: brief.platform,
@@ -1238,7 +1240,12 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
           <TaskMiniCard task={currentTask} stacked={assets.length > 0} onClick={() => setDetailOpen(true)} />
 
           {!assetMode ? (
-            <AssetModeChoices onPick={setAssetMode} />
+            <AssetModeChoices
+              onPick={(m) => {
+                setAssetMode(m);
+                if (m === 'orangen') setOrangenTakeover(true);
+              }}
+            />
           ) : assetMode === 'local' ? (
             <LocalUploadZone
               onFiles={(files) => {
@@ -1251,6 +1258,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
               brief={brief}
               creatorIds={selectedCreatorIds}
               hasAssets={assets.length > 0}
+              onReopen={() => setOrangenTakeover(true)}
               onGenerated={(count) => {
                 for (let i = 0; i < count; i++) {
                   const cid = selectedCreatorIds[(assets.length + i) % Math.max(selectedCreatorIds.length, 1)] ?? '';
@@ -1349,6 +1357,32 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
         onClose={() => setDetailOpen(false)}
         onOpen={() => setDetailOpen(false)}
       />
+
+      {orangenTakeover ? (
+        <OranGenTakeover
+          prefill={{
+            category: brief.brandCategory || brief.platform,
+            sellingPoints: [brief.brandTags, brief.styleRequirements, brief.goal].filter(Boolean).join('；'),
+          }}
+          onClose={() => setOrangenTakeover(false)}
+          onFinish={() => {
+            const count = Math.max(selectedCreatorIds.length, 1);
+            for (let i = 0; i < count; i++) {
+              const cid = selectedCreatorIds[(assets.length + i) % Math.max(selectedCreatorIds.length, 1)] ?? '';
+              addAsset({
+                id: `a_${Date.now().toString(36)}${i}${Math.random().toString(36).slice(2, 4)}`,
+                creatorId: cid,
+                title: `OranGen · ${CREATORS.find((c) => c.id === cid)?.name ?? '素材'} ${i + 1}`,
+                source: 'orangen',
+                thumbnailColor: ASSET_PALETTE[(assets.length + i) % ASSET_PALETTE.length],
+                status: 'ready',
+              });
+            }
+            setOrangenTakeover(false);
+            toast.success('已加入素材库', { description: `${count} 条 ORAN GEN 生成素材已就绪` });
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -1491,12 +1525,14 @@ function OranGenInlinePanel({
   hasAssets,
   onGenerated,
   onSwitchMode,
+  onReopen,
 }: {
   brief: { goal: string; brandName: string; brandCategory: string };
   creatorIds: string[];
   hasAssets: boolean;
   onGenerated: (count: number) => void;
   onSwitchMode: () => void;
+  onReopen?: () => void;
 }) {
   const steps = [
     { key: 'brief', label: '读取 Brief 与目标人群', agent: 'Brief 解析' },
@@ -1551,10 +1587,16 @@ function OranGenInlinePanel({
         </div>
 
         {phase === 'idle' ? (
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex items-center justify-end gap-2">
+            {onReopen ? (
+              <Button size="sm" variant="outline" onClick={onReopen} className="rounded-full">
+                <Sparkles className="mr-1 h-3.5 w-3.5" />
+                打开 ORAN GEN 工作台
+              </Button>
+            ) : null}
             <Button size="sm" onClick={start} className="rounded-full">
               <Wand2 className="mr-1 h-3.5 w-3.5" />
-              开始生成
+              快速模拟生成
             </Button>
           </div>
         ) : (
