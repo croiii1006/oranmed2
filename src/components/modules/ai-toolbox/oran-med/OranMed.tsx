@@ -507,6 +507,12 @@ function NewTaskView({
                             </div>
 
                             <div className="space-y-1.5">
+                              {pickMode === 'ai' && c.matchReason ? (
+                                <div className="space-y-0.5">
+                                  <div className="text-[9px] font-medium tracking-[0.08em] text-foreground/45">匹配原因</div>
+                                  <div className="line-clamp-2 text-[11px] leading-snug text-foreground/75">{c.matchReason}</div>
+                                </div>
+                              ) : null}
                               <div className="flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
                                 {c.region ? <span className="rounded-full bg-background/80 px-2 py-0.5">{c.region}</span> : null}
                                 <span className="rounded-full bg-background/80 px-2 py-0.5">{genderLabel}</span>
