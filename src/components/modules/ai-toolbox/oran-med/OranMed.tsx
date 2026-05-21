@@ -144,8 +144,7 @@ function NewTaskView({
       brief.brandTags.trim() &&
       brief.budget.trim() &&
       brief.brandName.trim() &&
-      brief.brandCategory.trim() &&
-      (brief.publishRequirements ?? '').trim(),
+      brief.brandCategory.trim(),
   );
 
   // Manual selection filters
