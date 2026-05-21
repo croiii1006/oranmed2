@@ -15,7 +15,7 @@ export interface Brief {
   styleRequirements: string;
   categoryRequirements: string;
   budget: string;
-  publishRequirements: string;
+  publishRequirements?: string;
 }
 
 export type CreatorTier = 'KOL' | 'KOC';
