@@ -671,18 +671,31 @@ function MetaField({
   const [editingText, setEditingText] = useState('');
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [popoverDraft, setPopoverDraft] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const [rowWidth, setRowWidth] = useState(0);
+  const [availHeight, setAvailHeight] = useState(0);
   const [tagWidths, setTagWidths] = useState<number[]>([]);
 
   useEffect(() => {
-    const el = rowRef.current;
-    if (!el) return;
-    const update = () => setRowWidth(el.clientWidth);
+    const row = rowRef.current;
+    const container = containerRef.current;
+    if (!row || !container) return;
+    const update = () => {
+      setRowWidth(row.clientWidth);
+      // available height = container inner height minus the label height above the row
+      const cRect = container.getBoundingClientRect();
+      const rRect = row.getBoundingClientRect();
+      const cs = getComputedStyle(container);
+      const padBottom = parseFloat(cs.paddingBottom) || 0;
+      const avail = cRect.bottom - padBottom - rRect.top;
+      setAvailHeight(Math.max(0, avail));
+    };
     update();
     const ro = new ResizeObserver(update);
-    ro.observe(el);
+    ro.observe(row);
+    ro.observe(container);
     return () => ro.disconnect();
   }, []);
 
