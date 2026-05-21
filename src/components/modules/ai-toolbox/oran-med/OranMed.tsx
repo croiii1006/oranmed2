@@ -672,7 +672,9 @@ function MetaField({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [popoverDraft, setPopoverDraft] = useState('');
   const rowRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
   const [rowWidth, setRowWidth] = useState(0);
+  const [tagWidths, setTagWidths] = useState<number[]>([]);
 
   useEffect(() => {
     const el = rowRef.current;
@@ -683,6 +685,15 @@ function MetaField({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    const el = measureRef.current;
+    if (!el) return;
+    const widths = Array.from(el.children).map((c) => (c as HTMLElement).offsetWidth);
+    setTagWidths(widths);
+  }, [value]);
+
+
 
   if (type === 'date') {
     return (
@@ -736,31 +747,32 @@ function MetaField({
     setEditingText('');
   };
 
-  // Estimate which tags fit in the single row.
-  // Per-tag width ≈ chars * 12 (CJK ~12px) + 30 (padding + × + gap).
-  // Reserve input ~70px and (if needed) +N chip ~38px.
-  const estimateTagWidth = (t: string) => t.length * 12 + 30;
-  const INPUT_RESERVE = 70;
-  const MORE_RESERVE = 38;
+  // Measure real DOM widths of rendered tags; fall back to char-based estimate
+  // if widths aren't ready (first render).
+  const estimateTagWidth = (t: string) => t.length * 14 + 28;
+  const INPUT_RESERVE = 60; // input min-width
+  const MORE_RESERVE = 34;  // "+N" chip
+  const GAP = 6;
 
   let visibleCount = tags.length;
   if (rowWidth > 0 && tags.length > 0) {
     let used = 0;
     visibleCount = 0;
     for (let i = 0; i < tags.length; i++) {
-      const w = estimateTagWidth(tags[i]);
+      const w = (tagWidths[i] ?? estimateTagWidth(tags[i]));
       const remaining = tags.length - i - 1;
-      const reserve = INPUT_RESERVE + (remaining > 0 ? MORE_RESERVE : 0);
-      if (used + w + reserve <= rowWidth) {
-        used += w;
+      const reserve = INPUT_RESERVE + (remaining > 0 ? MORE_RESERVE + GAP : 0);
+      const gapBefore = i > 0 ? GAP : 0;
+      if (used + gapBefore + w + GAP + reserve <= rowWidth) {
+        used += gapBefore + w;
         visibleCount++;
       } else {
         break;
       }
     }
-    // Always show at least 1 tag to avoid empty row when one tag is long.
     if (visibleCount === 0) visibleCount = 1;
   }
+
 
   const hiddenCount = Math.max(0, tags.length - visibleCount);
   const visibleTags = tags.slice(0, visibleCount);
@@ -809,7 +821,24 @@ function MetaField({
   return (
     <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
+      {/* Hidden measurement row */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        className="pointer-events-none invisible absolute -left-[9999px] top-0 flex gap-1.5"
+      >
+        {tags.map((tag, i) => (
+          <span
+            key={i}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border/50 bg-background/70 px-2.5 py-0.5 text-[12px] font-normal"
+          >
+            {tag}
+            <span className="ml-0.5">×</span>
+          </span>
+        ))}
+      </div>
       <div ref={rowRef} className="flex flex-nowrap items-center gap-1.5 overflow-hidden min-w-0">
+
         {visibleTags.map((tag, i) => renderTag(tag, i))}
         {hiddenCount > 0 && (
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
