@@ -275,10 +275,10 @@ function NewTaskView({
                 </Select>
               </div>
 
-              {/* Unified fields grid — responsive columns based on container width */}
+              {/* Inline meta fields — fill remaining height, responsive columns based on container width */}
               <div
                 className={cn(
-                  'mt-4 grid gap-2',
+                  'mt-4 flex-1 min-h-0 grid gap-2 auto-rows-fr',
                   creatorsOpen ? 'grid-cols-2' : 'grid-cols-3',
                 )}
               >
@@ -287,6 +287,10 @@ function NewTaskView({
                 <MetaField label="内容风格" value={brief.styleRequirements} onChange={(v) => updateBrief({ styleRequirements: v })} placeholder="专业测评 / 干货" />
                 <MetaField label="品牌标签" value={brief.brandTags} onChange={(v) => updateBrief({ brandTags: v })} placeholder="抗老,成分" />
                 <MetaField label="预算" value={brief.budget} onChange={(v) => updateBrief({ budget: v })} placeholder="50,000 积分" />
+              </div>
+
+              {/* Footer: brand name + category */}
+              <div className="mt-2 grid grid-cols-2 gap-2">
                 <label className="group flex items-center gap-2 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40 cursor-text">
                   <span className="shrink-0 text-[12px] font-light text-muted-foreground/70">品牌</span>
                   <input
@@ -296,12 +300,7 @@ function NewTaskView({
                     className="min-w-0 flex-1 border-0 bg-transparent text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none"
                   />
                 </label>
-                <div
-                  className={cn(
-                    'flex items-center gap-2 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors hover:border-accent/40',
-                    creatorsOpen ? 'col-span-2' : '',
-                  )}
-                >
+                <div className="flex items-center gap-2 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors hover:border-accent/40">
                   <span className="shrink-0 text-[12px] font-light text-muted-foreground/70">品类</span>
                   <CategoryCascader
                     data={CATEGORY_TREE}
