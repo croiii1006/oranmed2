@@ -3128,10 +3128,19 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
                   )}
                 </div>
 
-                {/* brief preview */}
-                <p className="mt-3 line-clamp-2 text-[12px] font-light leading-relaxed text-muted-foreground">
-                  {briefPreview}
-                </p>
+                {/* brief preview or rejection reason */}
+                {t.status === 'rejected' && t.rejectionReason ? (
+                  <div className="mt-3 rounded-lg border border-rose-200/70 bg-rose-50/70 px-2.5 py-1.5 dark:border-rose-900/40 dark:bg-rose-950/30">
+                    <div className="mb-0.5 text-[10px] font-medium text-rose-700 dark:text-rose-300">拒绝理由</div>
+                    <p className="line-clamp-2 text-[11px] font-light leading-snug text-rose-800/85 dark:text-rose-200/85">
+                      {t.rejectionReason}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-3 line-clamp-2 text-[12px] font-light leading-relaxed text-muted-foreground">
+                    {briefPreview}
+                  </p>
+                )}
 
                 {/* avatar bottom-right */}
                 <div className="mt-auto flex items-end justify-between pt-2">
