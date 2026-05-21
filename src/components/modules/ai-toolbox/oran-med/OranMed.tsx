@@ -1240,7 +1240,12 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
           <TaskMiniCard task={currentTask} stacked={assets.length > 0} onClick={() => setDetailOpen(true)} />
 
           {!assetMode ? (
-            <AssetModeChoices onPick={setAssetMode} />
+            <AssetModeChoices
+              onPick={(m) => {
+                setAssetMode(m);
+                if (m === 'orangen') setOrangenTakeover(true);
+              }}
+            />
           ) : assetMode === 'local' ? (
             <LocalUploadZone
               onFiles={(files) => {
@@ -1253,6 +1258,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
               brief={brief}
               creatorIds={selectedCreatorIds}
               hasAssets={assets.length > 0}
+              onReopen={() => setOrangenTakeover(true)}
               onGenerated={(count) => {
                 for (let i = 0; i < count; i++) {
                   const cid = selectedCreatorIds[(assets.length + i) % Math.max(selectedCreatorIds.length, 1)] ?? '';
