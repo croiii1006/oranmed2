@@ -248,7 +248,7 @@ function NewTaskView({
           >
 
             {/* Brief input card */}
-            <div className="relative flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+            <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
               {/* Header: orange dot + Brief title input + platform pill */}
               <div className="mb-3 flex items-center gap-3">
                 <span className="relative flex h-3 w-3 items-center justify-center flex-shrink-0">
@@ -275,8 +275,13 @@ function NewTaskView({
                 </Select>
               </div>
 
-              {/* Inline meta fields — each wrapped in a light gray box */}
-              <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3">
+              {/* Inline meta fields — fill remaining height, responsive columns based on container width */}
+              <div
+                className={cn(
+                  'mt-4 flex-1 min-h-0 grid gap-2 auto-rows-fr',
+                  creatorsOpen ? 'grid-cols-2' : 'grid-cols-3',
+                )}
+              >
                 <MetaField label="目标人群" value={brief.audience} onChange={(v) => updateBrief({ audience: v })} placeholder="25-35 岁都市女性" />
                 <MetaField label="期望发布" type="date" value={brief.expectedPublishDate} onChange={(v) => updateBrief({ expectedPublishDate: v })} />
                 <MetaField label="内容风格" value={brief.styleRequirements} onChange={(v) => updateBrief({ styleRequirements: v })} placeholder="专业测评 / 干货" />
