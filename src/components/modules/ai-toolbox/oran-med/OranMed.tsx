@@ -661,6 +661,20 @@ function MetaField({
   const [draft, setDraft] = useState('');
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editingText, setEditingText] = useState('');
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverDraft, setPopoverDraft] = useState('');
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [rowWidth, setRowWidth] = useState(0);
+
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const update = () => setRowWidth(el.clientWidth);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   if (type === 'date') {
     return (
@@ -681,15 +695,16 @@ function MetaField({
 
   const commit = (next: string[]) => onChange(next.join(','));
 
-  const addTag = () => {
-    const v = draft.trim();
+  const addTag = (source: 'inline' | 'popover' = 'inline') => {
+    const raw = source === 'inline' ? draft : popoverDraft;
+    const v = raw.trim();
     if (!v) return;
     if (tags.includes(v)) {
-      setDraft('');
+      source === 'inline' ? setDraft('') : setPopoverDraft('');
       return;
     }
     commit([...tags, v]);
-    setDraft('');
+    source === 'inline' ? setDraft('') : setPopoverDraft('');
   };
 
   const removeTag = (i: number) => commit(tags.filter((_, idx) => idx !== i));
@@ -713,50 +728,115 @@ function MetaField({
     setEditingText('');
   };
 
+  // Estimate which tags fit in the single row.
+  // Per-tag width ≈ chars * 12 (CJK ~12px) + 30 (padding + × + gap).
+  // Reserve input ~70px and (if needed) +N chip ~38px.
+  const estimateTagWidth = (t: string) => t.length * 12 + 30;
+  const INPUT_RESERVE = 70;
+  const MORE_RESERVE = 38;
+
+  let visibleCount = tags.length;
+  if (rowWidth > 0 && tags.length > 0) {
+    let used = 0;
+    visibleCount = 0;
+    for (let i = 0; i < tags.length; i++) {
+      const w = estimateTagWidth(tags[i]);
+      const remaining = tags.length - i - 1;
+      const reserve = INPUT_RESERVE + (remaining > 0 ? MORE_RESERVE : 0);
+      if (used + w + reserve <= rowWidth) {
+        used += w;
+        visibleCount++;
+      } else {
+        break;
+      }
+    }
+    // Always show at least 1 tag to avoid empty row when one tag is long.
+    if (visibleCount === 0) visibleCount = 1;
+  }
+
+  const hiddenCount = Math.max(0, tags.length - visibleCount);
+  const visibleTags = tags.slice(0, visibleCount);
+
+  const renderTag = (tag: string, i: number) =>
+    editingIdx === i ? (
+      <input
+        key={i}
+        autoFocus
+        value={editingText}
+        onChange={(e) => setEditingText(e.target.value)}
+        onBlur={commitEdit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commitEdit();
+          } else if (e.key === 'Escape') {
+            setEditingIdx(null);
+            setEditingText('');
+          }
+        }}
+        className="min-w-[40px] rounded-full border border-accent/40 bg-background/80 px-2.5 py-0.5 text-[12px] font-normal text-foreground/85 outline-none focus:ring-0"
+        style={{ width: `${Math.max(editingText.length, 2) + 2}ch` }}
+      />
+    ) : (
+      <span
+        key={i}
+        onClick={() => startEdit(i)}
+        className="group/tag inline-flex shrink-0 items-center gap-1 rounded-full border border-border/50 bg-background/70 px-2.5 py-0.5 text-[12px] font-normal text-foreground/85 cursor-text transition-colors hover:border-accent/50"
+      >
+        {tag}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            removeTag(i);
+          }}
+          className="ml-0.5 text-muted-foreground/60 transition-colors hover:text-foreground"
+          aria-label="删除"
+        >
+          ×
+        </button>
+      </span>
+    );
+
   return (
     <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
-      <div className="flex flex-wrap items-center gap-1.5">
-        {tags.map((tag, i) =>
-          editingIdx === i ? (
-            <input
-              key={i}
-              autoFocus
-              value={editingText}
-              onChange={(e) => setEditingText(e.target.value)}
-              onBlur={commitEdit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  commitEdit();
-                } else if (e.key === 'Escape') {
-                  setEditingIdx(null);
-                  setEditingText('');
-                }
-              }}
-              className="min-w-[40px] rounded-full border border-accent/40 bg-background/80 px-2.5 py-0.5 text-[12px] font-normal text-foreground/85 outline-none focus:ring-0"
-              style={{ width: `${Math.max(editingText.length, 2) + 2}ch` }}
-            />
-          ) : (
-            <span
-              key={i}
-              onClick={() => startEdit(i)}
-              className="group/tag inline-flex items-center gap-1 rounded-full border border-border/50 bg-background/70 px-2.5 py-0.5 text-[12px] font-normal text-foreground/85 cursor-text transition-colors hover:border-accent/50"
-            >
-              {tag}
+      <div ref={rowRef} className="flex flex-nowrap items-center gap-1.5 overflow-hidden min-w-0">
+        {visibleTags.map((tag, i) => renderTag(tag, i))}
+        {hiddenCount > 0 && (
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeTag(i);
-                }}
-                className="ml-0.5 text-muted-foreground/60 transition-colors hover:text-foreground"
-                aria-label="删除"
+                className="inline-flex shrink-0 items-center rounded-full border border-border/40 bg-muted/60 px-2 py-0.5 text-[12px] font-normal text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
               >
-                ×
+                +{hiddenCount}
               </button>
-            </span>
-          ),
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-[280px] rounded-xl p-3">
+              <div className="mb-2 text-[12px] font-light text-muted-foreground/70">
+                全部 {label}（{tags.length}）
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {tags.map((tag, i) => renderTag(tag, i))}
+              </div>
+              <div className="mt-3 border-t border-border/40 pt-2">
+                <input
+                  value={popoverDraft}
+                  onChange={(e) => setPopoverDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      addTag('popover');
+                    }
+                  }}
+                  onBlur={() => addTag('popover')}
+                  placeholder="添加标签"
+                  className="w-full border-0 bg-transparent py-1 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
         )}
         <input
           value={draft}
@@ -764,12 +844,12 @@ function MetaField({
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ',') {
               e.preventDefault();
-              addTag();
+              addTag('inline');
             } else if (e.key === 'Backspace' && !draft && tags.length) {
               removeTag(tags.length - 1);
             }
           }}
-          onBlur={addTag}
+          onBlur={() => addTag('inline')}
           placeholder={tags.length ? '添加' : placeholder || '添加标签'}
           className="min-w-[60px] flex-1 border-0 bg-transparent py-0 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
         />
