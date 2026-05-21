@@ -33,7 +33,12 @@ const loadFromStorage = (): { tasks: OranMedTask[]; current: string | null } => 
   try {
     const rawTasks = localStorage.getItem(STORAGE_KEY);
     const rawCurrent = localStorage.getItem(CURRENT_KEY);
-    const tasks = rawTasks ? (JSON.parse(rawTasks) as OranMedTask[]) : MOCK_TASKS;
+    const storedTasks = rawTasks ? (JSON.parse(rawTasks) as OranMedTask[]) : MOCK_TASKS;
+    const tasks = storedTasks.map((task) => {
+      if (task.status !== 'rejected' || task.rejectionReason) return task;
+      const sourceTask = MOCK_TASKS.find((mockTask) => mockTask.id === task.id);
+      return sourceTask?.rejectionReason ? { ...task, rejectionReason: sourceTask.rejectionReason } : task;
+    });
     return { tasks, current: rawCurrent };
   } catch {
     return { tasks: MOCK_TASKS, current: null };
