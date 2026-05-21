@@ -671,18 +671,31 @@ function MetaField({
   const [editingText, setEditingText] = useState('');
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [popoverDraft, setPopoverDraft] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const [rowWidth, setRowWidth] = useState(0);
+  const [availHeight, setAvailHeight] = useState(0);
   const [tagWidths, setTagWidths] = useState<number[]>([]);
 
   useEffect(() => {
-    const el = rowRef.current;
-    if (!el) return;
-    const update = () => setRowWidth(el.clientWidth);
+    const row = rowRef.current;
+    const container = containerRef.current;
+    if (!row || !container) return;
+    const update = () => {
+      setRowWidth(row.clientWidth);
+      // available height = container inner height minus the label height above the row
+      const cRect = container.getBoundingClientRect();
+      const rRect = row.getBoundingClientRect();
+      const cs = getComputedStyle(container);
+      const padBottom = parseFloat(cs.paddingBottom) || 0;
+      const avail = cRect.bottom - padBottom - rRect.top;
+      setAvailHeight(Math.max(0, avail));
+    };
     update();
     const ro = new ResizeObserver(update);
-    ro.observe(el);
+    ro.observe(row);
+    ro.observe(container);
     return () => ro.disconnect();
   }, []);
 
@@ -747,29 +760,45 @@ function MetaField({
     setEditingText('');
   };
 
-  // Measure real DOM widths of rendered tags; fall back to char-based estimate
-  // if widths aren't ready (first render).
+  // Pack tags into as many rows as the cell's available height allows.
+  // Only collapse into "+N" if even multi-row wrapping can't fit everything.
   const estimateTagWidth = (t: string) => t.length * 14 + 28;
-  const INPUT_RESERVE = 60; // input min-width
-  const MORE_RESERVE = 34;  // "+N" chip
+  const INPUT_RESERVE = 60;
+  const MORE_RESERVE = 34;
   const GAP = 6;
+  const ROW_H = 24;
+  const ROW_GAP = 6;
 
   let visibleCount = tags.length;
   if (rowWidth > 0 && tags.length > 0) {
-    let used = 0;
-    visibleCount = 0;
-    for (let i = 0; i < tags.length; i++) {
-      const w = (tagWidths[i] ?? estimateTagWidth(tags[i]));
-      const remaining = tags.length - i - 1;
-      const reserve = INPUT_RESERVE + (remaining > 0 ? MORE_RESERVE + GAP : 0);
-      const gapBefore = i > 0 ? GAP : 0;
-      if (used + gapBefore + w + GAP + reserve <= rowWidth) {
-        used += gapBefore + w;
-        visibleCount++;
-      } else {
-        break;
+    const maxRows = Math.max(1, Math.floor((availHeight + ROW_GAP) / (ROW_H + ROW_GAP)) || 1);
+
+    // First pass: try to pack ALL tags within maxRows without reserving "+N".
+    const pack = (reserveLast: number) => {
+      let row = 1;
+      let used = 0;
+      let placed = 0;
+      for (let i = 0; i < tags.length; i++) {
+        const w = tagWidths[i] ?? estimateTagWidth(tags[i]);
+        const isLastRow = row === maxRows;
+        const remaining = tags.length - i - 1;
+        const reserve = isLastRow ? INPUT_RESERVE + (remaining > 0 ? MORE_RESERVE + GAP : 0) + (reserveLast && remaining === 0 ? 0 : 0) : 0;
+        const gapBefore = used > 0 ? GAP : 0;
+        if (used + gapBefore + w + reserve <= rowWidth) {
+          used += gapBefore + w;
+          placed++;
+        } else if (row < maxRows) {
+          row++;
+          used = w;
+          placed++;
+        } else {
+          break;
+        }
       }
-    }
+      return placed;
+    };
+
+    visibleCount = pack(0);
     if (visibleCount === 0) visibleCount = 1;
   }
 
@@ -819,7 +848,7 @@ function MetaField({
     );
 
   return (
-    <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+    <div ref={containerRef} className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
       {/* Hidden measurement row */}
       <div
@@ -837,7 +866,8 @@ function MetaField({
           </span>
         ))}
       </div>
-      <div ref={rowRef} className="flex flex-nowrap items-center gap-1.5 overflow-hidden min-w-0">
+      <div ref={rowRef} className="flex flex-wrap items-start content-start gap-1.5 overflow-hidden min-w-0">
+
 
         {visibleTags.map((tag, i) => renderTag(tag, i))}
         {hiddenCount > 0 && (
