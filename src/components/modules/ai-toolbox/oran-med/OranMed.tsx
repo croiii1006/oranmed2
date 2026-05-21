@@ -1157,6 +1157,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
 
   const [step, setStep] = useState<'asset' | 'plan'>('asset');
   const [detailOpen, setDetailOpen] = useState(false);
+  const [orangenTakeover, setOrangenTakeover] = useState(false);
   const [planForm, setPlanForm] = useState({
     scheduledAt: '',
     platform: brief.platform,
