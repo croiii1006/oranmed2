@@ -848,7 +848,7 @@ function MetaField({
     );
 
   return (
-    <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+    <div ref={containerRef} className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
       {/* Hidden measurement row */}
       <div
@@ -866,7 +866,8 @@ function MetaField({
           </span>
         ))}
       </div>
-      <div ref={rowRef} className="flex flex-nowrap items-center gap-1.5 overflow-hidden min-w-0">
+      <div ref={rowRef} className="flex flex-wrap items-start content-start gap-1.5 overflow-hidden min-w-0">
+
 
         {visibleTags.map((tag, i) => renderTag(tag, i))}
         {hiddenCount > 0 && (
