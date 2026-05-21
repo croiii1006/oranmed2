@@ -184,6 +184,7 @@ function NewTaskView({
     if (!brief.brandCategory) patch.brandCategory = brandCategory;
     if (!brief.title) patch.title = `${brandName} · ${new Date().toLocaleDateString('zh-CN')} 投放`;
     if (Object.keys(patch).length) updateBrief(patch);
+    if (mode !== pickMode) setCreators([]);
     setPickMode(mode);
     setCreatorsOpen(true);
     if (mode === 'ai') {
