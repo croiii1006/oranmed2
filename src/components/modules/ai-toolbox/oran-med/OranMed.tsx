@@ -3287,6 +3287,17 @@ function TaskDetailDialog({
             <ScrollArea className="max-h-[60vh] pr-3">
               {view.kind === 'main' && (
                 <div className="space-y-5">
+                  {isRejected && task.rejectionReason && (
+                    <div className="rounded-xl border border-rose-200/70 bg-rose-50/70 p-3 dark:border-rose-900/50 dark:bg-rose-950/30">
+                      <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-rose-700 dark:text-rose-300">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        审核未通过 · 拒绝理由
+                      </div>
+                      <p className="text-xs leading-relaxed text-rose-800/90 dark:text-rose-200/90">
+                        {task.rejectionReason}
+                      </p>
+                    </div>
+                  )}
                   <section>
                     <h4 className="mb-2 text-xs font-medium text-muted-foreground">Brief</h4>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs">
