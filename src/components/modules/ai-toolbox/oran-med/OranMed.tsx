@@ -447,7 +447,6 @@ function NewTaskView({
                       const bg = `hsla(24, ${s}%, ${l}%, 0.12)`;
                       return { color, bg };
                     })();
-                    const genderLabel = c.gender === 'female' ? '女性' : '男性';
                     return (
                       <button
                         key={c.id}
