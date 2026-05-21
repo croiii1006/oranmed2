@@ -298,8 +298,14 @@ function NewTaskView({
                 <MetaField label="目标人群" value={brief.audience} onChange={(v) => updateBrief({ audience: v })} placeholder="25-35 岁都市女性" />
                 <MetaField label="期望发布" type="date" value={brief.expectedPublishDate} onChange={(v) => updateBrief({ expectedPublishDate: v })} />
                 <MetaField label="内容风格" value={brief.styleRequirements} onChange={(v) => updateBrief({ styleRequirements: v })} placeholder="专业测评 / 干货" />
-                <MetaField label="品牌标签" value={brief.brandTags} onChange={(v) => updateBrief({ brandTags: v })} placeholder="抗老,成分" />
+                <MetaField label="品牌卖点" value={brief.brandTags} onChange={(v) => updateBrief({ brandTags: v })} placeholder="抗老,成分" />
                 <MetaField label="预算" value={brief.budget} onChange={(v) => updateBrief({ budget: v })} placeholder="50,000 积分" />
+                <PlainField
+                  label="发布要求"
+                  value={brief.publishRequirements ?? ''}
+                  onChange={(v) => updateBrief({ publishRequirements: v })}
+                  placeholder="例如：需露出 logo / 含口播 / 不允许夸大宣传"
+                />
               </div>
 
               {/* Footer: brand name + category */}
