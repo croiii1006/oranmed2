@@ -264,7 +264,7 @@ function NewTaskView({
           >
 
             {/* Brief input card */}
-            <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+            <div className="relative h-[430px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
               {/* Header: orange dot + Brief title input + platform pill */}
               <div className="mb-3 flex items-center gap-3">
                 <span className="relative flex h-3 w-3 items-center justify-center flex-shrink-0">
@@ -384,7 +384,7 @@ function NewTaskView({
           {/* Creator match panel — slides in from right */}
           {creatorsOpen ? (
             <div className="min-w-0 flex-1 flex flex-col animate-in fade-in slide-in-from-right-6 duration-500">
-              <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-7 py-7 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+              <div className="relative h-[430px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-7 py-7 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
                 <div className="mb-5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
                     {pickMode === 'ai' ? (
@@ -800,7 +800,7 @@ function EntryStage({
   const hasInput = Boolean(rawInput.trim() || uploadedFiles.length > 0);
   return (
     <div className="w-full max-w-3xl">
-      <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
+      <div className="relative h-[430px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-8 pt-8 pb-6 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
         {/* Upload trigger — fixed size, doesn't grow with files */}
         <button
           type="button"
