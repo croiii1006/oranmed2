@@ -537,17 +537,123 @@ function MetaField({
   placeholder?: string;
   type?: string;
 }) {
+  const [draft, setDraft] = useState('');
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState('');
+
+  if (type === 'date') {
+    return (
+      <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+        <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
+        <input
+          type="date"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="min-w-0 w-full border-0 bg-transparent py-0 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
+        />
+      </div>
+    );
+  }
+
+  const tags = value ? value.split(',').map((t) => t.trim()).filter(Boolean) : [];
+
+  const commit = (next: string[]) => onChange(next.join(','));
+
+  const addTag = () => {
+    const v = draft.trim();
+    if (!v) return;
+    if (tags.includes(v)) {
+      setDraft('');
+      return;
+    }
+    commit([...tags, v]);
+    setDraft('');
+  };
+
+  const removeTag = (i: number) => commit(tags.filter((_, idx) => idx !== i));
+
+  const startEdit = (i: number) => {
+    setEditingIdx(i);
+    setEditingText(tags[i]);
+  };
+
+  const commitEdit = () => {
+    if (editingIdx === null) return;
+    const v = editingText.trim();
+    const next = [...tags];
+    if (!v) {
+      next.splice(editingIdx, 1);
+    } else {
+      next[editingIdx] = v;
+    }
+    commit(next);
+    setEditingIdx(null);
+    setEditingText('');
+  };
+
   return (
-    <label className="group flex items-center gap-2 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40 cursor-text">
-      <span className="shrink-0 text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="min-w-0 flex-1 border-0 bg-transparent py-0 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
-      />
-    </label>
+    <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+      <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {tags.map((tag, i) =>
+          editingIdx === i ? (
+            <input
+              key={i}
+              autoFocus
+              value={editingText}
+              onChange={(e) => setEditingText(e.target.value)}
+              onBlur={commitEdit}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  commitEdit();
+                } else if (e.key === 'Escape') {
+                  setEditingIdx(null);
+                  setEditingText('');
+                }
+              }}
+              className="min-w-[40px] rounded-full border border-accent/40 bg-background/80 px-2.5 py-0.5 text-[12px] font-normal text-foreground/85 outline-none focus:ring-0"
+              style={{ width: `${Math.max(editingText.length, 2) + 2}ch` }}
+            />
+          ) : (
+            <span
+              key={i}
+              onClick={() => startEdit(i)}
+              className="group/tag inline-flex items-center gap-1 rounded-full border border-border/50 bg-background/70 px-2.5 py-0.5 text-[12px] font-normal text-foreground/85 cursor-text transition-colors hover:border-accent/50"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeTag(i);
+                }}
+                className="ml-0.5 text-muted-foreground/60 transition-colors hover:text-foreground"
+                aria-label="删除"
+              >
+                ×
+              </button>
+            </span>
+          ),
+        )}
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault();
+              addTag();
+            } else if (e.key === 'Backspace' && !draft && tags.length) {
+              removeTag(tags.length - 1);
+            }
+          }}
+          onBlur={addTag}
+          placeholder={tags.length ? '添加' : placeholder || '添加标签'}
+          className="min-w-[60px] flex-1 border-0 bg-transparent py-0 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
+        />
+      </div>
+    </div>
   );
 }
 
