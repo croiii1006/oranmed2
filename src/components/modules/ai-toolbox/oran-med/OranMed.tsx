@@ -950,8 +950,8 @@ function EntryStage({
 
           <div className="flex-1 min-w-0">
             <div className="text-sm font-light text-foreground/80">
-              {dragOver ? '松开以上传' : '上传 Brief 文件'}
-              {!dragOver && uploadedFiles.length > 0 ? (
+              上传 Brief 文件
+              {uploadedFiles.length > 0 ? (
                 <span className="ml-2 text-[11px] font-light text-muted-foreground">
                   已选 {uploadedFiles.length} 个
                 </span>
@@ -959,7 +959,7 @@ function EntryStage({
             </div>
             <div className="text-[11px] font-light text-muted-foreground/70">支持 PDF / 图片 / Word / 文本 · 可多选 · 可拖拽</div>
           </div>
-          {uploadedFiles.length > 0 && !dragOver ? (
+          {uploadedFiles.length > 0 ? (
             <span
               onClick={(e) => {
                 e.stopPropagation();
@@ -971,6 +971,7 @@ function EntryStage({
             </span>
           ) : null}
         </button>
+
         <input
           ref={fileInputRef}
           type="file"
