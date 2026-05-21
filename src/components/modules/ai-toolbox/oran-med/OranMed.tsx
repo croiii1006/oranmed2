@@ -506,10 +506,16 @@ function NewTaskView({
                                   <span key={t} className="rounded-full bg-muted/70 px-2 py-0.5">{t}</span>
                                 ))}
                               </div>
-                              <div className="flex items-start gap-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
-                                <Sparkles className="mt-[2px] h-2.5 w-2.5 flex-shrink-0" style={{ color: matchStyles.color }} />
-                                <span>{c.matchReason}</span>
-                              </div>
+                              {pickMode === 'ai' ? (
+                                <div className="flex items-start gap-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                                  <Sparkles className="mt-[2px] h-2.5 w-2.5 flex-shrink-0" style={{ color: matchStyles.color }} />
+                                  <span>{c.matchReason}</span>
+                                </div>
+                              ) : (
+                                <div className="text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                                  {[c.region, c.gender === 'female' ? '女性' : c.gender === 'male' ? '男性' : null].filter(Boolean).join(' · ')}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
