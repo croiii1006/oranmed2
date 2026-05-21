@@ -199,10 +199,17 @@ function NewTaskView({
   };
 
   // Filter creators by brief platform, then sort by match score
-  const recommendedCreators = useMemo(
-    () => CREATORS.filter((c) => c.platform === brief.platform).sort((a, b) => b.matchScore - a.matchScore),
-    [brief.platform],
-  );
+  const recommendedCreators = useMemo(() => {
+    const base = CREATORS.filter((c) => c.platform === brief.platform).sort((a, b) => b.matchScore - a.matchScore);
+    if (pickMode !== 'manual') return base;
+    return base.filter((c) => {
+      const region = (c.region || '').trim().toUpperCase();
+      const isCN = CN_REGIONS.has(region);
+      const territoryOk = manualTerritory === 'all' || (manualTerritory === 'cn' ? isCN : !isCN);
+      const genderOk = manualGender === 'all' || c.gender === manualGender;
+      return territoryOk && genderOk;
+    });
+  }, [brief.platform, pickMode, manualTerritory, manualGender]);
 
   return (
     <div className="relative min-h-full flex flex-col items-center justify-start px-6 pt-[100px] pb-6 md:px-8 md:pt-[180px] md:pb-8">
