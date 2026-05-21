@@ -124,22 +124,49 @@ function NewTaskView({
   const [creatorsOpen, setCreatorsOpen] = useState(false);
   const [matching, setMatching] = useState(false);
   const [pickMode, setPickMode] = useState<'ai' | 'manual'>('ai');
+  const [stage, setStage] = useState<'entry' | 'brief'>('entry');
+  const [rawInput, setRawInput] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [parsing, setParsing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const brandName = brief.brandName || '欧莱雅';
   const brandCategory = brief.brandCategory || '美妆护肤';
 
   const isBriefComplete = Boolean(
     brief.title.trim() &&
-      brief.goal.trim() &&
       brief.audience.trim() &&
       brief.expectedPublishDate &&
-      brief.targetCreatorCount > 0 &&
       brief.styleRequirements.trim() &&
       brief.brandTags.trim() &&
       brief.budget.trim() &&
       brief.brandName.trim() &&
       brief.brandCategory.trim(),
   );
+
+  const handleSmartParse = () => {
+    if (!rawInput.trim() && !uploadedFile) return;
+    setParsing(true);
+    setTimeout(() => {
+      updateBrief({
+        title: '玻色因精华 5 月小红书种草投放',
+        platform: '小红书',
+        audience: '25-35 岁都市女性',
+        expectedPublishDate: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+        styleRequirements: '专业测评 / 成分干货',
+        brandTags: '抗老,玻色因,成分党',
+        budget: '50,000 积分',
+        brandName: '欧莱雅',
+        brandCategory: '美妆护肤',
+      });
+      setParsing(false);
+      setStage('brief');
+    }, 2200);
+  };
+
+  const handleManual = () => {
+    setStage('brief');
+  };
 
 
   const openCreators = (mode: 'ai' | 'manual') => {
