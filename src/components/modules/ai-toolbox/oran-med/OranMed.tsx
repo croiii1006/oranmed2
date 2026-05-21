@@ -1498,17 +1498,20 @@ function OranGenInlinePanel({
   brief,
   creatorIds,
   hasAssets,
+  productImage,
+  onProductImageChange,
   onGenerated,
   onSwitchMode,
-  onReopen,
 }: {
   brief: { goal: string; brandName: string; brandCategory: string };
   creatorIds: string[];
   hasAssets: boolean;
+  productImage: { name: string; url: string } | null;
+  onProductImageChange: (img: { name: string; url: string } | null) => void;
   onGenerated: (count: number) => void;
   onSwitchMode: () => void;
-  onReopen?: () => void;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const steps = [
     { key: 'brief', label: '读取 Brief 与目标人群', agent: 'Brief 解析' },
     { key: 'benchmark', label: '匹配对标爆款视频', agent: 'TikTok 爆款专家' },
@@ -1539,6 +1542,11 @@ function OranGenInlinePanel({
     }, stepDelay * steps.length);
   };
 
+  const handleFile = (file?: File | null) => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    onProductImageChange({ name: file.name, url });
+  };
 
   return (
     <div className="space-y-3">
@@ -1561,17 +1569,54 @@ function OranGenInlinePanel({
           {brief.goal || '未填写任务目标'}
         </div>
 
+        {/* 上传商品白底图 */}
+        <div className="mt-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleFile(e.target.files?.[0])}
+          />
+          {productImage ? (
+            <div className="flex items-center gap-3 rounded-xl border border-border/40 bg-muted/20 p-2">
+              <img src={productImage.url} alt={productImage.name} className="h-12 w-12 rounded-lg object-cover" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-xs text-foreground">{productImage.name}</div>
+                <div className="text-[10px] text-muted-foreground">商品白底图已上传</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-[11px] text-muted-foreground underline-offset-2 hover:underline"
+              >
+                更换
+              </button>
+              <button
+                type="button"
+                onClick={() => onProductImageChange(null)}
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted/40"
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border/60 bg-muted/10 px-3 py-3 text-xs text-muted-foreground transition-colors hover:border-accent/40 hover:bg-muted/30 hover:text-foreground"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              上传商品白底图（可选，用于风格参考）
+            </button>
+          )}
+        </div>
+
         {phase === 'idle' ? (
           <div className="mt-4 flex items-center justify-end gap-2">
-            {onReopen ? (
-              <Button size="sm" variant="outline" onClick={onReopen} className="rounded-full">
-                <Sparkles className="mr-1 h-3.5 w-3.5" />
-                打开 ORAN GEN 工作台
-              </Button>
-            ) : null}
             <Button size="sm" onClick={start} className="rounded-full">
               <Wand2 className="mr-1 h-3.5 w-3.5" />
-              快速模拟生成
+              开始生成
             </Button>
           </div>
         ) : (
