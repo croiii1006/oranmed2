@@ -155,6 +155,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     plan: [],
     planConfirmed: false,
     complianceConfirmed: false,
+    rejectionReason: '剧情植入过于硬广，需弱化产品口播，调整为更生活化的场景；同时素材尚未上传，请补齐 OranGen 生成视频后再次提交。',
   },
   {
     id: 'task_demo_6',
