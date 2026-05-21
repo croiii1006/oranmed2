@@ -1503,7 +1503,7 @@ function OranGenInlinePanel({
   onGenerated,
   onSwitchMode,
 }: {
-  brief: { goal: string; brandName: string; brandCategory: string };
+  brief: { goal: string; brandName: string; brandCategory: string; brandTags: string };
   creatorIds: string[];
   hasAssets: boolean;
   productImage: { name: string; url: string } | null;
