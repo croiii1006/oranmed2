@@ -275,8 +275,13 @@ function NewTaskView({
                 </Select>
               </div>
 
-              {/* Inline meta fields — each wrapped in a light gray box */}
-              <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3">
+              {/* Inline meta fields — fill remaining height, responsive columns based on container width */}
+              <div
+                className={cn(
+                  'mt-4 flex-1 min-h-0 grid gap-2 auto-rows-fr',
+                  creatorsOpen ? 'grid-cols-2' : 'grid-cols-3',
+                )}
+              >
                 <MetaField label="目标人群" value={brief.audience} onChange={(v) => updateBrief({ audience: v })} placeholder="25-35 岁都市女性" />
                 <MetaField label="期望发布" type="date" value={brief.expectedPublishDate} onChange={(v) => updateBrief({ expectedPublishDate: v })} />
                 <MetaField label="内容风格" value={brief.styleRequirements} onChange={(v) => updateBrief({ styleRequirements: v })} placeholder="专业测评 / 干货" />
