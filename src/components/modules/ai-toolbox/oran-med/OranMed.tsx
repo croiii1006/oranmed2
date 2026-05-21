@@ -3503,6 +3503,12 @@ function TaskDetailDialog({
                   <ChevronRight className="ml-1 h-3.5 w-3.5" />
                 </Button>
               )}
+              {isRejected && (
+                <Button onClick={onOpen} className="bg-[#FF5500] text-white hover:bg-[#FF5500]/90">
+                  修改并重新提交
+                  <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+              )}
             </DialogFooter>
           </>
         )}
