@@ -46,5 +46,7 @@ export const CREATORS: Creator[] = creatorLibraryItems.map((item) => {
     matchScore,
     matchReason: `${item.niche} · ${item.region} 内容方向与 Brief 契合`,
     avatarUrl: item.avatarUrl,
+    region: item.region,
+    gender: item.gender,
   };
 });

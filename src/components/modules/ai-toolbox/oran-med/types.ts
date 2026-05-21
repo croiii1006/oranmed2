@@ -15,6 +15,7 @@ export interface Brief {
   styleRequirements: string;
   categoryRequirements: string;
   budget: string;
+  publishRequirements?: string;
 }
 
 export type CreatorTier = 'KOL' | 'KOC';
@@ -31,6 +32,8 @@ export interface Creator {
   matchScore: number;
   matchReason: string;
   avatarUrl?: string;
+  region?: string;
+  gender?: 'male' | 'female';
 }
 
 export type AssetSource = 'local' | 'orangen';

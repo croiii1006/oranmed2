@@ -141,8 +141,14 @@ function NewTaskView({
       brief.brandTags.trim() &&
       brief.budget.trim() &&
       brief.brandName.trim() &&
-      brief.brandCategory.trim(),
+      brief.brandCategory.trim() &&
+      (brief.publishRequirements ?? '').trim(),
   );
+
+  // Manual selection filters
+  const [manualTerritory, setManualTerritory] = useState<'all' | 'cn' | 'overseas'>('all');
+  const [manualGender, setManualGender] = useState<'all' | 'male' | 'female'>('all');
+  const CN_REGIONS = new Set(['CN', 'CHINA', '中国', '中国大陆']);
 
   const handleSmartParse = () => {
     if (!rawInput.trim() && uploadedFiles.length === 0) return;
@@ -193,10 +199,17 @@ function NewTaskView({
   };
 
   // Filter creators by brief platform, then sort by match score
-  const recommendedCreators = useMemo(
-    () => CREATORS.filter((c) => c.platform === brief.platform).sort((a, b) => b.matchScore - a.matchScore),
-    [brief.platform],
-  );
+  const recommendedCreators = useMemo(() => {
+    const base = CREATORS.filter((c) => c.platform === brief.platform).sort((a, b) => b.matchScore - a.matchScore);
+    if (pickMode !== 'manual') return base;
+    return base.filter((c) => {
+      const region = (c.region || '').trim().toUpperCase();
+      const isCN = CN_REGIONS.has(region);
+      const territoryOk = manualTerritory === 'all' || (manualTerritory === 'cn' ? isCN : !isCN);
+      const genderOk = manualGender === 'all' || c.gender === manualGender;
+      return territoryOk && genderOk;
+    });
+  }, [brief.platform, pickMode, manualTerritory, manualGender]);
 
   return (
     <div className="relative min-h-full flex flex-col items-center justify-start px-6 pt-[100px] pb-6 md:px-8 md:pt-[180px] md:pb-8">
@@ -285,8 +298,14 @@ function NewTaskView({
                 <MetaField label="目标人群" value={brief.audience} onChange={(v) => updateBrief({ audience: v })} placeholder="25-35 岁都市女性" />
                 <MetaField label="期望发布" type="date" value={brief.expectedPublishDate} onChange={(v) => updateBrief({ expectedPublishDate: v })} />
                 <MetaField label="内容风格" value={brief.styleRequirements} onChange={(v) => updateBrief({ styleRequirements: v })} placeholder="专业测评 / 干货" />
-                <MetaField label="品牌标签" value={brief.brandTags} onChange={(v) => updateBrief({ brandTags: v })} placeholder="抗老,成分" />
+                <MetaField label="品牌卖点" value={brief.brandTags} onChange={(v) => updateBrief({ brandTags: v })} placeholder="抗老,成分" />
                 <MetaField label="预算" value={brief.budget} onChange={(v) => updateBrief({ budget: v })} placeholder="50,000 积分" />
+                <PlainField
+                  label="发布要求"
+                  value={brief.publishRequirements ?? ''}
+                  onChange={(v) => updateBrief({ publishRequirements: v })}
+                  placeholder="例如：需露出 logo / 含口播 / 不允许夸大宣传"
+                />
               </div>
 
               {/* Footer: brand name + category */}
@@ -363,15 +382,27 @@ function NewTaskView({
           {creatorsOpen ? (
             <div className="min-w-0 flex-1 flex flex-col animate-in fade-in slide-in-from-right-6 duration-500">
               <div className="relative h-[400px] flex flex-col rounded-[28px] border border-white/40 bg-muted/30 px-7 py-7 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl backdrop-saturate-150">
-                <div className="mb-5 flex items-center justify-between">
+                <div className="mb-5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
-                    <SparkleIcon />
+                    {pickMode === 'ai' ? (
+                      <SparkleIcon />
+                    ) : (
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    )}
                     <span className="text-sm font-light tracking-wide text-foreground/70">
                       {pickMode === 'ai' ? 'AI 推荐达人' : '手动选择达人'}
                     </span>
                     <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
                       {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
                     </span>
+                    {pickMode === 'manual' && !matching ? (
+                      <ManualFilterBar
+                        territory={manualTerritory}
+                        gender={manualGender}
+                        onTerritory={setManualTerritory}
+                        onGender={setManualGender}
+                      />
+                    ) : null}
                   </div>
                   <span className="text-[11px] font-light text-muted-foreground">
                     {matching ? '基于 Brief 与人群分析中' : `已选 ${selectedCreatorIds.length} 位`}
@@ -424,14 +455,16 @@ function NewTaskView({
                             : 'border-border/30 hover:-translate-y-0.5 hover:border-foreground/10 hover:bg-background/80 hover:shadow-[0_16px_34px_rgba(15,23,42,0.06)]',
                         )}
                       >
-                        {/* Match score badge — percentage with dynamic color depth */}
-                        <div
-                          className="pointer-events-none absolute left-2.5 top-2.5 z-30 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
-                          style={{ color: matchStyles.color, backgroundColor: matchStyles.bg }}
-                        >
-                          <span className="inline-block h-1 w-1 rounded-full" style={{ backgroundColor: matchStyles.color }} />
-                          <span>{c.matchScore}%</span>
-                        </div>
+                        {/* Match score badge — hidden in manual mode */}
+                        {pickMode === 'ai' ? (
+                          <div
+                            className="pointer-events-none absolute left-2.5 top-2.5 z-30 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
+                            style={{ color: matchStyles.color, backgroundColor: matchStyles.bg }}
+                          >
+                            <span className="inline-block h-1 w-1 rounded-full" style={{ backgroundColor: matchStyles.color }} />
+                            <span>{c.matchScore}%</span>
+                          </div>
+                        ) : null}
                         {selected ? (
                           <div className="absolute right-2.5 top-2.5 z-30 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
                             <CheckCircle2 className="h-3 w-3" strokeWidth={3} />
@@ -473,10 +506,16 @@ function NewTaskView({
                                   <span key={t} className="rounded-full bg-muted/70 px-2 py-0.5">{t}</span>
                                 ))}
                               </div>
-                              <div className="flex items-start gap-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
-                                <Sparkles className="mt-[2px] h-2.5 w-2.5 flex-shrink-0" style={{ color: matchStyles.color }} />
-                                <span>{c.matchReason}</span>
-                              </div>
+                              {pickMode === 'ai' ? (
+                                <div className="flex items-start gap-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                                  <Sparkles className="mt-[2px] h-2.5 w-2.5 flex-shrink-0" style={{ color: matchStyles.color }} />
+                                  <span>{c.matchReason}</span>
+                                </div>
+                              ) : (
+                                <div className="text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                                  {[c.region, c.gender === 'female' ? '女性' : c.gender === 'male' ? '男性' : null].filter(Boolean).join(' · ')}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -510,6 +549,62 @@ function NewTaskView({
 }
 
 // Custom 4-point sparkle with orange gradient
+function PlainField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+      <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="min-w-0 w-full border-0 bg-transparent py-0 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
+      />
+    </div>
+  );
+}
+
+function ManualFilterBar({
+  territory,
+  gender,
+  onTerritory,
+  onGender,
+}: {
+  territory: 'all' | 'cn' | 'overseas';
+  gender: 'all' | 'male' | 'female';
+  onTerritory: (v: 'all' | 'cn' | 'overseas') => void;
+  onGender: (v: 'all' | 'male' | 'female') => void;
+}) {
+  const chip = (active: boolean) =>
+    cn(
+      'rounded-full border px-2 py-0.5 text-[10px] font-light transition-colors',
+      active
+        ? 'border-foreground/30 bg-foreground text-background'
+        : 'border-border/50 bg-background/60 text-muted-foreground hover:border-foreground/20 hover:text-foreground',
+    );
+  return (
+    <div className="ml-1 flex items-center gap-1.5">
+      <span className="text-[10px] font-light text-muted-foreground/60">区域</span>
+      <button type="button" className={chip(territory === 'all')} onClick={() => onTerritory('all')}>全部</button>
+      <button type="button" className={chip(territory === 'cn')} onClick={() => onTerritory('cn')}>中国</button>
+      <button type="button" className={chip(territory === 'overseas')} onClick={() => onTerritory('overseas')}>海外</button>
+      <span className="ml-1 text-[10px] font-light text-muted-foreground/60">性别</span>
+      <button type="button" className={chip(gender === 'all')} onClick={() => onGender('all')}>全部</button>
+      <button type="button" className={chip(gender === 'male')} onClick={() => onGender('male')}>男</button>
+      <button type="button" className={chip(gender === 'female')} onClick={() => onGender('female')}>女</button>
+    </div>
+  );
+}
+
 function SparkleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
