@@ -394,17 +394,19 @@ function NewTaskView({
                     <span className="text-sm font-light tracking-wide text-foreground/70">
                       {pickMode === 'ai' ? 'AI 推荐达人' : '手动选择达人'}
                     </span>
-                    <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
-                      {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
-                    </span>
                     {pickMode === 'manual' && !matching ? (
-                      <ManualFilterBar
+                      <ManualFilterDropdown
+                        count={recommendedCreators.length}
                         territory={manualTerritory}
                         gender={manualGender}
                         onTerritory={setManualTerritory}
                         onGender={setManualGender}
                       />
-                    ) : null}
+                    ) : (
+                      <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
+                        {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
+                      </span>
+                    )}
                   </div>
                   <span className="text-[11px] font-light text-muted-foreground">
                     {matching ? '基于 Brief 与人群分析中' : `已选 ${selectedCreatorIds.length} 位`}
