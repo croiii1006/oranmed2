@@ -1980,7 +1980,7 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
           const statusDot = STATUS_DOT[t.status];
           const firstCreator = CREATORS.find((c) => c.id === t.selectedCreatorIds[0]);
           const avatarLabel = (firstCreator?.name || t.brief.brandName || 'M').slice(0, 1);
-          const briefPreview = t.brief.goal?.trim() || '输入 Brief 内容，或选择 Brief 模板';
+          const briefPreview = t.brief.goal?.trim() || '输入 Brief 内容';
           return (
             <button
               key={t.id}
