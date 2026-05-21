@@ -2887,7 +2887,7 @@ function formatDate(iso: string) {
 }
 
 function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenWorkflow: () => void }) {
-  const { tasks, loadTask, deleteTask } = useOranMed();
+  const { tasks, loadTask, deleteTask, setStatus } = useOranMed();
   const [detailId, setDetailId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | TaskStatus>('all');
