@@ -110,11 +110,6 @@ function OranMedInner() {
 }
 
 // ============== New task ==============
-const BRIEF_TEMPLATES = [
-  { id: 'tmpl-skincare', label: '美妆护肤 · 新品种草', content: '本次推广目标：新品玻色因精华上市种草，提升 25-35 岁都市女性用户的认知与搜索。希望达人以专业测评 + 真实使用感受的方式呈现，结合成分解析与肤感体验，引导评论区互动与加购。' },
-  { id: 'tmpl-food', label: '食品饮料 · 节日营销', content: '围绕节日场景打造礼赠话题，突出包装颜值与口味亮点。期望达人结合开箱、试吃、送礼等场景演绎，植入自然，强调限时优惠。' },
-  { id: 'tmpl-3c', label: '3C 数码 · 上市评测', content: '新品上市评测投放，强调差异化卖点与使用场景。期望达人输出深度评测内容，覆盖性能、外观、生态，提供购买建议。' },
-];
 
 function NewTaskView({
   onOpenWorkbench,
