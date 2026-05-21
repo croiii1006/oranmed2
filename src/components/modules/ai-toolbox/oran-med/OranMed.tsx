@@ -537,9 +537,9 @@ function MetaField({
   placeholder?: string;
   type?: string;
 }) {
-  const [draft, setDraft] = React.useState('');
-  const [editingIdx, setEditingIdx] = React.useState<number | null>(null);
-  const [editingText, setEditingText] = React.useState('');
+  const [draft, setDraft] = useState('');
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState('');
 
   if (type === 'date') {
     return (
