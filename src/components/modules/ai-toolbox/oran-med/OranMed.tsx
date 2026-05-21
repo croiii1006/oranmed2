@@ -1962,7 +1962,43 @@ function PlanFormStep({
 
       <div className="rounded-2xl border border-border/40 bg-card/40 p-6 backdrop-blur-sm py-[19px]">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-...
+          <Field label="发布时间">
+            <Input
+              type="datetime-local"
+              value={form.scheduledAt}
+              onChange={(e) => setForm((s) => ({ ...s, scheduledAt: e.target.value }))}
+            />
+          </Field>
+          <Field label="发布平台">
+            <Select value={form.platform} onValueChange={(v) => setForm((s) => ({ ...s, platform: v as Platform }))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PLATFORMS.map((p) => (
+                  <SelectItem key={p} value={p}>{p}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <div className="md:col-span-2">
+            <Field label="发布节奏">
+              <Input
+                value={form.cadence}
+                onChange={(e) => setForm((s) => ({ ...s, cadence: e.target.value }))}
+                placeholder="集中投放3天 / 间隔投放 / 高峰时段"
+              />
+            </Field>
+          </div>
+          <div className="md:col-span-2">
+            <Field label="发布说明">
+              <Textarea
+                rows={4}
+                value={form.notes}
+                onChange={(e) => setForm((s) => ({ ...s, notes: e.target.value }))}
+                placeholder="补充本次发布的文案要点、互动引导、合规要求等"
+              />
+            </Field>
           </div>
         </div>
 
