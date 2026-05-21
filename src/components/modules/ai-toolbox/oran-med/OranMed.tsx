@@ -147,12 +147,6 @@ function NewTaskView({
       brief.brandCategory.trim(),
   );
 
-  const handlePickTemplate = (id: string) => {
-    const t = BRIEF_TEMPLATES.find((x) => x.id === id);
-    if (!t) return;
-    updateBrief({ goal: t.content });
-    setTplOpen(false);
-  };
 
   const openCreators = (mode: 'ai' | 'manual') => {
     const patch: Partial<typeof brief> = {};
