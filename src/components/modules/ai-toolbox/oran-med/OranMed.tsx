@@ -3138,9 +3138,17 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
                   <span className="text-[10px] font-light text-muted-foreground/70">
                     {formatDate(t.updatedAt)} · {t.brief.brandName || '未命名品牌'}
                   </span>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-background bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-                    {avatarLabel}
-                  </div>
+                  {firstCreator?.avatarUrl ? (
+                    <img
+                      src={firstCreator.avatarUrl}
+                      alt={firstCreator.name}
+                      className="h-11 w-11 rounded-full border-2 border-background object-cover shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+                    />
+                  ) : (
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-background bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                      {avatarLabel}
+                    </div>
+                  )}
                 </div>
               </div>
             </button>
