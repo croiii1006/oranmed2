@@ -93,6 +93,7 @@ export interface OranMedTask {
   plan: PublishPlanItem[];
   planConfirmed: boolean;
   complianceConfirmed: boolean;
+  rejectionReason?: string;
 }
 
 export const emptyBrief = (): Brief => ({

@@ -2887,7 +2887,7 @@ function formatDate(iso: string) {
 }
 
 function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenWorkflow: () => void }) {
-  const { tasks, loadTask, deleteTask } = useOranMed();
+  const { tasks, loadTask, deleteTask, setStatus } = useOranMed();
   const [detailId, setDetailId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | TaskStatus>('all');
@@ -3128,10 +3128,19 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
                   )}
                 </div>
 
-                {/* brief preview */}
-                <p className="mt-3 line-clamp-2 text-[12px] font-light leading-relaxed text-muted-foreground">
-                  {briefPreview}
-                </p>
+                {/* brief preview or rejection reason */}
+                {t.status === 'rejected' && t.rejectionReason ? (
+                  <div className="mt-3 rounded-lg border border-rose-200/70 bg-rose-50/70 px-2.5 py-1.5 dark:border-rose-900/40 dark:bg-rose-950/30">
+                    <div className="mb-0.5 text-[10px] font-medium text-rose-700 dark:text-rose-300">拒绝理由</div>
+                    <p className="line-clamp-2 text-[11px] font-light leading-snug text-rose-800/85 dark:text-rose-200/85">
+                      {t.rejectionReason}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-3 line-clamp-2 text-[12px] font-light leading-relaxed text-muted-foreground">
+                    {briefPreview}
+                  </p>
+                )}
 
                 {/* avatar bottom-right */}
                 <div className="mt-auto flex items-end justify-between pt-2">
@@ -3192,6 +3201,10 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
         onOpen={() => {
           if (detailTask) {
             loadTask(detailTask.id);
+            if (detailTask.status === 'rejected') {
+              // Move back to draft so the user can edit and resubmit
+              setTimeout(() => setStatus('draft'), 0);
+            }
             setDetailId(null);
             onOpenWorkflow();
           }
@@ -3231,6 +3244,7 @@ function TaskDetailDialog({
   }, [open, task?.id]);
 
   const isDraft = task?.status === 'draft';
+  const isRejected = task?.status === 'rejected';
 
   const activeCreator = view.kind === 'creator' ? CREATORS.find((c) => c.id === view.id) : null;
   const activeAsset = view.kind === 'asset' ? task?.assets.find((a) => a.id === view.id) : null;
@@ -3286,6 +3300,17 @@ function TaskDetailDialog({
             <ScrollArea className="max-h-[60vh] pr-3">
               {view.kind === 'main' && (
                 <div className="space-y-5">
+                  {isRejected && task.rejectionReason && (
+                    <div className="rounded-xl border border-rose-200/70 bg-rose-50/70 p-3 dark:border-rose-900/50 dark:bg-rose-950/30">
+                      <div className="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-rose-700 dark:text-rose-300">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        审核未通过 · 拒绝理由
+                      </div>
+                      <p className="text-xs leading-relaxed text-rose-800/90 dark:text-rose-200/90">
+                        {task.rejectionReason}
+                      </p>
+                    </div>
+                  )}
                   <section>
                     <h4 className="mb-2 text-xs font-medium text-muted-foreground">Brief</h4>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs">
@@ -3488,6 +3513,12 @@ function TaskDetailDialog({
               {isDraft && (
                 <Button onClick={onOpen}>
                   继续编辑
+                  <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+              )}
+              {isRejected && (
+                <Button onClick={onOpen} className="bg-[#FF5500] text-white hover:bg-[#FF5500]/90">
+                  修改并重新提交
                   <ChevronRight className="ml-1 h-3.5 w-3.5" />
                 </Button>
               )}
