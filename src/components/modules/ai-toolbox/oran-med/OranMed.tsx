@@ -126,7 +126,6 @@ function NewTaskView({
   const { currentTask, tasks, updateBrief, saveBrief, toggleCreator } = useOranMed();
   const historyCount = tasks.length;
   const { brief, selectedCreatorIds } = currentTask;
-  const [tplOpen, setTplOpen] = useState(false);
   const [creatorsOpen, setCreatorsOpen] = useState(false);
   const [matching, setMatching] = useState(false);
   const [pickMode, setPickMode] = useState<'ai' | 'manual'>('ai');
