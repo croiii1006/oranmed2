@@ -672,7 +672,9 @@ function MetaField({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [popoverDraft, setPopoverDraft] = useState('');
   const rowRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
   const [rowWidth, setRowWidth] = useState(0);
+  const [tagWidths, setTagWidths] = useState<number[]>([]);
 
   useEffect(() => {
     const el = rowRef.current;
@@ -683,6 +685,14 @@ function MetaField({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    const el = measureRef.current;
+    if (!el) return;
+    const widths = Array.from(el.children).map((c) => (c as HTMLElement).offsetWidth);
+    setTagWidths(widths);
+  }, [tags]);
+
 
   if (type === 'date') {
     return (
