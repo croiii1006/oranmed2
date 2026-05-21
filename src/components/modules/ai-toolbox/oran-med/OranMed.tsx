@@ -1276,7 +1276,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
             />
           )}
 
-          {assetMode ? (
+          {assetMode === 'local' ? (
             <div className="flex justify-end">
               <Button
                 size="sm"
