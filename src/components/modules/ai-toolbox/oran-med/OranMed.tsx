@@ -821,7 +821,24 @@ function MetaField({
   return (
     <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
+      {/* Hidden measurement row */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        className="pointer-events-none invisible absolute -left-[9999px] top-0 flex gap-1.5"
+      >
+        {tags.map((tag, i) => (
+          <span
+            key={i}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border/50 bg-background/70 px-2.5 py-0.5 text-[12px] font-normal"
+          >
+            {tag}
+            <span className="ml-0.5">×</span>
+          </span>
+        ))}
+      </div>
       <div ref={rowRef} className="flex flex-nowrap items-center gap-1.5 overflow-hidden min-w-0">
+
         {visibleTags.map((tag, i) => renderTag(tag, i))}
         {hiddenCount > 0 && (
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
