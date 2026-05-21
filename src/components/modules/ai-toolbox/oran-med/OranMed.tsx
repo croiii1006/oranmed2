@@ -446,20 +446,21 @@ function NewTaskView({
                       const bg = `hsla(24, ${s}%, ${l}%, 0.12)`;
                       return { color, bg };
                     })();
+                    const genderLabel = c.gender === 'female' ? '女性' : '男性';
                     return (
                       <button
                         key={c.id}
                         type="button"
                         onClick={() => toggleCreator(c.id)}
                         className={cn(
-                          'group relative flex min-h-[148px] w-full flex-col items-center overflow-hidden rounded-[18px] border bg-background/60 px-3 py-4 text-center transition-all duration-200',
+                          'group relative flex min-h-[144px] w-full flex-col items-center overflow-hidden rounded-[18px] border bg-background px-3 py-4 text-center transition-all duration-200',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20',
                           selected
-                            ? 'border-foreground/35 bg-foreground/[0.04]'
-                            : 'border-border/30 hover:-translate-y-0.5 hover:border-foreground/10 hover:bg-background/80 hover:shadow-[0_16px_34px_rgba(15,23,42,0.06)]',
+                            ? 'border-foreground/35 bg-foreground/[0.03]'
+                            : 'border-border/30 hover:z-10 hover:-translate-y-0.5 hover:border-foreground/10 hover:bg-muted/[0.35] hover:shadow-[0_16px_34px_rgba(15,23,42,0.06)]',
                         )}
                       >
-                        {/* Match score badge — hidden in manual mode */}
+                        {/* Match score badge — AI mode only */}
                         {pickMode === 'ai' ? (
                           <div
                             className="pointer-events-none absolute left-2.5 top-2.5 z-30 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
@@ -470,35 +471,35 @@ function NewTaskView({
                           </div>
                         ) : null}
                         {selected ? (
-                          <div className="absolute right-2.5 top-2.5 z-30 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
-                            <CheckCircle2 className="h-3 w-3" strokeWidth={3} />
+                          <div className="absolute right-2.5 top-2.5 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
+                            <Check className="h-3 w-3" strokeWidth={3} />
                           </div>
                         ) : null}
 
-                        <div className="relative z-10 flex h-[58px] w-[58px] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60 transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-focus-visible:scale-[1.04] group-focus-visible:opacity-15">
+                        <div className="relative z-10 h-[58px] w-[58px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-focus-visible:scale-[1.04] group-focus-visible:opacity-15">
                           {c.avatarUrl ? (
                             <img src={c.avatarUrl} alt={c.name} className="h-full w-full object-cover" />
                           ) : (
-                            c.name.slice(0, 1)
+                            <div className="flex h-full w-full items-center justify-center text-sm font-light text-foreground/60">
+                              {c.name.slice(0, 1)}
+                            </div>
                           )}
                         </div>
 
                         <div className="relative z-10 mt-2.5 min-w-0 transition-opacity duration-200 group-hover:opacity-10 group-focus-visible:opacity-10">
-                          <div className="truncate text-[13px] font-light tracking-[-0.01em] text-foreground">
+                          <div className="truncate text-[13px] font-light tracking-[-0.01em] text-foreground sm:text-sm">
                             {c.name}
                           </div>
-                          <div className="mt-0.5 truncate text-[11px] font-light text-muted-foreground/70">
+                          <div className="mt-0.5 truncate text-[11px] font-light text-muted-foreground/70 sm:text-xs">
                             {c.handle}
                           </div>
                         </div>
 
-                        <div className="pointer-events-none absolute inset-1.5 z-10 rounded-[15px] bg-background/85 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                        <div className="pointer-events-none absolute inset-1.5 z-10 rounded-[15px] bg-white/78 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
                           <div className="flex h-full flex-col justify-between">
                             <div className="space-y-1">
-                              <div className="flex items-center gap-1.5 text-[10px] font-medium tracking-[0.08em] text-foreground/45">
-                                <span>{c.tier}</span>
-                                <span>·</span>
-                                <span>{c.platform}</span>
+                              <div className="text-[10px] font-medium tracking-[0.08em] text-foreground/45">
+                                CREATOR INFO
                               </div>
                               <div className="text-[13px] font-semibold text-foreground">{c.followers} 粉丝</div>
                               <div className="text-[11px] text-muted-foreground">均播 {c.avgPlay}</div>
@@ -506,20 +507,10 @@ function NewTaskView({
 
                             <div className="space-y-1.5">
                               <div className="flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
-                                {c.tags.slice(0, 2).map((t) => (
-                                  <span key={t} className="rounded-full bg-muted/70 px-2 py-0.5">{t}</span>
-                                ))}
+                                {c.region ? <span className="rounded-full bg-background/80 px-2 py-0.5">{c.region}</span> : null}
+                                <span className="rounded-full bg-background/80 px-2 py-0.5">{genderLabel}</span>
                               </div>
-                              {pickMode === 'ai' ? (
-                                <div className="flex items-start gap-1 text-[11px] leading-snug text-muted-foreground line-clamp-2">
-                                  <Sparkles className="mt-[2px] h-2.5 w-2.5 flex-shrink-0" style={{ color: matchStyles.color }} />
-                                  <span>{c.matchReason}</span>
-                                </div>
-                              ) : (
-                                <div className="text-[11px] leading-snug text-muted-foreground line-clamp-2">
-                                  {[c.region, c.gender === 'female' ? '女性' : c.gender === 'male' ? '男性' : null].filter(Boolean).join(' · ')}
-                                </div>
-                              )}
+                              <div className="truncate text-[11px] text-foreground/75">{c.tags[0] ?? c.platform}</div>
                             </div>
                           </div>
                         </div>
