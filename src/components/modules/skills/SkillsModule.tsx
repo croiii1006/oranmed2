@@ -997,6 +997,7 @@ export function SkillsModule() {
             agent04Task={taskGenVideo}
             resultVideo={state.resultVideo}
             resultVideoCount={Math.max(state.setup.selectedCreatorIds.length, 1)}
+            onReturnToOranMed={oranMedReturnTaskId ? handleReturnToOranMed : undefined}
             onRegenerate={handleRegenerate}
             // Memory
             memoryTitle={activeMemoryEntry?.title}
