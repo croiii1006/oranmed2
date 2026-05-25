@@ -165,6 +165,13 @@ export function SkillsModule() {
   const [prefilledCategory, setPrefilledCategory] = useState('');
   const [prefilledSellingPoints, setPrefilledSellingPoints] = useState('');
   const [prefilledMemoryIds, setPrefilledMemoryIds] = useState<string[]>([]);
+  // OranMed round-trip state
+  const [oranMedBrief, setOranMedBrief] = useState<OranGenPrefillBrief | null>(null);
+  const [oranMedCreators, setOranMedCreators] = useState<OranGenPrefillCreator[]>([]);
+  const [oranMedProductImage, setOranMedProductImage] = useState<{ name: string; url: string } | null>(null);
+  const [oranMedReturnTaskId, setOranMedReturnTaskId] = useState<string | null>(null);
+  const [autoStartTriggered, setAutoStartTriggered] = useState(false);
+  const { navigateToItem } = useModule();
   const isNarrowWorkspace = useMediaQuery('(max-width: 1279px)');
   const [narrowPane, setNarrowPane] = useState<NarrowPane>('left');
   const previousProcessingRef = useRef(state.isProcessing);
