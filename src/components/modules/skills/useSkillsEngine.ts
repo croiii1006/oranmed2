@@ -1118,7 +1118,11 @@ export function useSkillsEngine() {
       addTaskLog(genTaskId, '质量检测通过');
       await waitUntil(phase3Deadline);
 
-      const videoCount = Math.max(state.setup.selectedCreatorIds.length, 1);
+      let videoCount = 1;
+      setState(prev => {
+        videoCount = Math.max(prev.setup.selectedCreatorIds.length, 1);
+        return prev;
+      });
       updateTask(genTaskId, { status: 'done', progress: 100, endAt: now(), output: `视频生成完成，共 ${videoCount} 条，时长 30s` });
       updateAgentInMessages('agent-04', { status: 'done', progress: 100, statusText: `视频生成完成！共 ${videoCount} 条` });
       updateAgent('agent-04', { status: 'done', progress: 100, statusText: `视频生成完成！共 ${videoCount} 条` });
