@@ -90,15 +90,15 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
                 isExpanded ? 'w-8 h-8' : 'w-5 h-5'
               )}>
                 {avatarSrc ?
-                <img src={avatarSrc} alt={agent.name} className="w-full h-full object-contain" /> :
+                <img src={avatarSrc} alt={displayName} className="w-full h-full object-contain" /> :
 
-                <div className="w-full h-full rounded bg-muted flex items-center justify-center text-[9px] font-medium">{agent.name[0]}</div>
+                <div className="w-full h-full rounded bg-muted flex items-center justify-center text-[9px] font-medium">{displayName[0]}</div>
                 }
               </div>
               <span className={cn(
                 'flex-1 text-foreground/70 transition-all duration-200',
                 isExpanded ? 'text-base font-semibold text-foreground' : 'text-sm font-medium'
-              )}>{agent.name}</span>
+              )}>{displayName}</span>
               <ChevronRight className={cn(
                 'w-4 h-4 text-muted-foreground/30 transition-transform duration-200',
                 isExpanded && 'rotate-90'
