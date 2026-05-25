@@ -624,9 +624,27 @@ function CustomField({
   const [draft, setDraft] = useState('');
   const tags = field.value ? field.value.split(',').map((t) => t.trim()).filter(Boolean) : [];
   const commitTags = (next: string[]) => onChange({ value: next.join(',') });
+
+  const MAX_TAG_LEN = 20;
+  const MAX_TAG_COUNT = 10;
+
   const addTag = () => {
     const v = draft.trim();
-    if (!v || tags.includes(v)) {
+    if (!v) {
+      setDraft('');
+      return;
+    }
+    if (v.length > MAX_TAG_LEN) {
+      toast.error(`标签长度不能超过 ${MAX_TAG_LEN} 个字符`);
+      return;
+    }
+    if (tags.includes(v)) {
+      toast.error('标签已存在');
+      setDraft('');
+      return;
+    }
+    if (tags.length >= MAX_TAG_COUNT) {
+      toast.error(`最多只能添加 ${MAX_TAG_COUNT} 个标签`);
       setDraft('');
       return;
     }
@@ -635,12 +653,21 @@ function CustomField({
   };
   const removeTag = (i: number) => commitTags(tags.filter((_, idx) => idx !== i));
 
+  const handleLabelBlur = (val: string) => {
+    const trimmed = val.trim();
+    if (!trimmed) {
+      toast.error('字段名称不能为空');
+    }
+    onChange({ label: trimmed });
+  };
+
   return (
     <div className="group relative flex flex-col gap-1.5 rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <div className="flex items-center gap-1.5">
         <input
           value={field.label}
           onChange={(e) => onChange({ label: e.target.value })}
+          onBlur={(e) => handleLabelBlur(e.target.value)}
           placeholder="自定义字段名"
           className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[12px] font-light leading-5 text-muted-foreground/80 placeholder:text-muted-foreground/50 outline-none focus:ring-0"
         />
