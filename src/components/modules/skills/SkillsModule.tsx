@@ -242,7 +242,40 @@ export function SkillsModule() {
     setPrefilledCategory(prefill.category || '');
     setPrefilledSellingPoints(prefill.sellingPoints || '');
     setPrefilledMemoryIds(prefill.attachmentIds);
+
+    if (prefill.source === 'oran-med') {
+      setOranMedBrief(prefill.brief ?? null);
+      setOranMedCreators(prefill.creators ?? []);
+      setOranMedProductImage(prefill.productImage ?? null);
+      setOranMedReturnTaskId(prefill.returnTaskId ?? null);
+      if (prefill.autoStart) {
+        setAutoStartTriggered(false);
+      }
+    }
   }, [consumeOranGenPrefill]);
+
+  // Auto-start setup when coming from OranMed (user already provided everything)
+  useEffect(() => {
+    if (autoStartTriggered) return;
+    if (!oranMedBrief || !oranMedProductImage) return;
+    if (!historyLoaded) return;
+    if (state.setupCompleted) return;
+    if (hasInProgressSession) return;
+
+    const setup: SessionSetup = {
+      image: oranMedProductImage.url,
+      imageName: oranMedProductImage.name,
+      memoryEnabled: false,
+      selectedMemoryIds: [],
+      selectedCreatorIds: oranMedCreators.map((c) => c.id),
+      sellingPoints: oranMedBrief.brandTags || '',
+      category: oranMedBrief.brandCategory || prefilledCategory || '其它',
+    };
+    addHistory(setup);
+    completeSetup(setup);
+    setAutoStartTriggered(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [oranMedBrief, oranMedProductImage, historyLoaded, state.setupCompleted, autoStartTriggered]);
 
   useEffect(() => {
     const previousView = previousRightViewRef.current;
