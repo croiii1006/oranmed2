@@ -1,7 +1,9 @@
 import { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useMemory } from '@/contexts/MemoryContext';
-import { useOranGenPrefill } from '@/contexts/OranGenPrefillContext';
+import { useOranGenPrefill, type OranGenPrefillBrief, type OranGenPrefillCreator } from '@/contexts/OranGenPrefillContext';
+import { useModule } from '@/contexts/ModuleContext';
+import { useOranMed } from '@/components/modules/ai-toolbox/oran-med/context/OranMedContext';
 import { useSkillsEngine, SessionSetup, SkillsState, StreamMessageType } from './useSkillsEngine';
 import { SetupSummary } from './SetupSummary';
 import { AgentCard, AgentClusterCard } from './AgentCard';
