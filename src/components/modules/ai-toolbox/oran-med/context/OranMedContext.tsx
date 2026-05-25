@@ -138,6 +138,19 @@ export function OranMedProvider({ children }: { children: ReactNode }) {
     [patchCurrent],
   );
 
+  const addAssetToTask = useCallback(
+    (taskId: string, asset: ContentAsset) => {
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === taskId
+            ? { ...t, assets: [...t.assets, asset], updatedAt: new Date().toISOString() }
+            : t,
+        ),
+      );
+    },
+    [],
+  );
+
   const removeAsset = useCallback(
     (id: string) =>
       patchCurrent((t) => ({
