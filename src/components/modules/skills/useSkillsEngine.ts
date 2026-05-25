@@ -697,9 +697,9 @@ export function useSkillsEngine() {
   }, []);
 
   // Delay helpers
-  const randDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 1500 + Math.random() * 2000); streamTimers.current.push(t); });
-  const subDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 1000 + Math.random() * 1000); streamTimers.current.push(t); });
-  const backendDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 3000 + Math.random() * 3000); streamTimers.current.push(t); });
+  const randDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 3000); streamTimers.current.push(t); });
+  const subDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 3000); streamTimers.current.push(t); });
+  const backendDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 3000); streamTimers.current.push(t); });
   const pause = (ms = 600) => new Promise<void>(r => { const t = window.setTimeout(r, ms); streamTimers.current.push(t); });
   const waitUntil = (deadline: number) => new Promise<void>(r => {
     const remaining = Math.max(0, deadline - Date.now());

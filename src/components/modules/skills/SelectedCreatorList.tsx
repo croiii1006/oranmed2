@@ -27,10 +27,10 @@ export function SelectedCreatorList({ creators, className }: SelectedCreatorList
             type="button"
             onClick={() => setExpandedId(expanded ? null : c.id)}
             className={cn(
-              'group relative flex flex-col rounded-xl border bg-background/80 px-2.5 py-2 text-left transition-all',
+              'group relative flex w-[220px] flex-col rounded-xl border bg-background/80 px-2.5 py-2 text-left align-top transition-all',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15',
               expanded
-                ? 'w-full border-foreground/25 bg-foreground/[0.02] shadow-sm sm:w-[300px]'
+                ? 'border-foreground/25 bg-foreground/[0.02] shadow-sm'
                 : 'border-border/40 hover:border-foreground/15 hover:bg-muted/30',
             )}
           >
