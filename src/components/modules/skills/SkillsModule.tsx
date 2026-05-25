@@ -1,7 +1,9 @@
 import { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useMemory } from '@/contexts/MemoryContext';
-import { useOranGenPrefill } from '@/contexts/OranGenPrefillContext';
+import { useOranGenPrefill, type OranGenPrefillBrief, type OranGenPrefillCreator } from '@/contexts/OranGenPrefillContext';
+import { useModule } from '@/contexts/ModuleContext';
+import type { ContentAsset, OranMedTask } from '@/components/modules/ai-toolbox/oran-med/types';
 import { useSkillsEngine, SessionSetup, SkillsState, StreamMessageType } from './useSkillsEngine';
 import { SetupSummary } from './SetupSummary';
 import { AgentCard, AgentClusterCard } from './AgentCard';
@@ -48,16 +50,23 @@ function useMediaQuery(query: string) {
 }
 
 /* ─── Agent task background descriptions ─── */
-const getAgentDescriptions = (category: string, sellingPoints: string, memoryNames: string): Record<string, string> => ({
+const getAgentDescriptions = (
+  category: string,
+  sellingPoints: string,
+  memoryNames: string,
+  brief?: OranGenPrefillBrief | null,
+): Record<string, string> => ({
   'agent-01': `你是一名TikTok爆款视频专家，需要为用户收集「${category}」品类下最符合「${sellingPoints}」卖点的对标爆款视频，并生成一个可供复刻的视频列表。`,
-  'agent-02': `你是一名记忆库专家，需要根据「${memoryNames || '品牌记忆库'}」中的核心信息，提取关键特征向量，为后续内容生成提供品牌一致性保障。`,
+  'agent-02': brief
+    ? `你是一名 Brief 专家，需要根据 OranMed 传入的 Brief（品牌：${brief.brandName || '—'} · 品类：${brief.brandCategory || '—'} · 卖点：${brief.brandTags || '—'} · 受众：${brief.audience || '—'} · 风格：${brief.styleRequirements || '—'} · 投放平台：${brief.platform || '—'}）以及指定达人风格，提炼内容方向并为后续生成提供品牌一致性保障。`
+    : `你是一名记忆库专家，需要根据「${memoryNames || '品牌记忆库'}」中的核心信息，提取关键特征向量，为后续内容生成提供品牌一致性保障。`,
   'agent-03': '你是一名Prompt设计专家，需要基于用户选择的爆款视频结构和上述所有品牌信息，设计出高质量的TikTok视频复刻Prompt。',
   'agent-04': '你是一名视频生成专家，需要根据Prompt和素材图，生成高质量的TikTok短视频内容。'
 });
 
 /* ─── Agent rows inside flow-step card ─── */
-function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, memoryNames }: {agents: import('./AgentCard').AgentInfo[];isLast: boolean;msgId: string;category?: string;sellingPoints?: string;memoryNames?: string;}) {
-  const agentDescriptions = getAgentDescriptions(category || '', sellingPoints || '', memoryNames || '');
+function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, memoryNames, brief }: {agents: import('./AgentCard').AgentInfo[];isLast: boolean;msgId: string;category?: string;sellingPoints?: string;memoryNames?: string;brief?: OranGenPrefillBrief | null;}) {
+  const agentDescriptions = getAgentDescriptions(category || '', sellingPoints || '', memoryNames || '', brief);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -65,6 +74,7 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
       {agents.map((agent) => {
         const avatarSrc = avatarMap[agent.avatar];
         const isExpanded = expandedId === agent.id;
+        const displayName = brief && agent.id === 'agent-02' ? 'Brief 专家' : agent.name;
 
         return (
           <div key={agent.id} className="border-b border-border/10 last:border-b-0">
@@ -80,15 +90,15 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
                 isExpanded ? 'w-8 h-8' : 'w-5 h-5'
               )}>
                 {avatarSrc ?
-                <img src={avatarSrc} alt={agent.name} className="w-full h-full object-contain" /> :
+                <img src={avatarSrc} alt={displayName} className="w-full h-full object-contain" /> :
 
-                <div className="w-full h-full rounded bg-muted flex items-center justify-center text-[9px] font-medium">{agent.name[0]}</div>
+                <div className="w-full h-full rounded bg-muted flex items-center justify-center text-[9px] font-medium">{displayName[0]}</div>
                 }
               </div>
               <span className={cn(
                 'flex-1 text-foreground/70 transition-all duration-200',
                 isExpanded ? 'text-base font-semibold text-foreground' : 'text-sm font-medium'
-              )}>{agent.name}</span>
+              )}>{displayName}</span>
               <ChevronRight className={cn(
                 'w-4 h-4 text-muted-foreground/30 transition-transform duration-200',
                 isExpanded && 'rotate-90'
@@ -122,6 +132,87 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
     </div>);
 
 }
+
+/* ─── Return-to-OranMed banner (shown when result is ready & came from OranMed) ─── */
+const ORAN_MED_STORAGE_KEY = 'oran-med:tasks:v2';
+const ORAN_MED_CURRENT_KEY = 'oran-med:current:v2';
+
+const ASSET_PALETTE = [
+  'from-rose-300 to-orange-300',
+  'from-sky-300 to-indigo-300',
+  'from-violet-300 to-fuchsia-300',
+  'from-emerald-300 to-teal-300',
+  'from-amber-300 to-orange-300',
+];
+
+function ReturnToOranMedBanner({
+  taskId,
+  resultVideoUrl,
+  creators,
+  onReturn,
+}: {
+  taskId: string;
+  resultVideoUrl: string;
+  creators: OranGenPrefillCreator[];
+  onReturn: () => void;
+}) {
+  const handleReturn = () => {
+    try {
+      const raw = localStorage.getItem(ORAN_MED_STORAGE_KEY);
+      const tasks: OranMedTask[] = raw ? JSON.parse(raw) : [];
+      const idx = tasks.findIndex((t) => t.id === taskId);
+      if (idx >= 0) {
+        const count = Math.max(creators.length, 1);
+        const baseId = Date.now().toString(36);
+        const newAssets: ContentAsset[] = Array.from({ length: count }).map((_, i) => ({
+          id: `a_${baseId}${i}${Math.random().toString(36).slice(2, 4)}`,
+          creatorId: creators[i % Math.max(creators.length, 1)]?.id ?? '',
+          title: `OranGen · ${creators[i % Math.max(creators.length, 1)]?.name ?? '素材'} ${i + 1}`,
+          source: 'orangen',
+          thumbnailColor: ASSET_PALETTE[i % ASSET_PALETTE.length],
+          status: 'ready',
+        }));
+        tasks[idx] = {
+          ...tasks[idx],
+          assets: [...tasks[idx].assets, ...newAssets],
+          assetMode: 'orangen',
+          updatedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(ORAN_MED_STORAGE_KEY, JSON.stringify(tasks));
+        localStorage.setItem(ORAN_MED_CURRENT_KEY, taskId);
+      }
+    } catch {
+      // ignore storage errors
+    }
+    onReturn();
+    // navigate to workflow view of the task
+    setTimeout(() => {
+      window.location.href = `/ai-toolbox/oran-med?view=workflow&taskId=${encodeURIComponent(taskId)}`;
+    }, 0);
+  };
+
+  return (
+    <div className="mt-4 flex items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-50/60 px-4 py-3 dark:bg-emerald-950/30">
+      <div className="flex items-center gap-3">
+        <PartyPopper className="h-4 w-4 text-emerald-600" />
+        <div>
+          <div className="text-sm font-medium text-foreground">视频已生成</div>
+          <div className="text-xs text-muted-foreground">回到 OranMed 进行发布安排</div>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={handleReturn}
+        className="inline-flex items-center gap-1 rounded-full border border-[#FF5500]/30 bg-white px-4 py-1.5 text-xs font-medium text-[#FF5500] shadow-sm transition-all hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5"
+      >
+        回到 OranMed 发布
+        <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
+
 
 /* ─── History helpers ─── */
 
@@ -163,6 +254,13 @@ export function SkillsModule() {
   const [prefilledCategory, setPrefilledCategory] = useState('');
   const [prefilledSellingPoints, setPrefilledSellingPoints] = useState('');
   const [prefilledMemoryIds, setPrefilledMemoryIds] = useState<string[]>([]);
+  // OranMed round-trip state
+  const [oranMedBrief, setOranMedBrief] = useState<OranGenPrefillBrief | null>(null);
+  const [oranMedCreators, setOranMedCreators] = useState<OranGenPrefillCreator[]>([]);
+  const [oranMedProductImage, setOranMedProductImage] = useState<{ name: string; url: string } | null>(null);
+  const [oranMedReturnTaskId, setOranMedReturnTaskId] = useState<string | null>(null);
+  const [autoStartTriggered, setAutoStartTriggered] = useState(false);
+  const { navigateToItem } = useModule();
   const isNarrowWorkspace = useMediaQuery('(max-width: 1279px)');
   const [narrowPane, setNarrowPane] = useState<NarrowPane>('left');
   const previousProcessingRef = useRef(state.isProcessing);
@@ -233,7 +331,40 @@ export function SkillsModule() {
     setPrefilledCategory(prefill.category || '');
     setPrefilledSellingPoints(prefill.sellingPoints || '');
     setPrefilledMemoryIds(prefill.attachmentIds);
+
+    if (prefill.source === 'oran-med') {
+      setOranMedBrief(prefill.brief ?? null);
+      setOranMedCreators(prefill.creators ?? []);
+      setOranMedProductImage(prefill.productImage ?? null);
+      setOranMedReturnTaskId(prefill.returnTaskId ?? null);
+      if (prefill.autoStart) {
+        setAutoStartTriggered(false);
+      }
+    }
   }, [consumeOranGenPrefill]);
+
+  // Auto-start setup when coming from OranMed (user already provided everything)
+  useEffect(() => {
+    if (autoStartTriggered) return;
+    if (!oranMedBrief || !oranMedProductImage) return;
+    if (!historyLoaded) return;
+    if (state.setupCompleted) return;
+    if (hasInProgressSession) return;
+
+    const setup: SessionSetup = {
+      image: oranMedProductImage.url,
+      imageName: oranMedProductImage.name,
+      memoryEnabled: false,
+      selectedMemoryIds: [],
+      selectedCreatorIds: oranMedCreators.map((c) => c.id),
+      sellingPoints: oranMedBrief.brandTags || '',
+      category: oranMedBrief.brandCategory || prefilledCategory || '其它',
+    };
+    addHistory(setup);
+    completeSetup(setup);
+    setAutoStartTriggered(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [oranMedBrief, oranMedProductImage, historyLoaded, state.setupCompleted, autoStartTriggered]);
 
   useEffect(() => {
     const previousView = previousRightViewRef.current;
@@ -454,7 +585,8 @@ export function SkillsModule() {
                 msgId={msg.id}
                 category={state.setup.category}
                 sellingPoints={state.setup.sellingPoints}
-                memoryNames={state.setup.selectedMemoryIds.map((id) => entries.find((e) => e.id === id)?.title).filter(Boolean).join('、')} />);
+                memoryNames={state.setup.selectedMemoryIds.map((id) => entries.find((e) => e.id === id)?.title).filter(Boolean).join('、')}
+                brief={oranMedBrief} />);
 
 
           }
@@ -759,6 +891,17 @@ export function SkillsModule() {
                         <Loader2 className="w-3 h-3 animate-spin" />
                         <span>正在处理中...</span>
                       </div>
+                  }
+                    {state.resultVideo && oranMedReturnTaskId &&
+                  <ReturnToOranMedBanner
+                    taskId={oranMedReturnTaskId}
+                    resultVideoUrl={state.resultVideo.url}
+                    creators={oranMedCreators}
+                    onReturn={() => {
+                      setOranMedReturnTaskId(null);
+                      navigateToItem('oran-med', 'ai-toolbox');
+                    }}
+                  />
                   }
                   </div>
                 </div>

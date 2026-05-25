@@ -17,6 +17,7 @@ interface OranMedContextValue {
   setCreators: (ids: string[]) => void;
   setAssetMode: (mode: 'local' | 'orangen' | null) => void;
   addAsset: (asset: ContentAsset) => void;
+  addAssetToTask: (taskId: string, asset: ContentAsset) => void;
   removeAsset: (id: string) => void;
   updatePlanItem: (assetId: string, patch: Partial<PublishPlanItem>) => void;
   confirmPlan: () => void;
@@ -137,6 +138,19 @@ export function OranMedProvider({ children }: { children: ReactNode }) {
     [patchCurrent],
   );
 
+  const addAssetToTask = useCallback(
+    (taskId: string, asset: ContentAsset) => {
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === taskId
+            ? { ...t, assets: [...t.assets, asset], updatedAt: new Date().toISOString() }
+            : t,
+        ),
+      );
+    },
+    [],
+  );
+
   const removeAsset = useCallback(
     (id: string) =>
       patchCurrent((t) => ({
@@ -224,6 +238,7 @@ export function OranMedProvider({ children }: { children: ReactNode }) {
       setCreators,
       setAssetMode,
       addAsset,
+      addAssetToTask,
       removeAsset,
       updatePlanItem,
       confirmPlan,
@@ -232,7 +247,7 @@ export function OranMedProvider({ children }: { children: ReactNode }) {
       setStatus,
       deleteTask,
     }),
-    [tasks, currentTaskId, currentTask, startNewTask, loadTask, updateBrief, saveBrief, toggleCreator, setCreators, setAssetMode, addAsset, removeAsset, updatePlanItem, confirmPlan, setCompliance, submitForReview, setStatus, deleteTask],
+    [tasks, currentTaskId, currentTask, startNewTask, loadTask, updateBrief, saveBrief, toggleCreator, setCreators, setAssetMode, addAsset, addAssetToTask, removeAsset, updatePlanItem, confirmPlan, setCompliance, submitForReview, setStatus, deleteTask],
   );
 
   return <OranMedContext.Provider value={value}>{children}</OranMedContext.Provider>;
