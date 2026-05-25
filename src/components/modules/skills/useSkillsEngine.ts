@@ -620,6 +620,8 @@ export function useSkillsEngine() {
   });
 
   const streamTimers = useRef<number[]>([]);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const clearTimers = () => {
     streamTimers.current.forEach(clearTimeout);
