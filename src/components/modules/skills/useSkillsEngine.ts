@@ -620,6 +620,8 @@ export function useSkillsEngine() {
   });
 
   const streamTimers = useRef<number[]>([]);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const clearTimers = () => {
     streamTimers.current.forEach(clearTimeout);
@@ -1118,11 +1120,7 @@ export function useSkillsEngine() {
       addTaskLog(genTaskId, '质量检测通过');
       await waitUntil(phase3Deadline);
 
-      let videoCount = 1;
-      setState(prev => {
-        videoCount = Math.max(prev.setup.selectedCreatorIds.length, 1);
-        return prev;
-      });
+      const videoCount = Math.max(stateRef.current.setup.selectedCreatorIds.length, 1);
       updateTask(genTaskId, { status: 'done', progress: 100, endAt: now(), output: `视频生成完成，共 ${videoCount} 条，时长 30s` });
       updateAgentInMessages('agent-04', { status: 'done', progress: 100, statusText: `视频生成完成！共 ${videoCount} 条` });
       updateAgent('agent-04', { status: 'done', progress: 100, statusText: `视频生成完成！共 ${videoCount} 条` });

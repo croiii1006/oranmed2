@@ -156,41 +156,7 @@ function ReturnToOranMedBanner({
   creators: OranGenPrefillCreator[];
   onReturn: () => void;
 }) {
-  const handleReturn = () => {
-    try {
-      const raw = localStorage.getItem(ORAN_MED_STORAGE_KEY);
-      const tasks: OranMedTask[] = raw ? JSON.parse(raw) : [];
-      const idx = tasks.findIndex((t) => t.id === taskId);
-      if (idx >= 0) {
-        const count = Math.max(creators.length, 1);
-        const baseId = Date.now().toString(36);
-        const newAssets: ContentAsset[] = Array.from({ length: count }).map((_, i) => ({
-          id: `a_${baseId}${i}${Math.random().toString(36).slice(2, 4)}`,
-          creatorId: creators[i % Math.max(creators.length, 1)]?.id ?? '',
-          title: `OranGen · ${creators[i % Math.max(creators.length, 1)]?.name ?? '素材'} ${i + 1}`,
-          source: 'orangen',
-          thumbnailColor: ASSET_PALETTE[i % ASSET_PALETTE.length],
-          status: 'ready',
-        }));
-        tasks[idx] = {
-          ...tasks[idx],
-          assets: [...tasks[idx].assets, ...newAssets],
-          assetMode: 'orangen',
-          updatedAt: new Date().toISOString(),
-        };
-        localStorage.setItem(ORAN_MED_STORAGE_KEY, JSON.stringify(tasks));
-        localStorage.setItem(ORAN_MED_CURRENT_KEY, taskId);
-      }
-    } catch {
-      // ignore storage errors
-    }
-    onReturn();
-    // navigate to workflow view of the task
-    setTimeout(() => {
-      window.location.href = `/ai-toolbox/oran-med?view=workflow&taskId=${encodeURIComponent(taskId)}`;
-    }, 0);
-  };
-
+  void taskId; void resultVideoUrl; void creators;
   return (
     <div className="mt-4 flex items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-50/60 px-4 py-3 dark:bg-emerald-950/30">
       <div className="flex items-center gap-3">
@@ -202,7 +168,7 @@ function ReturnToOranMedBanner({
       </div>
       <button
         type="button"
-        onClick={handleReturn}
+        onClick={onReturn}
         className="inline-flex items-center gap-1 rounded-full border border-[#FF5500]/30 bg-white px-4 py-1.5 text-xs font-medium text-[#FF5500] shadow-sm transition-all hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5"
       >
         回到 OranMed 发布
@@ -273,6 +239,43 @@ export function SkillsModule() {
       setNarrowPane('right');
     }
   }, [isNarrowWorkspace, setActiveRightView]);
+
+  const handleReturnToOranMed = useCallback(() => {
+    if (!oranMedReturnTaskId) return;
+    const taskId = oranMedReturnTaskId;
+    try {
+      const raw = localStorage.getItem(ORAN_MED_STORAGE_KEY);
+      const tasks: OranMedTask[] = raw ? JSON.parse(raw) : [];
+      const idx = tasks.findIndex((t) => t.id === taskId);
+      if (idx >= 0) {
+        const count = Math.max(oranMedCreators.length, 1);
+        const baseId = Date.now().toString(36);
+        const newAssets: ContentAsset[] = Array.from({ length: count }).map((_, i) => ({
+          id: `a_${baseId}${i}${Math.random().toString(36).slice(2, 4)}`,
+          creatorId: oranMedCreators[i % Math.max(oranMedCreators.length, 1)]?.id ?? '',
+          title: `OranGen · ${oranMedCreators[i % Math.max(oranMedCreators.length, 1)]?.name ?? '素材'} ${i + 1}`,
+          source: 'orangen',
+          thumbnailColor: ASSET_PALETTE[i % ASSET_PALETTE.length],
+          status: 'ready',
+        }));
+        tasks[idx] = {
+          ...tasks[idx],
+          assets: [...tasks[idx].assets, ...newAssets],
+          assetMode: 'orangen',
+          updatedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(ORAN_MED_STORAGE_KEY, JSON.stringify(tasks));
+        localStorage.setItem(ORAN_MED_CURRENT_KEY, taskId);
+      }
+    } catch {
+      // ignore storage errors
+    }
+    setOranMedReturnTaskId(null);
+    navigateToItem('oran-med', 'ai-toolbox');
+    setTimeout(() => {
+      window.location.href = `/ai-toolbox/oran-med?view=workflow&taskId=${encodeURIComponent(taskId)}`;
+    }, 0);
+  }, [oranMedReturnTaskId, oranMedCreators, navigateToItem]);
 
   const showLeftFlowOnNarrow = useCallback(() => {
     if (isNarrowWorkspace) {
@@ -897,10 +900,7 @@ export function SkillsModule() {
                     taskId={oranMedReturnTaskId}
                     resultVideoUrl={state.resultVideo.url}
                     creators={oranMedCreators}
-                    onReturn={() => {
-                      setOranMedReturnTaskId(null);
-                      navigateToItem('oran-med', 'ai-toolbox');
-                    }}
+                    onReturn={handleReturnToOranMed}
                   />
                   }
                   </div>
@@ -960,6 +960,7 @@ export function SkillsModule() {
             agent04Task={taskGenVideo}
             resultVideo={state.resultVideo}
             resultVideoCount={Math.max(state.setup.selectedCreatorIds.length, 1)}
+            onReturnToOranMed={oranMedReturnTaskId ? handleReturnToOranMed : undefined}
             onRegenerate={handleRegenerate}
             // Memory
             memoryTitle={activeMemoryEntry?.title}
