@@ -26,6 +26,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OranMedProvider, useOranMed } from './context/OranMedContext';
 import { CREATORS } from './data/creators';
+import { creatorLibraryItems } from '@/components/modules/skills/creatorLibrary';
+import { SelectedCreatorList } from '@/components/modules/skills/SelectedCreatorList';
 import {
   PLATFORMS,
   STATUS_LABEL,
@@ -1540,7 +1542,25 @@ function TaskMiniCard({ task, stacked, onClick }: { task: OranMedTask; stacked: 
         </p>
         <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
           <span>{brief.brandName || '品牌'} · {brief.brandCategory || '品类'}</span>
-          <span>{task.selectedCreatorIds.length} 位达人</span>
+          <div className="flex items-center gap-1.5">
+            {task.selectedCreatorIds.slice(0, 3).map((id, i) => {
+              const c = CREATORS.find((cc) => cc.id === id);
+              if (!c?.avatarUrl) return null;
+              return (
+                <img
+                  key={id}
+                  src={c.avatarUrl}
+                  alt={c.name}
+                  title={c.name}
+                  className={cn(
+                    'h-5 w-5 rounded-full border border-background object-cover',
+                    i > 0 && '-ml-2.5',
+                  )}
+                />
+              );
+            })}
+            <span>{task.selectedCreatorIds.length} 位达人</span>
+          </div>
         </div>
       </button>
     </div>
@@ -1764,24 +1784,9 @@ function JumpToOranGenCard({
             <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70 mb-2">
               达人 ({selectedCreators.length})
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {selectedCreators.slice(0, 6).map((c) => (
-                <div
-                  key={c.id}
-                  className="flex items-center gap-1.5 rounded-full border border-border/40 bg-background/60 px-2 py-1 text-[11px] text-foreground/80"
-                >
-                  {c.avatarUrl ? (
-                    <img src={c.avatarUrl} alt={c.name} className="h-4 w-4 rounded-full object-cover" />
-                  ) : (
-                    <div className="h-4 w-4 rounded-full bg-muted" />
-                  )}
-                  <span>{c.name}</span>
-                </div>
-              ))}
-              {selectedCreators.length > 6 && (
-                <span className="text-[11px] text-muted-foreground">+{selectedCreators.length - 6}</span>
-              )}
-            </div>
+            <SelectedCreatorList
+              creators={creatorLibraryItems.filter((it) => creatorIds.includes(it.id))}
+            />
           </div>
         )}
 
@@ -2285,11 +2290,6 @@ function PlanFormStep({
       : orangenCount > 0
       ? `OranGen 生成`
       : `本地上传`;
-  const creatorNames = task.selectedCreatorIds
-    .map((id) => CREATORS.find((c) => c.id === id)?.name)
-    .filter(Boolean)
-    .slice(0, 3)
-    .join('、');
 
   const canSubmit = form.scheduledAt && form.platform;
 
