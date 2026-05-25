@@ -78,9 +78,17 @@ export function OranMed() {
 function OranMedInner() {
   const [params, setParams] = useSearchParams();
   const viewParam = params.get('view');
+  const taskIdParam = params.get('taskId');
   const view: 'new' | 'workflow' | 'tasks' =
     viewParam === 'tasks' ? 'tasks' : viewParam === 'workflow' ? 'workflow' : 'new';
-  const { currentTask, startNewTask } = useOranMed();
+  const { currentTask, startNewTask, loadTask, tasks } = useOranMed();
+
+  // Switch to the specified task when arriving via deep-link (e.g. returning from OranGen).
+  useEffect(() => {
+    if (taskIdParam && tasks.some((t) => t.id === taskIdParam) && taskIdParam !== currentTask.id) {
+      loadTask(taskIdParam);
+    }
+  }, [taskIdParam, tasks, currentTask.id, loadTask]);
 
   // Entry page always starts from a fresh draft
   useEffect(() => {
