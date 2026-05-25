@@ -1118,9 +1118,10 @@ export function useSkillsEngine() {
       addTaskLog(genTaskId, '质量检测通过');
       await waitUntil(phase3Deadline);
 
-      updateTask(genTaskId, { status: 'done', progress: 100, endAt: now(), output: '视频生成完成，时长 30s' });
-      updateAgentInMessages('agent-04', { status: 'done', progress: 100, statusText: '视频生成完成！' });
-      updateAgent('agent-04', { status: 'done', progress: 100, statusText: '视频生成完成！' });
+      const videoCount = Math.max(state.setup.selectedCreatorIds.length, 1);
+      updateTask(genTaskId, { status: 'done', progress: 100, endAt: now(), output: `视频生成完成，共 ${videoCount} 条，时长 30s` });
+      updateAgentInMessages('agent-04', { status: 'done', progress: 100, statusText: `视频生成完成！共 ${videoCount} 条` });
+      updateAgent('agent-04', { status: 'done', progress: 100, statusText: `视频生成完成！共 ${videoCount} 条` });
 
       setState(prev => ({
         ...prev,
@@ -1130,7 +1131,7 @@ export function useSkillsEngine() {
         runMeta: makeRunMeta('done', null, null),
       }));
 
-      addMessage({ type: 'video-gen-status', content: '🎉 所有任务已完成！复刻视频已生成，请在右侧面板查看和下载。' });
+      addMessage({ type: 'video-gen-status', content: `🎉 所有任务已完成！已为 ${videoCount} 位达人生成 ${videoCount} 条复刻视频，请在右侧面板查看和下载。` });
     })();
   }, [addMessage, updateTask, addTaskLog, updateChild, updateAgent, updateAgentInMessages]);
 
