@@ -700,7 +700,7 @@ export function useSkillsEngine() {
   const randDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 3000); streamTimers.current.push(t); });
   const subDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 3000); streamTimers.current.push(t); });
   const backendDelay = () => new Promise<void>(r => { const t = window.setTimeout(r, 3000); streamTimers.current.push(t); });
-  const pause = (_ms = 600) => new Promise<void>(r => { const t = window.setTimeout(r, 3000); streamTimers.current.push(t); });
+  const pause = (ms = 600) => new Promise<void>(r => { const t = window.setTimeout(r, ms); streamTimers.current.push(t); });
   const waitUntil = (deadline: number) => new Promise<void>(r => {
     const remaining = Math.max(0, deadline - Date.now());
     if (remaining === 0) {
