@@ -1,4 +1,4 @@
-import { Download, Film } from 'lucide-react';
+import { Download, Film, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ResultPreviewBlockProps {
@@ -7,9 +7,10 @@ interface ResultPreviewBlockProps {
     cover: string;
   };
   count?: number;
+  onReturnToOranMed?: () => void;
 }
 
-export function ResultPreviewBlock({ resultVideo, count = 1 }: ResultPreviewBlockProps) {
+export function ResultPreviewBlock({ resultVideo, count = 1, onReturnToOranMed }: ResultPreviewBlockProps) {
   const n = Math.max(count, 1);
 
   const gridColsClass =
@@ -77,6 +78,17 @@ export function ResultPreviewBlock({ resultVideo, count = 1 }: ResultPreviewBloc
             <Download className="h-3.5 w-3.5" /> 导出下载{n > 1 ? `（${n} 条）` : ''}
           </a>
         </Button>
+        {onReturnToOranMed && (
+          <Button
+            type="button"
+            size="sm"
+            onClick={onReturnToOranMed}
+            className="gap-1.5 rounded-lg bg-[#FF5500] text-xs text-white hover:bg-[#FF5500]/90"
+          >
+            回到 OranMed 发布
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
+        )}
       </div>
     </div>
   );
