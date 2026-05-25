@@ -17,6 +17,7 @@ interface OranMedContextValue {
   setCreators: (ids: string[]) => void;
   setAssetMode: (mode: 'local' | 'orangen' | null) => void;
   addAsset: (asset: ContentAsset) => void;
+  addAssetToTask: (taskId: string, asset: ContentAsset) => void;
   removeAsset: (id: string) => void;
   updatePlanItem: (assetId: string, patch: Partial<PublishPlanItem>) => void;
   confirmPlan: () => void;
