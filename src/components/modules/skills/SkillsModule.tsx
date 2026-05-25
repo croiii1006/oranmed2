@@ -133,6 +133,84 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
 
 }
 
+/* ─── Return-to-OranMed banner (shown when result is ready & came from OranMed) ─── */
+const ORAN_MED_STORAGE_KEY = 'oran-med:tasks:v2';
+const ORAN_MED_CURRENT_KEY = 'oran-med:current:v2';
+
+const ASSET_PALETTE = [
+  'from-rose-300 to-orange-300',
+  'from-sky-300 to-indigo-300',
+  'from-violet-300 to-fuchsia-300',
+  'from-emerald-300 to-teal-300',
+  'from-amber-300 to-orange-300',
+];
+
+function ReturnToOranMedBanner({
+  taskId,
+  resultVideoUrl,
+  creators,
+  onReturn,
+}: {
+  taskId: string;
+  resultVideoUrl: string;
+  creators: OranGenPrefillCreator[];
+  onReturn: () => void;
+}) {
+  const handleReturn = () => {
+    try {
+      const raw = localStorage.getItem(ORAN_MED_STORAGE_KEY);
+      const tasks: OranMedTask[] = raw ? JSON.parse(raw) : [];
+      const idx = tasks.findIndex((t) => t.id === taskId);
+      if (idx >= 0) {
+        const count = Math.max(creators.length, 1);
+        const baseId = Date.now().toString(36);
+        const newAssets: ContentAsset[] = Array.from({ length: count }).map((_, i) => ({
+          id: `a_${baseId}${i}${Math.random().toString(36).slice(2, 4)}`,
+          creatorId: creators[i % Math.max(creators.length, 1)]?.id ?? '',
+          title: `OranGen · ${creators[i % Math.max(creators.length, 1)]?.name ?? '素材'} ${i + 1}`,
+          source: 'orangen',
+          thumbnailColor: ASSET_PALETTE[i % ASSET_PALETTE.length],
+          status: 'ready',
+        }));
+        tasks[idx] = {
+          ...tasks[idx],
+          assets: [...tasks[idx].assets, ...newAssets],
+          assetMode: 'orangen',
+          updatedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(ORAN_MED_STORAGE_KEY, JSON.stringify(tasks));
+        localStorage.setItem(ORAN_MED_CURRENT_KEY, taskId);
+      }
+    } catch {
+      // ignore storage errors
+    }
+    onReturn();
+    // navigate to workflow view of the task
+    setTimeout(() => {
+      window.location.href = `/ai-toolbox/oran-med?view=workflow&taskId=${encodeURIComponent(taskId)}`;
+    }, 0);
+  };
+
+  return (
+    <div className="mt-4 flex items-center justify-between rounded-xl border border-emerald-300/40 bg-emerald-50/60 px-4 py-3 dark:bg-emerald-950/30">
+      <div className="flex items-center gap-3">
+        <PartyPopper className="h-4 w-4 text-emerald-600" />
+        <div>
+          <div className="text-sm font-medium text-foreground">视频已生成</div>
+          <div className="text-xs text-muted-foreground">回到 OranMed 进行发布安排</div>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={handleReturn}
+        className="inline-flex items-center gap-1 rounded-full border border-[#FF5500]/30 bg-white px-4 py-1.5 text-xs font-medium text-[#FF5500] shadow-sm transition-all hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5"
+      >
+        回到 OranMed 发布
+        <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+
 /* ─── History helpers ─── */
 
 function deriveStatusLabel(snapshot: SkillsState): string {
