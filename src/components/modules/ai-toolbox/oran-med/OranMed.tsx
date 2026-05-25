@@ -303,7 +303,7 @@ function NewTaskView({
                 <MetaField label="期望发布" type="date" value={brief.expectedPublishDate} onChange={(v) => updateBrief({ expectedPublishDate: v })} />
                 <MetaField label="内容风格" value={brief.styleRequirements} onChange={(v) => updateBrief({ styleRequirements: v })} placeholder="专业测评 / 干货" />
                 <MetaField label="品牌卖点" value={brief.brandTags} onChange={(v) => updateBrief({ brandTags: v })} placeholder="抗老,成分" />
-                <MetaField label="预算" value={brief.budget} onChange={(v) => updateBrief({ budget: v })} placeholder="50,000 积分" />
+                <PlainField label="预算" value={brief.budget} onChange={(v) => updateBrief({ budget: v })} placeholder="50000" />
                 <PlainField
                   label="发布要求"
                   value={brief.publishRequirements ?? ''}
