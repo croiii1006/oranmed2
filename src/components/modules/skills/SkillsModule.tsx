@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { useMemory } from '@/contexts/MemoryContext';
 import { useOranGenPrefill, type OranGenPrefillBrief, type OranGenPrefillCreator } from '@/contexts/OranGenPrefillContext';
 import { useModule } from '@/contexts/ModuleContext';
-import { useOranMed } from '@/components/modules/ai-toolbox/oran-med/context/OranMedContext';
+import type { ContentAsset, OranMedTask } from '@/components/modules/ai-toolbox/oran-med/types';
 import { useSkillsEngine, SessionSetup, SkillsState, StreamMessageType } from './useSkillsEngine';
 import { SetupSummary } from './SetupSummary';
 import { AgentCard, AgentClusterCard } from './AgentCard';
