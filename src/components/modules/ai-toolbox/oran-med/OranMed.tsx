@@ -1436,10 +1436,10 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setStep('plan')}
+                onClick={handleSubmit}
                 className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500]"
               >
-                下一步：添加发布计划
+                提交审核
                 <ChevronRight className="ml-1 h-3.5 w-3.5" />
               </Button>
             </div>

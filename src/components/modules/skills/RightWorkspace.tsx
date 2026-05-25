@@ -67,6 +67,7 @@ interface RightWorkspaceProps {
   agent04?: AgentInfo;
   agent04Task?: SkillTask;
   resultVideo?: {url: string;cover: string;} | null;
+  resultVideoCount?: number;
   onRegenerate?: () => void;
   // Memory data
   memoryTitle?: string;
@@ -207,7 +208,7 @@ export function RightWorkspace(props: RightWorkspaceProps) {
           <div className="p-5 space-y-5">
             {props.agent04Task && <WorkLog logs={props.agent04Task.logs} />}
             {props.resultVideo &&
-            <ResultPreviewBlock resultVideo={props.resultVideo} />
+            <ResultPreviewBlock resultVideo={props.resultVideo} count={props.resultVideoCount} />
             }
           </div>);
       default:

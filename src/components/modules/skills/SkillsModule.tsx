@@ -959,6 +959,7 @@ export function SkillsModule() {
             agent04={state.agents.find((a) => a.id === 'agent-04')}
             agent04Task={taskGenVideo}
             resultVideo={state.resultVideo}
+            resultVideoCount={Math.max(state.setup.selectedCreatorIds.length, 1)}
             onRegenerate={handleRegenerate}
             // Memory
             memoryTitle={activeMemoryEntry?.title}
