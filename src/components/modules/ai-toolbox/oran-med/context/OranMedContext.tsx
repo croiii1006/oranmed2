@@ -238,6 +238,7 @@ export function OranMedProvider({ children }: { children: ReactNode }) {
       setCreators,
       setAssetMode,
       addAsset,
+      addAssetToTask,
       removeAsset,
       updatePlanItem,
       confirmPlan,
@@ -246,7 +247,7 @@ export function OranMedProvider({ children }: { children: ReactNode }) {
       setStatus,
       deleteTask,
     }),
-    [tasks, currentTaskId, currentTask, startNewTask, loadTask, updateBrief, saveBrief, toggleCreator, setCreators, setAssetMode, addAsset, removeAsset, updatePlanItem, confirmPlan, setCompliance, submitForReview, setStatus, deleteTask],
+    [tasks, currentTaskId, currentTask, startNewTask, loadTask, updateBrief, saveBrief, toggleCreator, setCreators, setAssetMode, addAsset, addAssetToTask, removeAsset, updatePlanItem, confirmPlan, setCompliance, submitForReview, setStatus, deleteTask],
   );
 
   return <OranMedContext.Provider value={value}>{children}</OranMedContext.Provider>;
