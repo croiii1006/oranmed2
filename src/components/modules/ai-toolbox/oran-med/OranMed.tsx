@@ -1766,24 +1766,9 @@ function JumpToOranGenCard({
             <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70 mb-2">
               达人 ({selectedCreators.length})
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {selectedCreators.slice(0, 6).map((c) => (
-                <div
-                  key={c.id}
-                  className="flex items-center gap-1.5 rounded-full border border-border/40 bg-background/60 px-2 py-1 text-[11px] text-foreground/80"
-                >
-                  {c.avatarUrl ? (
-                    <img src={c.avatarUrl} alt={c.name} className="h-4 w-4 rounded-full object-cover" />
-                  ) : (
-                    <div className="h-4 w-4 rounded-full bg-muted" />
-                  )}
-                  <span>{c.name}</span>
-                </div>
-              ))}
-              {selectedCreators.length > 6 && (
-                <span className="text-[11px] text-muted-foreground">+{selectedCreators.length - 6}</span>
-              )}
-            </div>
+            <SelectedCreatorList
+              creators={creatorLibraryItems.filter((it) => creatorIds.includes(it.id))}
+            />
           </div>
         )}
 
