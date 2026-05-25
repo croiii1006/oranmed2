@@ -2,6 +2,13 @@ export type Platform = '小红书' | '抖音' | 'B站' | '微博';
 
 export const PLATFORMS: Platform[] = ['小红书', '抖音', 'B站', '微博'];
 
+export interface CustomBriefField {
+  id: string;
+  label: string;
+  value: string;
+  mode: 'tags' | 'text';
+}
+
 export interface Brief {
   title: string;
   platform: Platform;
@@ -16,6 +23,7 @@ export interface Brief {
   categoryRequirements: string;
   budget: string;
   publishRequirements?: string;
+  customFields?: CustomBriefField[];
 }
 
 export type CreatorTier = 'KOL' | 'KOC';
