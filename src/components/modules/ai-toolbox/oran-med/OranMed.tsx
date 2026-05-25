@@ -2263,7 +2263,7 @@ function BriefCard() {
           <Input value={brief.categoryRequirements} onChange={(e) => updateBrief({ categoryRequirements: e.target.value })} placeholder="护肤,成分党" />
         </Field>
         <Field label="预算" >
-          <Input value={brief.budget} onChange={(e) => updateBrief({ budget: e.target.value })} placeholder="50,000 积分" />
+          <Input value={brief.budget} onChange={(e) => updateBrief({ budget: e.target.value })} placeholder="50000" />
         </Field>
         <div className="md:col-span-2">
           <Field label="任务目标 / 投放策略" required>
