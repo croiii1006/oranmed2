@@ -1645,6 +1645,206 @@ function LocalUploadZone({
   );
 }
 
+
+// ============== Jump-to-OranGen card (new no-asset flow) ==============
+function JumpToOranGenCard({
+  brief,
+  taskId,
+  creatorIds,
+  productImage,
+  onProductImageChange,
+  onSwitchMode,
+}: {
+  brief: {
+    title: string;
+    platform: string;
+    goal: string;
+    brandName: string;
+    brandCategory: string;
+    brandTags: string;
+    audience: string;
+    styleRequirements: string;
+  };
+  taskId: string;
+  creatorIds: string[];
+  productImage: { name: string; url: string } | null;
+  onProductImageChange: (img: { name: string; url: string } | null) => void;
+  onSwitchMode: () => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { setPrefill: setOranGenPrefill } = useOranGenPrefill();
+  const { navigateToItem } = useModule();
+
+  const tags = (brief.brandTags || '').split(/[,，、]/).map((t) => t.trim()).filter(Boolean);
+  const selectedCreators = creatorIds
+    .map((id) => CREATORS.find((c) => c.id === id))
+    .filter((c): c is Creator => Boolean(c));
+
+  const handleFile = (file?: File | null) => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    onProductImageChange({ name: file.name, url });
+  };
+
+  const handleJump = () => {
+    if (!productImage) {
+      toast.error('请先上传商品白底图');
+      return;
+    }
+    setOranGenPrefill({
+      attachmentIds: [],
+      attachmentNames: [],
+      category: brief.brandCategory || undefined,
+      sellingPoints: brief.brandTags || undefined,
+      source: 'oran-med',
+      returnTaskId: taskId,
+      brief: {
+        title: brief.title,
+        brandName: brief.brandName,
+        brandCategory: brief.brandCategory,
+        audience: brief.audience,
+        goal: brief.goal,
+        styleRequirements: brief.styleRequirements,
+        brandTags: brief.brandTags,
+        platform: brief.platform,
+      },
+      creators: selectedCreators.map((c) => ({
+        id: c.id,
+        name: c.name,
+        avatarUrl: c.avatarUrl,
+        platform: c.platform,
+        tier: c.tier,
+      })),
+      productImage,
+      autoStart: true,
+    });
+    navigateToItem('oran-gen', 'ai-toolbox');
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">OranGen 生成 · 跳转到生成工作台</span>
+        <button
+          type="button"
+          onClick={onSwitchMode}
+          className="text-muted-foreground underline-offset-2 hover:underline"
+        >
+          切换资产来源
+        </button>
+      </div>
+
+      <div className="rounded-2xl border border-border/40 bg-card/60 p-4 backdrop-blur-sm space-y-4">
+        {/* Brief 摘要 */}
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70 mb-2">Brief</div>
+          <div className="text-sm text-foreground/90 mb-2">
+            {brief.brandName || '品牌'} · {brief.brandCategory || '品类'}
+            <span className="ml-2 text-xs text-muted-foreground">{brief.platform}</span>
+          </div>
+          {tags.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map((t) => (
+                <span
+                  key={t}
+                  className="inline-flex items-center rounded-full border border-[#FF5500]/20 bg-[#FF5500]/5 px-2.5 py-1 text-[11px] text-[#FF5500]"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="text-xs text-muted-foreground/70">Brief 卖点为空</div>
+          )}
+        </div>
+
+        {/* 达人 */}
+        {selectedCreators.length > 0 && (
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70 mb-2">
+              达人 ({selectedCreators.length})
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {selectedCreators.slice(0, 6).map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center gap-1.5 rounded-full border border-border/40 bg-background/60 px-2 py-1 text-[11px] text-foreground/80"
+                >
+                  {c.avatarUrl ? (
+                    <img src={c.avatarUrl} alt={c.name} className="h-4 w-4 rounded-full object-cover" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full bg-muted" />
+                  )}
+                  <span>{c.name}</span>
+                </div>
+              ))}
+              {selectedCreators.length > 6 && (
+                <span className="text-[11px] text-muted-foreground">+{selectedCreators.length - 6}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 产品白底图 */}
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70 mb-2">商品白底图</div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleFile(e.target.files?.[0])}
+          />
+          {productImage ? (
+            <div className="group relative h-28 w-28 overflow-hidden rounded-xl border border-border/40 bg-muted/20">
+              <img src={productImage.url} alt={productImage.name} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => onProductImageChange(null)}
+                className="absolute right-1 top-1 rounded-full bg-background/80 p-1 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute inset-x-0 bottom-0 bg-background/80 py-0.5 text-[10px] text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+              >
+                更换
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex h-28 w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border/50 bg-muted/10 text-xs text-muted-foreground transition-colors hover:border-accent/40 hover:bg-muted/30 hover:text-foreground"
+            >
+              <Upload className="h-4 w-4" />
+              <span>点击上传商品白底图</span>
+              <span className="text-[10px] text-muted-foreground/70">支持 jpg / png</span>
+            </button>
+          )}
+        </div>
+
+        {/* 跳转按钮 */}
+        <div className="flex items-center justify-end pt-1">
+          <Button
+            size="sm"
+            onClick={handleJump}
+            disabled={!productImage}
+            variant="outline"
+            className="rounded-full border-[#FF5500]/30 bg-white text-[#FF5500] shadow-[0_1px_2px_rgba(255,85,0,0.08)] hover:border-[#FF5500]/50 hover:bg-[#FF5500]/5 hover:text-[#FF5500] disabled:opacity-50"
+          >
+            <Wand2 className="mr-1 h-3.5 w-3.5" />
+            前往 OranGen 生成
+            <ChevronRight className="ml-1 h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============== OranGen inline panel ==============
 const ORAN_REFERENCE_VIDEOS = [
   { id: 'ref-1', url: '/orangen-reference-videos/dr-melaxin-hit-1.mp4', title: '热视频 · 高转化开场', views: '180万', hit: 96, tag: '高转化开场' },
