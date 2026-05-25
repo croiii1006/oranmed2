@@ -580,8 +580,8 @@ function now() {
   return new Date().toLocaleTimeString('zh-CN', { hour12: false });
 }
 
-const PHASE1_MS = 82_000;
-const PHASE2_MS = 33_000;
+const PHASE1_MS = 3_000;
+const PHASE2_MS = 3_000;
 const PHASE3_MS = 3_000;
 
 const makeRunMeta = (phase: SkillsRunPhase, awaitingAction: SkillsAwaitingAction, nextActionAt: number | null): SkillsRunMeta => ({
