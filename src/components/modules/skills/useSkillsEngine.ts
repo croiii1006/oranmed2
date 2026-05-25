@@ -582,7 +582,7 @@ function now() {
 
 const PHASE1_MS = 82_000;
 const PHASE2_MS = 33_000;
-const PHASE3_MS = 273_000;
+const PHASE3_MS = 3_000;
 
 const makeRunMeta = (phase: SkillsRunPhase, awaitingAction: SkillsAwaitingAction, nextActionAt: number | null): SkillsRunMeta => ({
   phase,
