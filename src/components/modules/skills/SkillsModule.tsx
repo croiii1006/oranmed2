@@ -811,6 +811,17 @@ export function SkillsModule() {
                         <span>正在处理中...</span>
                       </div>
                   }
+                    {state.resultVideo && oranMedReturnTaskId &&
+                  <ReturnToOranMedBanner
+                    taskId={oranMedReturnTaskId}
+                    resultVideoUrl={state.resultVideo.url}
+                    creators={oranMedCreators}
+                    onReturn={() => {
+                      setOranMedReturnTaskId(null);
+                      navigateToItem('oran-med', 'ai-toolbox');
+                    }}
+                  />
+                  }
                   </div>
                 </div>
               </div>
