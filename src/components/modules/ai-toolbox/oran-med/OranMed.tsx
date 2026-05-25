@@ -578,6 +578,100 @@ function PlainField({
   );
 }
 
+function CustomField({
+  field,
+  onChange,
+  onRemove,
+}: {
+  field: CustomBriefField;
+  onChange: (patch: Partial<CustomBriefField>) => void;
+  onRemove: () => void;
+}) {
+  const [draft, setDraft] = useState('');
+  const tags = field.value ? field.value.split(',').map((t) => t.trim()).filter(Boolean) : [];
+  const commitTags = (next: string[]) => onChange({ value: next.join(',') });
+  const addTag = () => {
+    const v = draft.trim();
+    if (!v || tags.includes(v)) {
+      setDraft('');
+      return;
+    }
+    commitTags([...tags, v]);
+    setDraft('');
+  };
+  const removeTag = (i: number) => commitTags(tags.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="group relative flex flex-col gap-1.5 rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+      <div className="flex items-center gap-1.5">
+        <input
+          value={field.label}
+          onChange={(e) => onChange({ label: e.target.value })}
+          placeholder="自定义字段名"
+          className="min-w-0 flex-1 border-0 bg-transparent p-0 text-[12px] font-light leading-5 text-muted-foreground/80 placeholder:text-muted-foreground/50 outline-none focus:ring-0"
+        />
+        <button
+          type="button"
+          onClick={() => onChange({ mode: field.mode === 'tags' ? 'text' : 'tags' })}
+          className="rounded-full border border-border/50 bg-background/70 px-1.5 py-0.5 text-[10px] font-light text-muted-foreground transition-colors hover:border-accent/50 hover:text-foreground"
+          title="切换标签/文本"
+        >
+          {field.mode === 'tags' ? '标签' : '文本'}
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="rounded-full p-0.5 text-muted-foreground/60 opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+          title="删除字段"
+        >
+          <Trash2 className="h-3 w-3" />
+        </button>
+      </div>
+      {field.mode === 'text' ? (
+        <input
+          value={field.value}
+          onChange={(e) => onChange({ value: e.target.value })}
+          placeholder="填写内容"
+          className="min-w-0 w-full border-0 bg-transparent py-0 text-[13px] font-normal leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
+        />
+      ) : (
+        <div className="flex min-h-[24px] flex-wrap items-center gap-1.5 overflow-hidden">
+          {tags.map((t, i) => (
+            <span
+              key={`${t}-${i}`}
+              className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-[11px] leading-4 text-foreground/80"
+            >
+              {t}
+              <button
+                type="button"
+                onClick={() => removeTag(i)}
+                className="text-muted-foreground/60 hover:text-destructive"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ',' || e.key === '，') {
+                e.preventDefault();
+                addTag();
+              } else if (e.key === 'Backspace' && !draft && tags.length) {
+                removeTag(tags.length - 1);
+              }
+            }}
+            onBlur={addTag}
+            placeholder={tags.length ? '' : '回车添加标签'}
+            className="min-w-[60px] flex-1 border-0 bg-transparent p-0 text-[12px] leading-5 text-foreground/85 placeholder:text-muted-foreground/60 outline-none focus:ring-0"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ManualFilterDropdown({
   count,
   territory,
