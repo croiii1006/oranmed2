@@ -311,6 +311,40 @@ function NewTaskView({
                   onChange={(v) => updateBrief({ publishRequirements: v })}
                   placeholder="例如：需露出 logo / 含口播 / 不允许夸大宣传"
                 />
+                {(brief.customFields ?? []).map((field) => (
+                  <CustomField
+                    key={field.id}
+                    field={field}
+                    onChange={(patch) =>
+                      updateBrief({
+                        customFields: (brief.customFields ?? []).map((f) =>
+                          f.id === field.id ? { ...f, ...patch } : f,
+                        ),
+                      })
+                    }
+                    onRemove={() =>
+                      updateBrief({
+                        customFields: (brief.customFields ?? []).filter((f) => f.id !== field.id),
+                      })
+                    }
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next: CustomBriefField = {
+                      id: `cf_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+                      label: '自定义字段',
+                      value: '',
+                      mode: 'tags',
+                    };
+                    updateBrief({ customFields: [...(brief.customFields ?? []), next] });
+                  }}
+                  className="group flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-border/50 bg-muted/20 px-3 py-2 text-[12px] font-light text-muted-foreground transition-colors hover:border-accent/60 hover:bg-muted/40 hover:text-foreground"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>添加自定义</span>
+                </button>
               </div>
 
               {/* Footer: brand name + category */}
