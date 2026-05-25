@@ -74,6 +74,7 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
       {agents.map((agent) => {
         const avatarSrc = avatarMap[agent.avatar];
         const isExpanded = expandedId === agent.id;
+        const displayName = brief && agent.id === 'agent-02' ? 'Brief 专家' : agent.name;
 
         return (
           <div key={agent.id} className="border-b border-border/10 last:border-b-0">
