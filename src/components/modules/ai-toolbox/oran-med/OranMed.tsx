@@ -2290,11 +2290,6 @@ function PlanFormStep({
       : orangenCount > 0
       ? `OranGen 生成`
       : `本地上传`;
-  const creatorNames = task.selectedCreatorIds
-    .map((id) => CREATORS.find((c) => c.id === id)?.name)
-    .filter(Boolean)
-    .slice(0, 3)
-    .join('、');
 
   const canSubmit = form.scheduledAt && form.platform;
 
