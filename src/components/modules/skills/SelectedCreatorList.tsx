@@ -14,7 +14,7 @@ export function SelectedCreatorList({ creators, className }: SelectedCreatorList
   if (creators.length === 0) return null;
 
   return (
-    <div className={cn('flex flex-wrap gap-2', className)}>
+    <div className={cn('flex flex-wrap items-start gap-2', className)}>
       {creators.map((c) => {
         const expanded = expandedId === c.id;
         const territory =
