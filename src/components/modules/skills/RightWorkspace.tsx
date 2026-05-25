@@ -68,6 +68,7 @@ interface RightWorkspaceProps {
   agent04Task?: SkillTask;
   resultVideo?: {url: string;cover: string;} | null;
   resultVideoCount?: number;
+  onReturnToOranMed?: () => void;
   onRegenerate?: () => void;
   // Memory data
   memoryTitle?: string;
