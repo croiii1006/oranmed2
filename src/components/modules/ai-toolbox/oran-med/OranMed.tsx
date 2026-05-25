@@ -28,6 +28,7 @@ import {
   PLATFORMS,
   STATUS_LABEL,
   STATUS_TONE,
+  type CustomBriefField,
   type Creator,
   type OranMedTask,
   type Platform,
