@@ -934,10 +934,7 @@ export function SkillsModule() {
                     taskId={oranMedReturnTaskId}
                     resultVideoUrl={state.resultVideo.url}
                     creators={oranMedCreators}
-                    onReturn={() => {
-                      setOranMedReturnTaskId(null);
-                      navigateToItem('oran-med', 'ai-toolbox');
-                    }}
+                    onReturn={handleReturnToOranMed}
                   />
                   }
                   </div>
