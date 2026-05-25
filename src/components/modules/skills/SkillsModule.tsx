@@ -274,6 +274,43 @@ export function SkillsModule() {
     }
   }, [isNarrowWorkspace, setActiveRightView]);
 
+  const handleReturnToOranMed = useCallback(() => {
+    if (!oranMedReturnTaskId) return;
+    const taskId = oranMedReturnTaskId;
+    try {
+      const raw = localStorage.getItem(ORAN_MED_STORAGE_KEY);
+      const tasks: OranMedTask[] = raw ? JSON.parse(raw) : [];
+      const idx = tasks.findIndex((t) => t.id === taskId);
+      if (idx >= 0) {
+        const count = Math.max(oranMedCreators.length, 1);
+        const baseId = Date.now().toString(36);
+        const newAssets: ContentAsset[] = Array.from({ length: count }).map((_, i) => ({
+          id: `a_${baseId}${i}${Math.random().toString(36).slice(2, 4)}`,
+          creatorId: oranMedCreators[i % Math.max(oranMedCreators.length, 1)]?.id ?? '',
+          title: `OranGen · ${oranMedCreators[i % Math.max(oranMedCreators.length, 1)]?.name ?? '素材'} ${i + 1}`,
+          source: 'orangen',
+          thumbnailColor: ASSET_PALETTE[i % ASSET_PALETTE.length],
+          status: 'ready',
+        }));
+        tasks[idx] = {
+          ...tasks[idx],
+          assets: [...tasks[idx].assets, ...newAssets],
+          assetMode: 'orangen',
+          updatedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(ORAN_MED_STORAGE_KEY, JSON.stringify(tasks));
+        localStorage.setItem(ORAN_MED_CURRENT_KEY, taskId);
+      }
+    } catch {
+      // ignore storage errors
+    }
+    setOranMedReturnTaskId(null);
+    navigateToItem('oran-med', 'ai-toolbox');
+    setTimeout(() => {
+      window.location.href = `/ai-toolbox/oran-med?view=workflow&taskId=${encodeURIComponent(taskId)}`;
+    }, 0);
+  }, [oranMedReturnTaskId, oranMedCreators, navigateToItem]);
+
   const showLeftFlowOnNarrow = useCallback(() => {
     if (isNarrowWorkspace) {
       setNarrowPane('left');
