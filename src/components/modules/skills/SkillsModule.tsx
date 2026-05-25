@@ -65,8 +65,8 @@ const getAgentDescriptions = (
 });
 
 /* ─── Agent rows inside flow-step card ─── */
-function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, memoryNames }: {agents: import('./AgentCard').AgentInfo[];isLast: boolean;msgId: string;category?: string;sellingPoints?: string;memoryNames?: string;}) {
-  const agentDescriptions = getAgentDescriptions(category || '', sellingPoints || '', memoryNames || '');
+function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, memoryNames, brief }: {agents: import('./AgentCard').AgentInfo[];isLast: boolean;msgId: string;category?: string;sellingPoints?: string;memoryNames?: string;brief?: OranGenPrefillBrief | null;}) {
+  const agentDescriptions = getAgentDescriptions(category || '', sellingPoints || '', memoryNames || '', brief);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
