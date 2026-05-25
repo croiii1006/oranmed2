@@ -1542,7 +1542,25 @@ function TaskMiniCard({ task, stacked, onClick }: { task: OranMedTask; stacked: 
         </p>
         <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
           <span>{brief.brandName || '品牌'} · {brief.brandCategory || '品类'}</span>
-          <span>{task.selectedCreatorIds.length} 位达人</span>
+          <div className="flex items-center gap-1.5">
+            {task.selectedCreatorIds.slice(0, 3).map((id, i) => {
+              const c = CREATORS.find((cc) => cc.id === id);
+              if (!c?.avatarUrl) return null;
+              return (
+                <img
+                  key={id}
+                  src={c.avatarUrl}
+                  alt={c.name}
+                  title={c.name}
+                  className={cn(
+                    'h-5 w-5 rounded-full border border-background object-cover',
+                    i > 0 && '-ml-2.5',
+                  )}
+                />
+              );
+            })}
+            <span>{task.selectedCreatorIds.length} 位达人</span>
+          </div>
         </div>
       </button>
     </div>
