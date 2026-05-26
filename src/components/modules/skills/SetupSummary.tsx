@@ -1,13 +1,25 @@
 import { Database, FolderOpen, Tag, Users } from 'lucide-react';
-import type { SessionSetup } from './useSkillsEngine';
+import type { CandidateVideo, SessionSetup } from './useSkillsEngine';
 import { creatorLibraryItems } from './creatorLibrary';
 import { SelectedCreatorList } from './SelectedCreatorList';
 
 interface SetupSummaryProps {
   setup: SessionSetup;
+  candidateVideos?: CandidateVideo[];
+  creatorVideoBindings?: Record<string, string>;
+  onPickCreatorVideo?: (creatorId: string, videoId: string) => void;
+  onClearCreatorVideo?: (creatorId: string) => void;
+  pickerDisabled?: boolean;
 }
 
-export function SetupSummary({ setup }: SetupSummaryProps) {
+export function SetupSummary({
+  setup,
+  candidateVideos,
+  creatorVideoBindings,
+  onPickCreatorVideo,
+  onClearCreatorVideo,
+  pickerDisabled,
+}: SetupSummaryProps) {
   const selectedCreators = creatorLibraryItems.filter((item) =>
     (setup.selectedCreatorIds || []).includes(item.id),
   );
@@ -61,7 +73,16 @@ export function SetupSummary({ setup }: SetupSummaryProps) {
             {selectedCreators.length > 0 ? `达人库 (${selectedCreators.length})` : '达人库未选择'}
           </span>
         </div>
-        {selectedCreators.length > 0 ? <SelectedCreatorList creators={selectedCreators} /> : null}
+        {selectedCreators.length > 0 ? (
+          <SelectedCreatorList
+            creators={selectedCreators}
+            candidateVideos={candidateVideos}
+            bindings={creatorVideoBindings}
+            onPickVideo={onPickCreatorVideo}
+            onClearVideo={onClearCreatorVideo}
+            disabled={pickerDisabled}
+          />
+        ) : null}
       </div>
     </div>
   );

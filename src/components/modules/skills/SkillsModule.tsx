@@ -193,6 +193,7 @@ function deriveStatusLabel(snapshot: SkillsState): string {
 export function SkillsModule() {
   const {
     state, completeSetup, refreshCandidates, selectVideo,
+    setCreatorVideo, clearCreatorVideo,
     updatePrompt, confirmGenerate, regenerate, backToVideoSelect,
     setActiveTaskId, setActiveRightView, handleUserInput, resetSession, restoreState
   } = useSkillsEngine();
@@ -673,7 +674,17 @@ export function SkillsModule() {
     switch (msg.type) {
       case 'setup-summary':{
           const setup = JSON.parse(msg.content);
-          return <SetupSummary key={msg.id} setup={setup} />;
+          return (
+            <SetupSummary
+              key={msg.id}
+              setup={setup}
+              candidateVideos={state.candidateVideos}
+              creatorVideoBindings={state.creatorVideoBindings}
+              onPickCreatorVideo={setCreatorVideo}
+              onClearCreatorVideo={clearCreatorVideo}
+              pickerDisabled={!!state.selectedVideo}
+            />
+          );
         }
 
       case 'agent-cluster':
@@ -960,6 +971,8 @@ export function SkillsModule() {
             agent04Task={taskGenVideo}
             resultVideo={state.resultVideo}
             resultVideoCount={Math.max(state.setup.selectedCreatorIds.length, 1)}
+            resultCreators={creatorLibraryItems.filter((c) => state.setup.selectedCreatorIds.includes(c.id))}
+            creatorVideoBindings={state.creatorVideoBindings}
             onReturnToOranMed={oranMedReturnTaskId ? handleReturnToOranMed : undefined}
             onRegenerate={handleRegenerate}
             // Memory
