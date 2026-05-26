@@ -194,7 +194,7 @@ function deriveStatusLabel(snapshot: SkillsState): string {
 export function SkillsModule() {
   const {
     state, completeSetup, refreshCandidates, selectVideo,
-    setCreatorVideo, clearCreatorVideo,
+    setCreatorVideo, clearCreatorVideo, confirmCreatorBindings,
     updatePrompt, confirmGenerate, regenerate, backToVideoSelect,
     setActiveTaskId, setActiveRightView, handleUserInput, resetSession, restoreState
   } = useSkillsEngine();
