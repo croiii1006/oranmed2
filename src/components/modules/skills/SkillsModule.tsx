@@ -972,6 +972,7 @@ export function SkillsModule() {
             selectedCreators={creatorLibraryItems.filter((c) => state.setup.selectedCreatorIds.includes(c.id))}
             onPickCreatorVideo={setCreatorVideo}
             onClearCreatorVideo={clearCreatorVideo}
+            onConfirmCreatorBindings={confirmCreatorBindings}
             // Agent 02/03
             agent02={state.agents.find((a) => a.id === 'agent-02')}
             agent03={state.agents.find((a) => a.id === 'agent-03')}
