@@ -253,25 +253,40 @@ export function SkillsModule() {
 
   const handleReturnToOranMed = useCallback(() => {
     const taskId = oranMedReturnTaskId;
+    // Use the actual selected creators in the current session (source of truth),
+    // falling back to the prefill snapshot if state is empty.
+    const selectedIds = state.setup.selectedCreatorIds?.length
+      ? state.setup.selectedCreatorIds
+      : oranMedCreators.map((c) => c.id);
+    const resolvedCreators = selectedIds.map((id) => {
+      const fromPrefill = oranMedCreators.find((c) => c.id === id);
+      if (fromPrefill) return { id: fromPrefill.id, name: fromPrefill.name };
+      const fromLib = creatorLibraryItems.find((c) => c.id === id);
+      return { id, name: fromLib?.name ?? '素材' };
+    });
+    const count = Math.max(resolvedCreators.length, 1);
     if (taskId) {
       try {
         const raw = localStorage.getItem(ORAN_MED_STORAGE_KEY);
         const tasks: OranMedTask[] = raw ? JSON.parse(raw) : [];
         const idx = tasks.findIndex((t) => t.id === taskId);
         if (idx >= 0) {
-          const count = Math.max(oranMedCreators.length, 1);
           const baseId = Date.now().toString(36);
-          const newAssets: ContentAsset[] = Array.from({ length: count }).map((_, i) => ({
-            id: `a_${baseId}${i}${Math.random().toString(36).slice(2, 4)}`,
-            creatorId: oranMedCreators[i % Math.max(oranMedCreators.length, 1)]?.id ?? '',
-            title: `OranGen · ${oranMedCreators[i % Math.max(oranMedCreators.length, 1)]?.name ?? '素材'} ${i + 1}`,
-            source: 'orangen',
-            thumbnailColor: ASSET_PALETTE[i % ASSET_PALETTE.length],
-            status: 'ready',
-          }));
+          const newAssets: ContentAsset[] = Array.from({ length: count }).map((_, i) => {
+            const creator = resolvedCreators[i] ?? resolvedCreators[0];
+            return {
+              id: `a_${baseId}${i}${Math.random().toString(36).slice(2, 4)}`,
+              creatorId: creator?.id ?? '',
+              title: `OranGen · ${creator?.name ?? '素材'} ${i + 1}`,
+              source: 'orangen',
+              thumbnailColor: ASSET_PALETTE[i % ASSET_PALETTE.length],
+              status: 'ready',
+            };
+          });
           tasks[idx] = {
             ...tasks[idx],
             assets: [...tasks[idx].assets, ...newAssets],
+            selectedCreatorIds: Array.from(new Set([...(tasks[idx].selectedCreatorIds ?? []), ...resolvedCreators.map((c) => c.id)])),
             assetMode: 'orangen',
             updatedAt: new Date().toISOString(),
           };
@@ -293,7 +308,7 @@ export function SkillsModule() {
     setTimeout(() => {
       window.location.href = `/ai-toolbox/oran-med`;
     }, 0);
-  }, [oranMedReturnTaskId, oranMedCreators, navigateToItem]);
+  }, [oranMedReturnTaskId, oranMedCreators, navigateToItem, state.setup.selectedCreatorIds, setOranMedReturnTaskId]);
 
   const showLeftFlowOnNarrow = useCallback(() => {
     if (isNarrowWorkspace) {
