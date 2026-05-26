@@ -1310,6 +1310,7 @@ export function useSkillsEngine() {
       selectedVideo: null,
       creatorVideoBindings: {},
       generatedPrompt: '',
+      generatedPrompts: {},
       resultVideo: null,
       isProcessing: false,
       runMeta: null,
