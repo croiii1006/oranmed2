@@ -37,7 +37,7 @@ const coverColors = [
 'from-rose-200 to-rose-100'];
 
 
-export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId, disabled, creators = [], creatorVideoBindings = {}, onPickCreator, onClearCreator }: VideoCandidateRowProps) {
+export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId, disabled, creators = [], creatorVideoBindings = {}, onPickCreator, onClearCreator, onConfirmBindings }: VideoCandidateRowProps) {
   const [detailVideo, setDetailVideo] = useState<CandidateVideo | null>(null);
   const [detailIndex, setDetailIndex] = useState(0);
 
