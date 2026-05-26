@@ -1929,6 +1929,8 @@ export function useSkillsEngine() {
     completeSetup,
     refreshCandidates,
     selectVideo,
+    setCreatorVideo,
+    clearCreatorVideo,
     updatePrompt,
     confirmGenerate,
     regenerate,
