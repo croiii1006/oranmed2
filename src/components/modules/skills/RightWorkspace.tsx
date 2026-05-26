@@ -209,7 +209,10 @@ export function RightWorkspace(props: RightWorkspaceProps) {
             {props.generatedPrompt &&
             <PromptEditorBlock
               prompt={props.generatedPrompt}
-              onChange={(val) => props.onPromptChange?.(val)}
+              prompts={props.generatedPrompts}
+              candidateVideos={props.candidateVideos}
+              creatorVideoBindings={props.creatorVideoBindings}
+              onChange={(val, vid) => props.onPromptChange?.(val, vid)}
               onConfirm={() => props.onPromptConfirm?.()}
               onBack={() => props.onBackToVideoSelect?.()}
               memoryEnabled={props.memoryEnabled ?? false}
