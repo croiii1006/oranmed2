@@ -7,18 +7,12 @@ interface SetupSummaryProps {
   setup: SessionSetup;
   candidateVideos?: CandidateVideo[];
   creatorVideoBindings?: Record<string, string>;
-  onPickCreatorVideo?: (creatorId: string, videoId: string) => void;
-  onClearCreatorVideo?: (creatorId: string) => void;
-  pickerDisabled?: boolean;
 }
 
 export function SetupSummary({
   setup,
   candidateVideos,
   creatorVideoBindings,
-  onPickCreatorVideo,
-  onClearCreatorVideo,
-  pickerDisabled,
 }: SetupSummaryProps) {
   const selectedCreators = creatorLibraryItems.filter((item) =>
     (setup.selectedCreatorIds || []).includes(item.id),
@@ -78,9 +72,6 @@ export function SetupSummary({
             creators={selectedCreators}
             candidateVideos={candidateVideos}
             bindings={creatorVideoBindings}
-            onPickVideo={onPickCreatorVideo}
-            onClearVideo={onClearCreatorVideo}
-            disabled={pickerDisabled}
           />
         ) : null}
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, X, Film, Check } from 'lucide-react';
+import { ChevronDown, X, Film } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CreatorLibraryItem } from './creatorLibrary';
 import type { CandidateVideo } from './useSkillsEngine';
@@ -9,9 +9,6 @@ interface SelectedCreatorListProps {
   className?: string;
   candidateVideos?: CandidateVideo[];
   bindings?: Record<string, string>;
-  onPickVideo?: (creatorId: string, videoId: string) => void;
-  onClearVideo?: (creatorId: string) => void;
-  disabled?: boolean;
 }
 
 export function SelectedCreatorList({
@@ -19,15 +16,10 @@ export function SelectedCreatorList({
   className,
   candidateVideos = [],
   bindings = {},
-  onPickVideo,
-  onClearVideo,
-  disabled = false,
 }: SelectedCreatorListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (creators.length === 0) return null;
-
-  const canPick = candidateVideos.length > 0 && !!onPickVideo && !disabled;
 
   return (
     <div className={cn('flex flex-wrap items-start gap-2', className)}>
@@ -75,8 +67,8 @@ export function SelectedCreatorList({
               )}
             </button>
 
-            {/* Bound video chip (collapsed) */}
-            {!expanded && boundVideo && (
+            {/* Bound video chip */}
+            {boundVideo && (
               <div className="mt-1.5 flex items-center gap-1 truncate rounded-md bg-foreground/[0.04] px-1.5 py-0.5 text-[10px] text-foreground/70">
                 <Film className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />
                 <span className="truncate">复刻：{boundVideo.title}</span>
@@ -84,58 +76,12 @@ export function SelectedCreatorList({
             )}
 
             {expanded ? (
-              <div className="mt-2.5 space-y-2 border-t border-border/40 pt-2 text-[11px] text-foreground/80">
-                <div className="space-y-1">
-                  <DetailRow label="领域" value={c.niche} />
-                  <DetailRow label="地区" value={c.region} />
-                  <DetailRow label="粉丝" value={c.followers} />
-                  <DetailRow label="均播" value={c.avgViews} />
-                  <DetailRow label="账号" value={c.handle} />
-                </div>
-
-                {/* Per-creator video picker */}
-                {candidateVideos.length > 0 && (
-                  <div className="space-y-1 border-t border-border/30 pt-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground/70">选择对标视频</span>
-                      {boundVideo && onClearVideo && !disabled && (
-                        <button
-                          type="button"
-                          onClick={() => onClearVideo(c.id)}
-                          className="text-[10px] text-muted-foreground hover:text-foreground"
-                        >
-                          清空
-                        </button>
-                      )}
-                    </div>
-                    <div className="max-h-[180px] space-y-1 overflow-y-auto pr-0.5">
-                      {candidateVideos.map((v, idx) => {
-                        const active = boundVideoId === v.id;
-                        return (
-                          <button
-                            key={v.id}
-                            type="button"
-                            disabled={!canPick}
-                            onClick={() => onPickVideo?.(c.id, v.id)}
-                            className={cn(
-                              'flex w-full items-center gap-1.5 rounded-md border px-1.5 py-1 text-left text-[10px] transition-colors',
-                              active
-                                ? 'border-foreground/40 bg-foreground/[0.06] text-foreground'
-                                : 'border-border/30 hover:border-foreground/20 hover:bg-muted/40 text-foreground/75',
-                              !canPick && 'cursor-not-allowed opacity-60',
-                            )}
-                          >
-                            <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded bg-muted/70 text-[9px] font-mono text-muted-foreground">
-                              {idx + 1}
-                            </span>
-                            <span className="min-w-0 flex-1 truncate">{v.title}</span>
-                            {active && <Check className="h-3 w-3 shrink-0 text-foreground/70" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+              <div className="mt-2.5 space-y-1 border-t border-border/40 pt-2 text-[11px] text-foreground/80">
+                <DetailRow label="领域" value={c.niche} />
+                <DetailRow label="地区" value={c.region} />
+                <DetailRow label="粉丝" value={c.followers} />
+                <DetailRow label="均播" value={c.avgViews} />
+                <DetailRow label="账号" value={c.handle} />
               </div>
             ) : null}
           </div>

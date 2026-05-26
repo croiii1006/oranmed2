@@ -680,9 +680,6 @@ export function SkillsModule() {
               setup={setup}
               candidateVideos={state.candidateVideos}
               creatorVideoBindings={state.creatorVideoBindings}
-              onPickCreatorVideo={setCreatorVideo}
-              onClearCreatorVideo={clearCreatorVideo}
-              pickerDisabled={!!state.selectedVideo}
             />
           );
         }
@@ -955,6 +952,9 @@ export function SkillsModule() {
             selectedVideoId={state.selectedVideo?.id}
             onVideoSelect={handleVideoSelect}
             videoSelectDisabled={!!state.selectedVideo}
+            selectedCreators={creatorLibraryItems.filter((c) => state.setup.selectedCreatorIds.includes(c.id))}
+            onPickCreatorVideo={setCreatorVideo}
+            onClearCreatorVideo={clearCreatorVideo}
             // Agent 02/03
             agent02={state.agents.find((a) => a.id === 'agent-02')}
             agent03={state.agents.find((a) => a.id === 'agent-03')}
