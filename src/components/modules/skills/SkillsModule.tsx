@@ -385,7 +385,8 @@ export function SkillsModule() {
     if (!oranMedBrief || !oranMedProductImage) return;
     if (!historyLoaded) return;
     if (state.setupCompleted) return;
-    if (hasInProgressSession) return;
+    // 来自 OranMed 的跳转：忽略 in-progress 检查，直接开启新会话
+
 
     const setup: SessionSetup = {
       image: oranMedProductImage.url,
