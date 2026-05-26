@@ -1208,6 +1208,7 @@ export function useSkillsEngine() {
     setState(prev => ({
       ...prev,
       generatedPrompt: '',
+      generatedPrompts: {},
       resultVideo: null,
       selectedVideo: null,
       creatorVideoBindings: {},
