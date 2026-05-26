@@ -100,6 +100,8 @@ export interface SkillsState {
   messages: StreamMessage[];
   candidateVideos: CandidateVideo[];
   selectedVideo: CandidateVideo | null;
+  /** Per-creator video bindings: creatorId → videoId */
+  creatorVideoBindings: Record<string, string>;
   generatedPrompt: string;
   resultVideo: { url: string; cover: string } | null;
   isProcessing: boolean;
