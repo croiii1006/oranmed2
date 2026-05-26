@@ -103,6 +103,8 @@ export interface SkillsState {
   /** Per-creator video bindings: creatorId → videoId */
   creatorVideoBindings: Record<string, string>;
   generatedPrompt: string;
+  /** Per-video prompts, keyed by videoId. */
+  generatedPrompts: Record<string, string>;
   resultVideo: { url: string; cover: string } | null;
   isProcessing: boolean;
   runMeta: SkillsRunMeta | null;
