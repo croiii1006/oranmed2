@@ -136,6 +136,7 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
 /* ─── Return-to-OranMed banner (shown when result is ready & came from OranMed) ─── */
 const ORAN_MED_STORAGE_KEY = 'oran-med:tasks:v2';
 const ORAN_MED_CURRENT_KEY = 'oran-med:current:v2';
+const ORAN_MED_RETURN_TASK_KEY = 'skills:oran-med-return-task-id';
 
 const ASSET_PALETTE = [
   'from-rose-300 to-orange-300',
