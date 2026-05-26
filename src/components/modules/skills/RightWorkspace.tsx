@@ -183,7 +183,8 @@ export function RightWorkspace(props: RightWorkspaceProps) {
                 creators={props.selectedCreators}
                 creatorVideoBindings={props.creatorVideoBindings}
                 onPickCreator={props.onPickCreatorVideo}
-                onClearCreator={props.onClearCreatorVideo} />
+                onClearCreator={props.onClearCreatorVideo}
+                onConfirmBindings={props.onConfirmCreatorBindings} />
               </div>
             }
           </div>);
