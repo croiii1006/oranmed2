@@ -26,6 +26,7 @@ interface VideoCandidateRowProps {
   creatorVideoBindings?: Record<string, string>;
   onPickCreator?: (creatorId: string, videoId: string) => void;
   onClearCreator?: (creatorId: string) => void;
+  onConfirmBindings?: () => void;
 }
 
 const coverColors = [
@@ -36,7 +37,7 @@ const coverColors = [
 'from-rose-200 to-rose-100'];
 
 
-export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId, disabled, creators = [], creatorVideoBindings = {}, onPickCreator, onClearCreator }: VideoCandidateRowProps) {
+export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId, disabled, creators = [], creatorVideoBindings = {}, onPickCreator, onClearCreator, onConfirmBindings }: VideoCandidateRowProps) {
   const [detailVideo, setDetailVideo] = useState<CandidateVideo | null>(null);
   const [detailIndex, setDetailIndex] = useState(0);
 
@@ -147,8 +148,32 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
     );
   };
 
+  const boundCreatorCount = creators.filter((c) => !!creatorVideoBindings[c.id]).length;
+  const allCreatorsBound = creators.length > 0 && boundCreatorCount === creators.length;
+  const showConfirmBar = creators.length > 0 && boundCreatorCount > 0 && !selectedVideoId && !disabled;
+
   return (
     <div className="space-y-3">
+      {showConfirmBar && (
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-background/95 px-3 py-2 shadow-sm backdrop-blur">
+          <span className="text-xs text-muted-foreground">
+            已为 <span className="font-medium text-foreground">{boundCreatorCount}/{creators.length}</span> 位达人绑定视频
+          </span>
+          <button
+            type="button"
+            onClick={onConfirmBindings}
+            disabled={!allCreatorsBound}
+            className={cn(
+              'inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
+              allCreatorsBound
+                ? 'bg-foreground text-background hover:bg-foreground/90'
+                : 'bg-muted text-muted-foreground/60 cursor-not-allowed',
+            )}
+          >
+            <Check className="w-3 h-3" /> 确认进入下一步
+          </button>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {displayVideos.map((video, i) =>
         <div

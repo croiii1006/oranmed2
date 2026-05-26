@@ -136,6 +136,7 @@ function AgentClusterSteps({ agents, isLast, msgId, category, sellingPoints, mem
 /* ─── Return-to-OranMed banner (shown when result is ready & came from OranMed) ─── */
 const ORAN_MED_STORAGE_KEY = 'oran-med:tasks:v2';
 const ORAN_MED_CURRENT_KEY = 'oran-med:current:v2';
+const ORAN_MED_RETURN_TASK_KEY = 'skills:oran-med-return-task-id';
 
 const ASSET_PALETTE = [
   'from-rose-300 to-orange-300',
@@ -193,7 +194,7 @@ function deriveStatusLabel(snapshot: SkillsState): string {
 export function SkillsModule() {
   const {
     state, completeSetup, refreshCandidates, selectVideo,
-    setCreatorVideo, clearCreatorVideo,
+    setCreatorVideo, clearCreatorVideo, confirmCreatorBindings,
     updatePrompt, confirmGenerate, regenerate, backToVideoSelect,
     setActiveTaskId, setActiveRightView, handleUserInput, resetSession, restoreState
   } = useSkillsEngine();
@@ -225,7 +226,16 @@ export function SkillsModule() {
   const [oranMedBrief, setOranMedBrief] = useState<OranGenPrefillBrief | null>(null);
   const [oranMedCreators, setOranMedCreators] = useState<OranGenPrefillCreator[]>([]);
   const [oranMedProductImage, setOranMedProductImage] = useState<{ name: string; url: string } | null>(null);
-  const [oranMedReturnTaskId, setOranMedReturnTaskId] = useState<string | null>(null);
+  const [oranMedReturnTaskId, setOranMedReturnTaskIdState] = useState<string | null>(() => {
+    try { return localStorage.getItem(ORAN_MED_RETURN_TASK_KEY); } catch { return null; }
+  });
+  const setOranMedReturnTaskId = useCallback((id: string | null) => {
+    setOranMedReturnTaskIdState(id);
+    try {
+      if (id) localStorage.setItem(ORAN_MED_RETURN_TASK_KEY, id);
+      else localStorage.removeItem(ORAN_MED_RETURN_TASK_KEY);
+    } catch { /* ignore */ }
+  }, []);
   const [autoStartTriggered, setAutoStartTriggered] = useState(false);
   const { navigateToItem } = useModule();
   const isNarrowWorkspace = useMediaQuery('(max-width: 1279px)');
@@ -962,6 +972,7 @@ export function SkillsModule() {
             selectedCreators={creatorLibraryItems.filter((c) => state.setup.selectedCreatorIds.includes(c.id))}
             onPickCreatorVideo={setCreatorVideo}
             onClearCreatorVideo={clearCreatorVideo}
+            onConfirmCreatorBindings={confirmCreatorBindings}
             // Agent 02/03
             agent02={state.agents.find((a) => a.id === 'agent-02')}
             agent03={state.agents.find((a) => a.id === 'agent-03')}

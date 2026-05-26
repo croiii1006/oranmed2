@@ -56,6 +56,7 @@ interface RightWorkspaceProps {
   selectedCreators?: CreatorLibraryItem[];
   onPickCreatorVideo?: (creatorId: string, videoId: string) => void;
   onClearCreatorVideo?: (creatorId: string) => void;
+  onConfirmCreatorBindings?: () => void;
   // Agent 02/03 data
   agent02?: AgentInfo;
   agent03?: AgentInfo;
@@ -182,7 +183,8 @@ export function RightWorkspace(props: RightWorkspaceProps) {
                 creators={props.selectedCreators}
                 creatorVideoBindings={props.creatorVideoBindings}
                 onPickCreator={props.onPickCreatorVideo}
-                onClearCreator={props.onClearCreatorVideo} />
+                onClearCreator={props.onClearCreatorVideo}
+                onConfirmBindings={props.onConfirmCreatorBindings} />
               </div>
             }
           </div>);
