@@ -1208,25 +1208,25 @@ export function useSkillsEngine() {
     }));
   }, []);
 
-  // Per-creator video binding. When all selected creators have a binding,
-  // auto-advance into phase 2 using the first creator's chosen video.
+  // Per-creator video binding. User must explicitly confirm to advance
+  // (avoid mis-tap by auto-advancing on last creator binding).
   const setCreatorVideo = useCallback((creatorId: string, videoId: string) => {
     const current = stateRef.current;
-    // Block changes once phase 2 already started.
     if (current.selectedVideo) return;
     const newBindings = { ...current.creatorVideoBindings, [creatorId]: videoId };
     setState(prev => ({ ...prev, creatorVideoBindings: newBindings }));
+  }, []);
 
+  const confirmCreatorBindings = useCallback(() => {
+    const current = stateRef.current;
+    if (current.selectedVideo) return;
     const selectedIds = current.setup.selectedCreatorIds;
-    const allBound = selectedIds.length > 0 && selectedIds.every(id => !!newBindings[id]);
-    if (allBound && current.runMeta?.awaitingAction === 'select_video') {
-      const firstVideoId = newBindings[selectedIds[0]];
-      const refVideo = current.candidateVideos.find(v => v.id === firstVideoId);
-      if (refVideo) {
-        // Defer to avoid setState-in-setState ordering issues
-        window.setTimeout(() => selectVideo(refVideo), 0);
-      }
-    }
+    if (selectedIds.length === 0) return;
+    const allBound = selectedIds.every(id => !!current.creatorVideoBindings[id]);
+    if (!allBound) return;
+    const firstVideoId = current.creatorVideoBindings[selectedIds[0]];
+    const refVideo = current.candidateVideos.find(v => v.id === firstVideoId);
+    if (refVideo) selectVideo(refVideo);
   }, [selectVideo]);
 
   const clearCreatorVideo = useCallback((creatorId: string) => {
