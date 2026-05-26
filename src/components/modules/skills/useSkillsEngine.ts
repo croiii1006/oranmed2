@@ -900,12 +900,20 @@ export function useSkillsEngine() {
   // ─── Select video → Phase 2: Agent 02 + 03 parallel ───
   const selectVideo = useCallback((video: CandidateVideo) => {
     const phase2Deadline = Date.now() + PHASE2_MS;
-    setState(prev => ({
-      ...prev,
-      selectedVideo: video,
-      isProcessing: true,
-      runMeta: makeRunMeta('phase2', null, phase2Deadline),
-    }));
+    setState(prev => {
+      // Apply this video to every selected creator (acts as "全部达人复刻")
+      const bindings: Record<string, string> = { ...prev.creatorVideoBindings };
+      for (const cid of prev.setup.selectedCreatorIds) {
+        bindings[cid] = video.id;
+      }
+      return {
+        ...prev,
+        selectedVideo: video,
+        creatorVideoBindings: bindings,
+        isProcessing: true,
+        runMeta: makeRunMeta('phase2', null, phase2Deadline),
+      };
+    });
 
     addMessage({ type: 'selection-confirm', content: `已选择「${video.title}」作为对标视频，现在为你生成专属爆款视频Prompt。` });
 
@@ -1168,6 +1176,7 @@ export function useSkillsEngine() {
       generatedPrompt: '',
       resultVideo: null,
       selectedVideo: null,
+      creatorVideoBindings: {},
       isProcessing: false,
       activeRightView: 'agents',
       activeAgentTab: '01',
@@ -1198,6 +1207,38 @@ export function useSkillsEngine() {
       runMeta: makeRunMeta('awaiting_select', 'select_video', null),
     }));
   }, []);
+
+  // Per-creator video binding. When all selected creators have a binding,
+  // auto-advance into phase 2 using the first creator's chosen video.
+  const setCreatorVideo = useCallback((creatorId: string, videoId: string) => {
+    const current = stateRef.current;
+    // Block changes once phase 2 already started.
+    if (current.selectedVideo) return;
+    const newBindings = { ...current.creatorVideoBindings, [creatorId]: videoId };
+    setState(prev => ({ ...prev, creatorVideoBindings: newBindings }));
+
+    const selectedIds = current.setup.selectedCreatorIds;
+    const allBound = selectedIds.length > 0 && selectedIds.every(id => !!newBindings[id]);
+    if (allBound && current.runMeta?.awaitingAction === 'select_video') {
+      const firstVideoId = newBindings[selectedIds[0]];
+      const refVideo = current.candidateVideos.find(v => v.id === firstVideoId);
+      if (refVideo) {
+        // Defer to avoid setState-in-setState ordering issues
+        window.setTimeout(() => selectVideo(refVideo), 0);
+      }
+    }
+  }, [selectVideo]);
+
+  const clearCreatorVideo = useCallback((creatorId: string) => {
+    const current = stateRef.current;
+    if (current.selectedVideo) return;
+    setState(prev => {
+      const next = { ...prev.creatorVideoBindings };
+      delete next[creatorId];
+      return { ...prev, creatorVideoBindings: next };
+    });
+  }, []);
+
 
   // Regenerate
   const regenerate = useCallback(() => {
