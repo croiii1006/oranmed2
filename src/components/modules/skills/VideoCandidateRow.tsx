@@ -26,6 +26,7 @@ interface VideoCandidateRowProps {
   creatorVideoBindings?: Record<string, string>;
   onPickCreator?: (creatorId: string, videoId: string) => void;
   onClearCreator?: (creatorId: string) => void;
+  onConfirmBindings?: () => void;
 }
 
 const coverColors = [
