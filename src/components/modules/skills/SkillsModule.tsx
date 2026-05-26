@@ -973,7 +973,7 @@ export function SkillsModule() {
             resultVideoCount={Math.max(state.setup.selectedCreatorIds.length, 1)}
             resultCreators={creatorLibraryItems.filter((c) => state.setup.selectedCreatorIds.includes(c.id))}
             creatorVideoBindings={state.creatorVideoBindings}
-            onReturnToOranMed={oranMedReturnTaskId ? handleReturnToOranMed : undefined}
+            onReturnToOranMed={handleReturnToOranMed}
             onRegenerate={handleRegenerate}
             // Memory
             memoryTitle={activeMemoryEntry?.title}
