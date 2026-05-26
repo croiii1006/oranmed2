@@ -1261,7 +1261,7 @@ export function useSkillsEngine() {
     if (!allBound) return;
     const firstVideoId = current.creatorVideoBindings[selectedIds[0]];
     const refVideo = current.candidateVideos.find(v => v.id === firstVideoId);
-    if (refVideo) selectVideo(refVideo);
+    if (refVideo) selectVideo(refVideo, false);
   }, [selectVideo]);
 
   const clearCreatorVideo = useCallback((creatorId: string) => {
