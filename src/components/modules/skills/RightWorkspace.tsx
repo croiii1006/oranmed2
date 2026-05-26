@@ -63,7 +63,8 @@ interface RightWorkspaceProps {
   agent02Task?: SkillTask;
   agent03Task?: SkillTask;
   generatedPrompt?: string;
-  onPromptChange?: (val: string) => void;
+  generatedPrompts?: Record<string, string>;
+  onPromptChange?: (val: string, videoId?: string) => void;
   onPromptConfirm?: () => void;
   onBackToVideoSelect?: () => void;
   memoryEnabled?: boolean;
