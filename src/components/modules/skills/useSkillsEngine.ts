@@ -1171,9 +1171,20 @@ export function useSkillsEngine() {
     })();
   }, [addMessage, updateTask, addTaskLog, updateChild, updateAgent, updateAgentInMessages]);
 
-  // Update prompt
-  const updatePrompt = useCallback((prompt: string) => {
-    setState(prev => ({ ...prev, generatedPrompt: prompt }));
+  // Update prompt. If videoId given, only that entry in the map is updated.
+  const updatePrompt = useCallback((prompt: string, videoId?: string) => {
+    setState(prev => {
+      if (!videoId) {
+        return { ...prev, generatedPrompt: prompt };
+      }
+      const nextMap = { ...prev.generatedPrompts, [videoId]: prompt };
+      const isActive = prev.selectedVideo?.id === videoId || !prev.generatedPrompts[videoId];
+      return {
+        ...prev,
+        generatedPrompts: nextMap,
+        generatedPrompt: isActive ? prompt : prev.generatedPrompt,
+      };
+    });
   }, []);
 
   // Refresh candidates
