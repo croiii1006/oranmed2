@@ -53,6 +53,9 @@ interface RightWorkspaceProps {
   selectedVideoId?: string | null;
   onVideoSelect?: (video: CandidateVideo) => void;
   videoSelectDisabled?: boolean;
+  selectedCreators?: CreatorLibraryItem[];
+  onPickCreatorVideo?: (creatorId: string, videoId: string) => void;
+  onClearCreatorVideo?: (creatorId: string) => void;
   // Agent 02/03 data
   agent02?: AgentInfo;
   agent03?: AgentInfo;
@@ -175,7 +178,11 @@ export function RightWorkspace(props: RightWorkspaceProps) {
                 videos={props.candidateVideos}
                 onSelect={(v) => props.onVideoSelect?.(v)}
                 selectedVideoId={props.selectedVideoId}
-                disabled={props.videoSelectDisabled} />
+                disabled={props.videoSelectDisabled}
+                creators={props.selectedCreators}
+                creatorVideoBindings={props.creatorVideoBindings}
+                onPickCreator={props.onPickCreatorVideo}
+                onClearCreator={props.onClearCreatorVideo} />
               </div>
             }
           </div>);
