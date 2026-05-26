@@ -901,13 +901,16 @@ export function useSkillsEngine() {
   }, [streamText, addMessage, updateTask, addTaskLog, updateChild, updateAgent, updateAgentInMessages]);
 
   // ─── Select video → Phase 2: Agent 02 + 03 parallel ───
-  const selectVideo = useCallback((video: CandidateVideo) => {
+  const selectVideo = useCallback((video: CandidateVideo, applyToAll: boolean = true) => {
     const phase2Deadline = Date.now() + PHASE2_MS;
     setState(prev => {
-      // Apply this video to every selected creator (acts as "全部达人复刻")
       const bindings: Record<string, string> = { ...prev.creatorVideoBindings };
       for (const cid of prev.setup.selectedCreatorIds) {
-        bindings[cid] = video.id;
+        // Only overwrite when applyToAll (entering via "全选" from a single card).
+        // When confirming per-creator bindings, keep existing choices intact.
+        if (applyToAll || !bindings[cid]) {
+          bindings[cid] = video.id;
+        }
       }
       return {
         ...prev,
