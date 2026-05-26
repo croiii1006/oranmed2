@@ -56,6 +56,7 @@ interface RightWorkspaceProps {
   selectedCreators?: CreatorLibraryItem[];
   onPickCreatorVideo?: (creatorId: string, videoId: string) => void;
   onClearCreatorVideo?: (creatorId: string) => void;
+  onConfirmCreatorBindings?: () => void;
   // Agent 02/03 data
   agent02?: AgentInfo;
   agent03?: AgentInfo;
