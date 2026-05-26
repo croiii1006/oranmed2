@@ -212,7 +212,14 @@ export function RightWorkspace(props: RightWorkspaceProps) {
           <div className="p-5 space-y-5">
             {props.agent04Task && <WorkLog logs={props.agent04Task.logs} />}
             {props.resultVideo &&
-            <ResultPreviewBlock resultVideo={props.resultVideo} count={props.resultVideoCount} onReturnToOranMed={props.onReturnToOranMed} />
+            <ResultPreviewBlock
+              resultVideo={props.resultVideo}
+              count={props.resultVideoCount}
+              onReturnToOranMed={props.onReturnToOranMed}
+              creators={props.resultCreators}
+              candidateVideos={props.candidateVideos}
+              creatorVideoBindings={props.creatorVideoBindings}
+            />
             }
           </div>);
       default:
