@@ -1,5 +1,7 @@
 import { Download, Film, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import type { CandidateVideo } from './useSkillsEngine';
+import type { CreatorLibraryItem } from './creatorLibrary';
 
 interface ResultPreviewBlockProps {
   resultVideo: {
@@ -8,10 +10,21 @@ interface ResultPreviewBlockProps {
   };
   count?: number;
   onReturnToOranMed?: () => void;
+  creators?: CreatorLibraryItem[];
+  candidateVideos?: CandidateVideo[];
+  creatorVideoBindings?: Record<string, string>;
 }
 
-export function ResultPreviewBlock({ resultVideo, count = 1, onReturnToOranMed }: ResultPreviewBlockProps) {
-  const n = Math.max(count, 1);
+export function ResultPreviewBlock({
+  resultVideo,
+  count = 1,
+  onReturnToOranMed,
+  creators = [],
+  candidateVideos = [],
+  creatorVideoBindings = {},
+}: ResultPreviewBlockProps) {
+  const useBindings = creators.length > 0;
+  const n = useBindings ? creators.length : Math.max(count, 1);
 
   const gridColsClass =
     n === 1 ? 'grid-cols-1'
@@ -30,7 +43,7 @@ export function ResultPreviewBlock({ resultVideo, count = 1, onReturnToOranMed }
         )}
       </div>
 
-      {n === 1 ? (
+      {n === 1 && !useBindings ? (
         <div className="relative flex aspect-video items-center justify-center bg-neutral-50">
           <video
             src={resultVideo.url}
@@ -43,32 +56,47 @@ export function ResultPreviewBlock({ resultVideo, count = 1, onReturnToOranMed }
         </div>
       ) : (
         <div className={`grid gap-3 p-4 ${gridColsClass}`}>
-          {Array.from({ length: n }).map((_, i) => (
-            <div
-              key={i}
-              className="relative overflow-hidden rounded-lg border border-border/40 bg-neutral-50"
-            >
-              <div className="relative aspect-[9/16] w-full bg-black">
-                <video
-                  src={resultVideo.url}
-                  className="absolute inset-0 h-full w-full object-contain"
-                  controls
-                  playsInline
-                  preload="metadata"
-                />
+          {Array.from({ length: n }).map((_, i) => {
+            const creator = useBindings ? creators[i] : null;
+            const boundVideoId = creator ? creatorVideoBindings[creator.id] : undefined;
+            const refVideo = boundVideoId ? candidateVideos.find((v) => v.id === boundVideoId) : null;
+            return (
+              <div
+                key={creator?.id ?? i}
+                className="relative overflow-hidden rounded-lg border border-border/40 bg-neutral-50"
+              >
+                <div className="relative aspect-[9/16] w-full bg-black">
+                  <video
+                    src={resultVideo.url}
+                    className="absolute inset-0 h-full w-full object-contain"
+                    controls
+                    playsInline
+                    preload="metadata"
+                  />
+                </div>
+                <div className="space-y-0.5 border-t border-border/30 px-2 py-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-[11px] font-medium text-foreground">
+                      {creator ? creator.name : `复刻视频 #${i + 1}`}
+                    </span>
+                    <a
+                      href={resultVideo.url}
+                      download
+                      className="inline-flex shrink-0 items-center gap-1 text-[11px] text-foreground hover:underline"
+                    >
+                      <Download className="h-3 w-3" /> 下载
+                    </a>
+                  </div>
+                  {refVideo && (
+                    <div className="flex items-center gap-1 truncate text-[10px] text-muted-foreground">
+                      <Film className="h-2.5 w-2.5 shrink-0" />
+                      <span className="truncate">对标：{refVideo.title}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center justify-between border-t border-border/30 px-2 py-1.5">
-                <span className="text-[11px] text-muted-foreground">复刻视频 #{i + 1}</span>
-                <a
-                  href={resultVideo.url}
-                  download
-                  className="inline-flex items-center gap-1 text-[11px] text-foreground hover:underline"
-                >
-                  <Download className="h-3 w-3" /> 下载
-                </a>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
