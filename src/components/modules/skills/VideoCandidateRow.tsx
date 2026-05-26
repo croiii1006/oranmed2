@@ -147,7 +147,7 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
                 )}>
                 
                   <Copy className="w-3 h-3" />
-                  {selectedVideoId === video.id ? '已选择' : '复刻'}
+                  {selectedVideoId === video.id ? '已应用全部' : '全部达人复刻'}
                 </button>
               </div>
             </div>
@@ -329,7 +329,7 @@ function VideoDetailDialog({ video, colorIndex, selectedVideoId, onSelect, onClo
               )}>
               
               <Copy className="w-4 h-4" />
-              {selectedVideoId === video.id ? '已选择' : '一键复刻'}
+              {selectedVideoId === video.id ? '已应用全部' : '一键全部达人复刻'}
             </Button>
           </div>
         </div>
