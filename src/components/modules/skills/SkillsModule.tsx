@@ -994,6 +994,7 @@ export function SkillsModule() {
             agent02Task={taskMemory}
             agent03Task={taskPrompt}
             generatedPrompt={state.generatedPrompt}
+            generatedPrompts={state.generatedPrompts}
             onPromptChange={updatePrompt}
             onPromptConfirm={handlePromptConfirm}
             onBackToVideoSelect={handleBackToVideoSelect}

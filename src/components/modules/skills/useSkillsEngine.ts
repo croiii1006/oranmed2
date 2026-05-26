@@ -103,6 +103,8 @@ export interface SkillsState {
   /** Per-creator video bindings: creatorId → videoId */
   creatorVideoBindings: Record<string, string>;
   generatedPrompt: string;
+  /** Per-video prompts, keyed by videoId. */
+  generatedPrompts: Record<string, string>;
   resultVideo: { url: string; cover: string } | null;
   isProcessing: boolean;
   runMeta: SkillsRunMeta | null;
@@ -613,6 +615,7 @@ export function useSkillsEngine() {
     selectedVideo: null,
     creatorVideoBindings: {},
     generatedPrompt: '',
+    generatedPrompts: {},
     resultVideo: null,
     isProcessing: false,
     runMeta: null,
@@ -898,13 +901,16 @@ export function useSkillsEngine() {
   }, [streamText, addMessage, updateTask, addTaskLog, updateChild, updateAgent, updateAgentInMessages]);
 
   // ─── Select video → Phase 2: Agent 02 + 03 parallel ───
-  const selectVideo = useCallback((video: CandidateVideo) => {
+  const selectVideo = useCallback((video: CandidateVideo, applyToAll: boolean = true) => {
     const phase2Deadline = Date.now() + PHASE2_MS;
     setState(prev => {
-      // Apply this video to every selected creator (acts as "全部达人复刻")
       const bindings: Record<string, string> = { ...prev.creatorVideoBindings };
       for (const cid of prev.setup.selectedCreatorIds) {
-        bindings[cid] = video.id;
+        // Only overwrite when applyToAll (entering via "全选" from a single card).
+        // When confirming per-creator bindings, keep existing choices intact.
+        if (applyToAll || !bindings[cid]) {
+          bindings[cid] = video.id;
+        }
       }
       return {
         ...prev,
@@ -1052,16 +1058,33 @@ export function useSkillsEngine() {
 
       const mockPrompt = `【爆款复刻 Prompt】\n\n镜头风格：近景特写 + 俯拍切换，暖色调滤镜\n节奏：快节奏剪辑，BGM 节拍同步\n内容结构：\n1. 开场 - 产品白底展示，旋转 360°（0-3s）\n2. 使用场景 - 手部特写展示质感（3-8s）\n3. 效果对比 - 使用前后对比（8-15s）\n4. 口播种草 - 真人出镜，口述卖点（15-25s）\n5. 结尾 CTA - 点击链接，限时优惠（25-30s）\n\n关键词：${state.setup.sellingPoints.slice(0, 30)}\n品类：${state.setup.category}\n参考来源：${video.title}`;
 
-      const resolvedPrompt = buildPromptForSelectedVideo(state.setup, video);
+      const currentSnapshot = stateRef.current;
+      const bindings = currentSnapshot.creatorVideoBindings;
+      const usedVideoIds = Array.from(new Set(
+        currentSnapshot.setup.selectedCreatorIds
+          .map(cid => bindings[cid])
+          .filter((v): v is string => !!v)
+      ));
+      const fallbackIds = usedVideoIds.length > 0 ? usedVideoIds : [video.id];
+      const promptsMap: Record<string, string> = {};
+      for (const vid of fallbackIds) {
+        const refVideo = currentSnapshot.candidateVideos.find(v => v.id === vid) || video;
+        promptsMap[vid] = buildPromptForSelectedVideo(currentSnapshot.setup, refVideo);
+      }
+      const resolvedPrompt = promptsMap[video.id] || promptsMap[fallbackIds[0]];
 
       setState(prev => ({
         ...prev,
         generatedPrompt: resolvedPrompt,
+        generatedPrompts: promptsMap,
         isProcessing: false,
         runMeta: makeRunMeta('awaiting_confirm', 'confirm_prompt', null),
       }));
 
-      addMessage({ type: 'video-gen-status', content: '✅ Prompt已生成，请在右侧面板查看和编辑，确认后生成视频 →' });
+      const promptCount = Object.keys(promptsMap).length;
+      addMessage({ type: 'video-gen-status', content: promptCount > 1
+        ? `✅ 已为 ${promptCount} 条参考视频分别生成 Prompt，请在右侧面板逐一查看和编辑 →`
+        : '✅ Prompt已生成，请在右侧面板查看和编辑，确认后生成视频 →' });
     })();
   }, [state.setup, addMessage, updateTask, addTaskLog, updateChild, updateAgent, updateAgentInMessages]);
 
@@ -1148,9 +1171,20 @@ export function useSkillsEngine() {
     })();
   }, [addMessage, updateTask, addTaskLog, updateChild, updateAgent, updateAgentInMessages]);
 
-  // Update prompt
-  const updatePrompt = useCallback((prompt: string) => {
-    setState(prev => ({ ...prev, generatedPrompt: prompt }));
+  // Update prompt. If videoId given, only that entry in the map is updated.
+  const updatePrompt = useCallback((prompt: string, videoId?: string) => {
+    setState(prev => {
+      if (!videoId) {
+        return { ...prev, generatedPrompt: prompt };
+      }
+      const nextMap = { ...prev.generatedPrompts, [videoId]: prompt };
+      const isActive = prev.selectedVideo?.id === videoId || !prev.generatedPrompts[videoId];
+      return {
+        ...prev,
+        generatedPrompts: nextMap,
+        generatedPrompt: isActive ? prompt : prev.generatedPrompt,
+      };
+    });
   }, []);
 
   // Refresh candidates
@@ -1174,6 +1208,7 @@ export function useSkillsEngine() {
     setState(prev => ({
       ...prev,
       generatedPrompt: '',
+      generatedPrompts: {},
       resultVideo: null,
       selectedVideo: null,
       creatorVideoBindings: {},
@@ -1226,7 +1261,7 @@ export function useSkillsEngine() {
     if (!allBound) return;
     const firstVideoId = current.creatorVideoBindings[selectedIds[0]];
     const refVideo = current.candidateVideos.find(v => v.id === firstVideoId);
-    if (refVideo) selectVideo(refVideo);
+    if (refVideo) selectVideo(refVideo, false);
   }, [selectVideo]);
 
   const clearCreatorVideo = useCallback((creatorId: string) => {
@@ -1307,6 +1342,7 @@ export function useSkillsEngine() {
       selectedVideo: null,
       creatorVideoBindings: {},
       generatedPrompt: '',
+      generatedPrompts: {},
       resultVideo: null,
       isProcessing: false,
       runMeta: null,
