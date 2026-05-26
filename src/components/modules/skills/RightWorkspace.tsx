@@ -7,6 +7,7 @@ import { PixelProgress } from './PixelProgress';
 import { PromptEditorBlock } from './PromptEditorBlock';
 import { ResultPreviewBlock } from './ResultPreviewBlock';
 import { VideoCandidateRow } from './VideoCandidateRow';
+import type { CreatorLibraryItem } from './creatorLibrary';
 import type { AgentInfo } from './AgentCard';
 import type { CandidateVideo, SkillTask, TaskLog } from './useSkillsEngine';
 
@@ -68,6 +69,8 @@ interface RightWorkspaceProps {
   agent04Task?: SkillTask;
   resultVideo?: {url: string;cover: string;} | null;
   resultVideoCount?: number;
+  resultCreators?: CreatorLibraryItem[];
+  creatorVideoBindings?: Record<string, string>;
   onReturnToOranMed?: () => void;
   onRegenerate?: () => void;
   // Memory data
