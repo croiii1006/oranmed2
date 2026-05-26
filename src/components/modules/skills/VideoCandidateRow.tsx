@@ -1,10 +1,19 @@
-import { useState, useRef } from 'react';
-import { ExternalLink, Copy, Volume2, VolumeX, Eye, Heart, ShoppingCart, TrendingUp, X, CalendarDays, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { ExternalLink, Copy, Volume2, VolumeX, Eye, Heart, ShoppingCart, TrendingUp, X, CalendarDays, Sparkles, ChevronDown, Check, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { CandidateVideo } from './useSkillsEngine';
+import type { CreatorLibraryItem } from './creatorLibrary';
 import { cn } from '@/lib/utils';
 
 interface VideoCandidateRowProps {
@@ -13,6 +22,10 @@ interface VideoCandidateRowProps {
   onPreview?: (video: CandidateVideo) => void;
   selectedVideoId?: string | null;
   disabled?: boolean;
+  creators?: CreatorLibraryItem[];
+  creatorVideoBindings?: Record<string, string>;
+  onPickCreator?: (creatorId: string, videoId: string) => void;
+  onClearCreator?: (creatorId: string) => void;
 }
 
 const coverColors = [
@@ -23,7 +36,7 @@ const coverColors = [
 'from-rose-200 to-rose-100'];
 
 
-export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId, disabled }: VideoCandidateRowProps) {
+export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId, disabled, creators = [], creatorVideoBindings = {}, onPickCreator, onClearCreator }: VideoCandidateRowProps) {
   const [detailVideo, setDetailVideo] = useState<CandidateVideo | null>(null);
   const [detailIndex, setDetailIndex] = useState(0);
 
@@ -32,6 +45,106 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
   const openDetail = (video: CandidateVideo, idx: number) => {
     setDetailVideo(video);
     setDetailIndex(idx);
+  };
+
+  const renderCreatorDropdown = (video: CandidateVideo, size: 'sm' | 'lg' = 'sm') => {
+    const boundCount = creators.filter((c) => creatorVideoBindings[c.id] === video.id).length;
+    const allSelected = selectedVideoId === video.id;
+    const triggerLabel = allSelected
+      ? '已应用全部'
+      : boundCount > 0
+        ? `已选 ${boundCount} 位达人`
+        : creators.length > 0
+          ? '选择达人复刻'
+          : '复刻';
+
+    const triggerClass = size === 'lg'
+      ? cn(
+          'flex-1 rounded-full h-11 font-medium text-sm gap-2 inline-flex items-center justify-center transition-colors',
+          allSelected
+            ? 'bg-muted text-foreground hover:bg-muted/80'
+            : 'bg-foreground text-background hover:bg-foreground/90',
+          disabled && !allSelected && 'opacity-60 cursor-not-allowed',
+        )
+      : cn(
+          'flex-1 h-8 rounded-full flex items-center justify-center gap-1 text-[11px] font-medium transition-colors',
+          allSelected
+            ? 'bg-muted text-foreground'
+            : disabled
+              ? 'bg-muted/50 text-muted-foreground/50 cursor-not-allowed'
+              : 'bg-foreground text-background hover:bg-foreground/90',
+        );
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild disabled={disabled && !allSelected}>
+          <button
+            type="button"
+            onClick={(e) => e.stopPropagation()}
+            className={triggerClass}
+          >
+            <Copy className={size === 'lg' ? 'w-4 h-4' : 'w-3 h-3'} />
+            <span>{triggerLabel}</span>
+            <ChevronDown className={size === 'lg' ? 'w-3.5 h-3.5 opacity-70' : 'w-3 h-3 opacity-70'} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56" onClick={(e) => e.stopPropagation()}>
+          <DropdownMenuItem
+            disabled={disabled || creators.length === 0}
+            onSelect={(e) => {
+              e.preventDefault();
+              if (!disabled) onSelect(video);
+            }}
+            className="gap-2 font-medium"
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span className="flex-1">全选所有达人复刻</span>
+            {allSelected && <Check className="w-3.5 h-3.5" />}
+          </DropdownMenuItem>
+          {creators.length > 0 && <DropdownMenuSeparator />}
+          {creators.length > 0 && (
+            <DropdownMenuLabel className="text-[10px] font-normal text-muted-foreground/70 py-1">
+              单独选择达人
+            </DropdownMenuLabel>
+          )}
+          {creators.map((c) => {
+            const boundVideoId = creatorVideoBindings[c.id];
+            const checked = boundVideoId === video.id;
+            const boundElsewhere = !!boundVideoId && !checked;
+            return (
+              <DropdownMenuItem
+                key={c.id}
+                disabled={disabled}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  if (disabled) return;
+                  if (checked) {
+                    onClearCreator?.(c.id);
+                  } else {
+                    onPickCreator?.(c.id, video.id);
+                  }
+                }}
+                className="gap-2"
+              >
+                <img src={c.avatarUrl} alt="" className="w-5 h-5 rounded-full object-cover shrink-0" />
+                <span className="flex-1 truncate text-xs">
+                  {c.name}
+                  {boundElsewhere && (
+                    <span className="ml-1 text-[10px] text-muted-foreground/60">(已绑其他视频)</span>
+                  )}
+                </span>
+                {checked && <Check className="w-3.5 h-3.5 shrink-0" />}
+              </DropdownMenuItem>
+            );
+          })}
+          {creators.length === 0 && (
+            <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+              请先选择达人
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   };
 
   return (
@@ -134,21 +247,7 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
                     原链接
                   </a>
               }
-                <button
-                onClick={(e) => {e.stopPropagation();if (!disabled) onSelect(video);}}
-                disabled={disabled && selectedVideoId !== video.id}
-                className={cn(
-                  'flex-1 h-8 rounded-full flex items-center justify-center gap-1 text-[11px] font-medium transition-colors',
-                  selectedVideoId === video.id ?
-                  'bg-muted text-foreground' :
-                  disabled ?
-                  'bg-muted/50 text-muted-foreground/50 cursor-not-allowed' :
-                  'bg-foreground text-background hover:bg-foreground/90'
-                )}>
-                
-                  <Copy className="w-3 h-3" />
-                  {selectedVideoId === video.id ? '已应用全部' : '全部达人复刻'}
-                </button>
+                {renderCreatorDropdown(video, 'sm')}
               </div>
             </div>
           </div>
@@ -164,7 +263,8 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
             colorIndex={detailIndex}
             selectedVideoId={selectedVideoId}
             onSelect={(v) => {onSelect(v);setDetailVideo(null);}}
-            onClose={() => setDetailVideo(null)} />
+            onClose={() => setDetailVideo(null)}
+            renderDropdown={(v) => renderCreatorDropdown(v, 'lg')} />
 
           }
         </DialogContent>
@@ -181,9 +281,10 @@ interface VideoDetailDialogProps {
   selectedVideoId?: string | null;
   onSelect: (video: CandidateVideo) => void;
   onClose: () => void;
+  renderDropdown: (video: CandidateVideo) => React.ReactNode;
 }
 
-function VideoDetailDialog({ video, colorIndex, selectedVideoId, onSelect, onClose }: VideoDetailDialogProps) {
+function VideoDetailDialog({ video, colorIndex, selectedVideoId, onSelect, onClose, renderDropdown }: VideoDetailDialogProps) {
   const [isMuted, setIsMuted] = useState(false);
 
   return (
@@ -319,18 +420,7 @@ function VideoDetailDialog({ video, colorIndex, selectedVideoId, onSelect, onClo
                 原链接
               </a>
             }
-            <Button
-              onClick={() => onSelect(video)}
-              className={cn(
-                'flex-1 rounded-full h-11 font-medium text-sm gap-2',
-                selectedVideoId === video.id ?
-                'bg-muted text-foreground hover:bg-muted/80' :
-                'bg-foreground text-background hover:bg-foreground/90'
-              )}>
-              
-              <Copy className="w-4 h-4" />
-              {selectedVideoId === video.id ? '已应用全部' : '一键全部达人复刻'}
-            </Button>
+            {renderDropdown(video)}
           </div>
         </div>
       </div>

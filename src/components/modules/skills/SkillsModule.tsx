@@ -680,9 +680,6 @@ export function SkillsModule() {
               setup={setup}
               candidateVideos={state.candidateVideos}
               creatorVideoBindings={state.creatorVideoBindings}
-              onPickCreatorVideo={setCreatorVideo}
-              onClearCreatorVideo={clearCreatorVideo}
-              pickerDisabled={!!state.selectedVideo}
             />
           );
         }
