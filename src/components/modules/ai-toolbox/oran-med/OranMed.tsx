@@ -123,7 +123,7 @@ function OranMedInner() {
           onGoWorkflow={() => setParams({ view: 'workflow' })}
         />
       ) : (
-        <div className="mx-auto w-full max-w-[1280px] px-6 py-8 lg:px-10 lg:py-10">
+        <div className="mx-auto w-full max-w-[1680px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10 2xl:px-14">
           <WorkflowView onBack={() => setParams({})} onComplete={() => setParams({ view: 'tasks' })} />
         </div>
       )}
@@ -1715,7 +1715,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
         <span>返回</span>
       </button>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(340px,440px)_1fr]">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(320px,400px)_1fr] xl:grid-cols-[minmax(360px,460px)_1fr] xl:gap-8 2xl:grid-cols-[minmax(400px,520px)_1fr]">
         {/* LEFT */}
         <div className="space-y-5">
           <TaskMiniCard task={currentTask} stacked={assets.length > 0} onClick={() => setDetailOpen(true)} />
@@ -1760,7 +1760,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
         </div>
 
         {/* RIGHT */}
-        <div className="min-h-[400px] rounded-2xl border border-border/40 bg-card/30 p-5 backdrop-blur-sm">
+        <div className="flex min-h-[400px] flex-col rounded-2xl border border-border/40 bg-card/30 p-5 backdrop-blur-sm xl:min-h-[520px]">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Assets</div>
@@ -1776,7 +1776,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
           </div>
 
           {assets.length === 0 ? (
-            <div className="flex h-[300px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/40 text-center">
+            <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/40 text-center">
               <ImageIcon className="h-6 w-6 text-muted-foreground/60" />
               <div className="text-xs text-muted-foreground">
                 {assetMode === 'orangen'
@@ -1787,7 +1787,8 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+
               {assets.map((a) => {
                 const c = CREATORS.find((cc) => cc.id === a.creatorId);
                 return (
