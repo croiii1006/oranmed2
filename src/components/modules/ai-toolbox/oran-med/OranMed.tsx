@@ -222,8 +222,7 @@ function NewTaskView({
   );
 
   // Manual selection filters
-  const [manualTerritory, setManualTerritory] = useState<'all' | 'cn' | 'overseas'>('all');
-  const [manualGender, setManualGender] = useState<'all' | 'male' | 'female'>('all');
+  const [manualFilters, setManualFilters] = useState<ManualFilters>(defaultManualFilters);
   const CN_REGIONS = new Set(['CN', 'CHINA', '中国', '中国大陆']);
 
   const handleSmartParse = () => {
