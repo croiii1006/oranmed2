@@ -131,7 +131,56 @@ function OranMedInner() {
   );
 }
 
+// ============== Selection helpers ==============
+
+// Parse follower / play strings like "12.4w" / "182.4K" / "1.2M" / "5万" → number of 万
+function parseToWan(raw?: string): number {
+  if (!raw) return 0;
+  const m = raw.match(/([\d.]+)/);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  if (!Number.isFinite(n)) return 0;
+  const s = raw.toLowerCase();
+  if (raw.includes('万') || s.includes('w')) return n;
+  if (s.includes('k')) return n / 10; // 10K = 1w
+  if (s.includes('m')) return n * 100;
+  return n / 10000; // bare number → assume raw count
+}
+
+function formatWan(n: number): string {
+  if (n <= 0) return '0';
+  if (n >= 10000) return `${(n / 10000).toFixed(1).replace(/\.0$/, '')}亿`;
+  if (n >= 1) return `${n.toFixed(1).replace(/\.0$/, '')}w`;
+  return `${Math.round(n * 10000).toLocaleString()}`;
+}
+
+function formatPrice(n: number, currency?: string): string {
+  const sym = currency === 'CNY' ? '¥' : '$';
+  if (n >= 10000) return `${sym}${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  if (n >= 1000) return `${sym}${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  return `${sym}${Math.round(n).toLocaleString()}`;
+}
+
+function summarizeCreators(list: Creator[]) {
+  let fans = 0;
+  let plays = 0;
+  let missingPrice = 0;
+  const priceByCurrency: Record<string, number> = {};
+  for (const c of list) {
+    fans += parseToWan(c.followers);
+    plays += parseToWan(c.avgPlay);
+    if (c.reportedVideoPrice != null) {
+      const key = c.currency || 'USD';
+      priceByCurrency[key] = (priceByCurrency[key] ?? 0) + c.reportedVideoPrice;
+    } else {
+      missingPrice += 1;
+    }
+  }
+  return { fans, plays, priceByCurrency, missingPrice };
+}
+
 // ============== New task ==============
+
 
 function NewTaskView({
   onOpenWorkbench,
@@ -238,6 +287,17 @@ function NewTaskView({
       return territoryOk && genderOk;
     });
   }, [brief.platform, pickMode, manualTerritory, manualGender]);
+
+  const selectedCreatorsForSummary = useMemo(
+    () => CREATORS.filter((c) => selectedCreatorIds.includes(c.id)),
+    [selectedCreatorIds],
+  );
+  const selectionSummary = useMemo(
+    () => summarizeCreators(selectedCreatorsForSummary),
+    [selectedCreatorsForSummary],
+  );
+
+
 
   return (
     <div className="relative min-h-full flex flex-col items-center justify-start px-6 pt-[100px] pb-6 md:px-8 md:pt-[180px] md:pb-8">
@@ -468,9 +528,42 @@ function NewTaskView({
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] font-light text-muted-foreground">
-                    {matching ? '基于 Brief 与人群分析中' : `已选 ${selectedCreatorIds.length} 位`}
-                  </span>
+                  {matching ? (
+                    <span className="text-[11px] font-light text-muted-foreground">基于 Brief 与人群分析中</span>
+                  ) : (
+                    <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-0.5 text-[11px] font-light text-muted-foreground">
+                      <span className={cn(
+                        selectedCreatorIds.length >= brief.targetCreatorCount ? 'text-foreground/70' : 'text-muted-foreground',
+                      )}>
+                        已选 {selectedCreatorIds.length}
+                        <span className="text-muted-foreground/60"> / 目标 {brief.targetCreatorCount}</span>
+                      </span>
+                      {selectedCreatorIds.length > 0 ? (
+                        <>
+                          <span className="text-foreground/20">·</span>
+                          <span>触达 <span className="text-foreground/80">{formatWan(selectionSummary.fans)}</span> 粉丝</span>
+                          <span className="text-foreground/20">·</span>
+                          <span>均播合计 <span className="text-foreground/80">{formatWan(selectionSummary.plays)}</span></span>
+                          {Object.keys(selectionSummary.priceByCurrency).length > 0 ? (
+                            <>
+                              <span className="text-foreground/20">·</span>
+                              <span>
+                                报价 <span className="text-foreground/80">
+                                  {Object.entries(selectionSummary.priceByCurrency)
+                                    .map(([cur, sum]) => formatPrice(sum, cur))
+                                    .join(' + ')}
+                                </span>
+                              </span>
+                            </>
+                          ) : null}
+                          {selectionSummary.missingPrice > 0 ? (
+                            <span className="text-muted-foreground/70">({selectionSummary.missingPrice} 位待询价)</span>
+                          ) : null}
+                        </>
+                      ) : null}
+                    </div>
+                  )}
+
                 </div>
 
                 {matching ? (
@@ -560,6 +653,22 @@ function NewTaskView({
                             {c.handle}
                           </div>
                         </div>
+
+                        {/* Always-on mini metrics — fades out on hover so the overlay can show full details */}
+                        <div className="relative z-10 mt-2 flex flex-col items-center gap-0.5 text-[10.5px] font-light leading-tight text-muted-foreground/80 transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0">
+                          <div className="flex items-center gap-1">
+                            <span className="text-foreground/75">{c.followers}</span>
+                            <span className="text-foreground/25">·</span>
+                            <span>均播 <span className="text-foreground/70">{c.avgPlay}</span></span>
+                          </div>
+                          <div className="text-foreground/70">
+                            {c.reportedVideoPrice != null
+                              ? formatPrice(c.reportedVideoPrice, c.currency)
+                              : '报价待询'}
+                          </div>
+                        </div>
+
+
 
 
                         <div className="pointer-events-none absolute inset-0 z-10 rounded-[20px] bg-white/85 p-4 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
