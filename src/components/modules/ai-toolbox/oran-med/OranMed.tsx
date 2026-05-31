@@ -532,12 +532,8 @@ function NewTaskView({
                     <span className="text-[11px] font-light text-muted-foreground">基于 Brief 与人群分析中</span>
                   ) : (
                     <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-0.5 text-[11px] font-light text-muted-foreground">
-                      <span className={cn(
-                        selectedCreatorIds.length >= brief.targetCreatorCount ? 'text-foreground/70' : 'text-muted-foreground',
-                      )}>
-                        已选 {selectedCreatorIds.length}
-                        <span className="text-muted-foreground/60"> / 目标 {brief.targetCreatorCount}</span>
-                      </span>
+                      <span className="text-muted-foreground">已选 {selectedCreatorIds.length}</span>
+
                       {selectedCreatorIds.length > 0 ? (
                         <>
                           <span className="text-foreground/20">·</span>
