@@ -1,6 +1,6 @@
-export type Platform = '小红书' | '抖音' | 'B站' | '微博';
+export type Platform = 'TikTok';
 
-export const PLATFORMS: Platform[] = ['小红书', '抖音', 'B站', '微博'];
+export const PLATFORMS: Platform[] = ['TikTok'];
 
 export interface CustomBriefField {
   id: string;
@@ -138,7 +138,7 @@ export interface CreatorOnboarding {
 
 export const emptyBrief = (): Brief => ({
   title: '',
-  platform: '小红书',
+  platform: 'TikTok',
   goal: '',
   brandName: '',
   brandCategory: '',
