@@ -718,7 +718,7 @@ function CustomField({
   };
 
   return (
-    <div className="group relative flex flex-col gap-1.5 rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+    <div className="group relative flex flex-col gap-1.5 overflow-hidden rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <div className="flex items-center gap-1.5">
         <input
           value={field.label}
