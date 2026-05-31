@@ -3210,10 +3210,7 @@ function TaskStatusFooter({ task }: { task: OranMedTask }) {
 
 // ============== Workbench ==============
 const PLATFORM_ACCENT: Record<Platform, { bar: string; chip: string; dot: string }> = {
-  'TikTok': { bar: 'from-rose-400 via-rose-500 to-pink-500', chip: 'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300', dot: 'bg-rose-500' },
-  'TikTok':   { bar: 'from-zinc-700 via-zinc-900 to-black', chip: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200', dot: 'bg-zinc-900 dark:bg-zinc-200' },
-  'TikTok':   { bar: 'from-sky-400 via-cyan-400 to-pink-400', chip: 'bg-sky-50 text-sky-600 dark:bg-sky-950/40 dark:text-sky-300', dot: 'bg-sky-500' },
-  'TikTok':   { bar: 'from-orange-400 via-amber-500 to-red-500', chip: 'bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-300', dot: 'bg-orange-500' },
+  'TikTok': { bar: 'from-zinc-700 via-zinc-900 to-black', chip: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200', dot: 'bg-zinc-900 dark:bg-zinc-200' },
 };
 
 const STATUS_DOT: Record<TaskStatus, string> = {
