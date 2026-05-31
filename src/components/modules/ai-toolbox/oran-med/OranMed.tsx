@@ -13,6 +13,7 @@ import {
   FileText,
   Image as ImageIcon,
   Info,
+  MoreHorizontal,
   ListChecks,
   ListFilter,
   Play,
