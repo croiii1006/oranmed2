@@ -654,6 +654,22 @@ function NewTaskView({
                           </div>
                         </div>
 
+                        {/* Always-on mini metrics — fades out on hover so the overlay can show full details */}
+                        <div className="relative z-10 mt-2 flex flex-col items-center gap-0.5 text-[10.5px] font-light leading-tight text-muted-foreground/80 transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0">
+                          <div className="flex items-center gap-1">
+                            <span className="text-foreground/75">{c.followers}</span>
+                            <span className="text-foreground/25">·</span>
+                            <span>均播 <span className="text-foreground/70">{c.avgPlay}</span></span>
+                          </div>
+                          <div className="text-foreground/70">
+                            {c.reportedVideoPrice != null
+                              ? formatPrice(c.reportedVideoPrice, c.currency)
+                              : '报价待询'}
+                          </div>
+                        </div>
+
+
+
 
                         <div className="pointer-events-none absolute inset-0 z-10 rounded-[20px] bg-white/85 p-4 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
                           <div className="flex h-full flex-col gap-3">
