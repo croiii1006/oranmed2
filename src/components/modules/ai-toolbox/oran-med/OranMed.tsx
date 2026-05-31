@@ -512,7 +512,7 @@ function NewTaskView({
                         type="button"
                         onClick={() => toggleCreator(c.id)}
                         className={cn(
-                          'group relative flex min-h-[196px] w-full flex-col items-center overflow-hidden rounded-[20px] border bg-background px-4 py-5 text-center transition-all duration-200',
+                          'group relative flex min-h-[196px] w-full flex-col items-center justify-center overflow-hidden rounded-[20px] border bg-background px-4 py-5 text-center transition-all duration-200',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20',
                           selected
                             ? 'border-foreground/35 bg-foreground/[0.03]'
@@ -529,24 +529,20 @@ function NewTaskView({
                             <span>{c.matchScore}%</span>
                           </div>
                         ) : null}
-                        {selected ? (
-                          <div className="absolute right-3 top-3 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
-                            <Check className="h-3 w-3" strokeWidth={3} />
-                          </div>
-                        ) : (
-                          <span
-                            role="button"
-                            tabIndex={0}
-                            onClick={(e) => { e.stopPropagation(); setDetailCreatorId(c.id); }}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); setDetailCreatorId(c.id); } }}
-                            className="absolute right-3 top-3 z-30 flex h-6 w-6 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity duration-150 hover:text-foreground group-hover:opacity-100 group-focus-visible:opacity-100"
-                            aria-label="查看达人详情"
-                          >
-                            <MoreHorizontal className="h-3.5 w-3.5" />
-                          </span>
-                        )}
 
-                        <div className="relative z-10 h-[68px] w-[68px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-hover:blur-md group-focus-visible:scale-[1.04] group-focus-visible:opacity-15 group-focus-visible:blur-md">
+                        {/* Detail (three-dots) — always available, doesn't conflict with check */}
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => { e.stopPropagation(); setDetailCreatorId(c.id); }}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); setDetailCreatorId(c.id); } }}
+                          className="absolute right-3 top-3 z-30 flex h-6 w-6 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity duration-150 hover:text-foreground group-hover:opacity-100 group-focus-visible:opacity-100"
+                          aria-label="查看达人详情"
+                        >
+                          <MoreHorizontal className="h-3.5 w-3.5" />
+                        </span>
+
+                        <div className="relative z-10 h-[64px] w-[64px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-hover:blur-md group-focus-visible:scale-[1.04] group-focus-visible:opacity-15 group-focus-visible:blur-md">
                           {c.avatarUrl ? (
                             <img src={c.avatarUrl} alt={c.name} className="h-full w-full object-cover" />
                           ) : (
@@ -554,16 +550,23 @@ function NewTaskView({
                               {c.name.slice(0, 1)}
                             </div>
                           )}
+                          {/* Selected check — overlaid on avatar bottom-right so it never collides with the more-dots button */}
+                          {selected ? (
+                            <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm ring-2 ring-background">
+                              <Check className="h-3 w-3" strokeWidth={3} />
+                            </div>
+                          ) : null}
                         </div>
 
-                        <div className="relative z-10 mt-3 min-w-0 transition-all duration-200 group-hover:opacity-10 group-hover:blur-md group-focus-visible:opacity-10 group-focus-visible:blur-md">
-                          <div className="truncate text-sm font-light tracking-[-0.01em] text-foreground">
+                        <div className="relative z-10 mt-2.5 min-w-0 transition-all duration-200 group-hover:opacity-10 group-hover:blur-md group-focus-visible:opacity-10 group-focus-visible:blur-md">
+                          <div className="truncate text-[13.5px] font-normal tracking-[-0.01em] text-foreground leading-tight">
                             {c.name}
                           </div>
-                          <div className="mt-0.5 truncate text-xs font-light text-muted-foreground/70">
+                          <div className="mt-1 truncate text-[11.5px] font-light text-muted-foreground/70 leading-tight">
                             {c.handle}
                           </div>
                         </div>
+
 
                         <div className="pointer-events-none absolute inset-0 z-10 rounded-[20px] bg-white/85 p-4 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
                           <div className="flex h-full flex-col gap-3">
