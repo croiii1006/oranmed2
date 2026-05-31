@@ -316,10 +316,10 @@ function NewTaskView({
                 </Select>
               </div>
 
-              {/* Inline meta fields — fill remaining height, responsive columns based on container width */}
+              {/* Inline meta fields — scroll when content exceeds height, fixed min row height to prevent overlap */}
               <div
                 className={cn(
-                  'mt-4 flex-1 min-h-0 grid gap-2 auto-rows-fr',
+                  'mt-4 flex-1 min-h-0 overflow-y-auto pr-1 grid gap-2 auto-rows-[minmax(64px,auto)] content-start',
                   creatorsOpen ? 'grid-cols-2' : 'grid-cols-3',
                 )}
               >
