@@ -1760,7 +1760,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
         </div>
 
         {/* RIGHT */}
-        <div className="min-h-[400px] rounded-2xl border border-border/40 bg-card/30 p-5 backdrop-blur-sm">
+        <div className="flex min-h-[400px] flex-col rounded-2xl border border-border/40 bg-card/30 p-5 backdrop-blur-sm xl:min-h-[520px]">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Assets</div>
