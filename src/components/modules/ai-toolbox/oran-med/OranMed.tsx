@@ -288,6 +288,17 @@ function NewTaskView({
     });
   }, [brief.platform, pickMode, manualTerritory, manualGender]);
 
+  const selectedCreatorsForSummary = useMemo(
+    () => CREATORS.filter((c) => selectedCreatorIds.includes(c.id)),
+    [selectedCreatorIds],
+  );
+  const selectionSummary = useMemo(
+    () => summarizeCreators(selectedCreatorsForSummary),
+    [selectedCreatorsForSummary],
+  );
+
+
+
   return (
     <div className="relative min-h-full flex flex-col items-center justify-start px-6 pt-[100px] pb-6 md:px-8 md:pt-[180px] md:pb-8">
       <div className="absolute right-4 top-4 z-20 md:right-8 md:top-6">
