@@ -28,6 +28,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OranMedProvider, useOranMed } from './context/OranMedContext';
 import { CREATORS } from './data/creators';
+import { CreatorDetailDialog } from './components/CreatorDetailDialog';
+
 import { creatorLibraryItems } from '@/components/modules/skills/creatorLibrary';
 import { SelectedCreatorList } from '@/components/modules/skills/SelectedCreatorList';
 import {
