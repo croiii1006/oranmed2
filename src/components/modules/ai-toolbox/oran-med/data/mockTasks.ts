@@ -8,7 +8,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-05-12T11:30:00.000Z',
     brief: {
       title: '玻色因精华 5 月小红书投放',
-      platform: '小红书',
+      platform: 'TikTok',
       goal: '提升新品「玻色因精华」在 25-35 岁都市女性中的认知，带动搜索与加购。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -29,9 +29,9 @@ export const MOCK_TASKS: OranMedTask[] = [
       { id: 'a3', creatorId: 'c_anny', title: '抗老晚安例程', source: 'local', thumbnailColor: 'from-violet-300 to-fuchsia-300', status: 'ready' },
     ],
     plan: [
-      { assetId: 'a1', creatorId: 'c_linxi', platform: '小红书', scheduledAt: '2025-06-02T10:00', caption: '玻色因实测 30 天', hashtags: '#玻色因 #抗老', paidPromotion: true },
-      { assetId: 'a2', creatorId: 'c_drsensitive', platform: '小红书', scheduledAt: '2025-06-03T20:00', caption: '敏感肌实测笔记', hashtags: '#敏感肌 #成分党', paidPromotion: false },
-      { assetId: 'a3', creatorId: 'c_anny', platform: '小红书', scheduledAt: '2025-06-04T21:00', caption: '抗老晚安例程', hashtags: '#抗老 #精华', paidPromotion: true },
+      { assetId: 'a1', creatorId: 'c_linxi', platform: 'TikTok', scheduledAt: '2025-06-02T10:00', caption: '玻色因实测 30 天', hashtags: '#玻色因 #抗老', paidPromotion: true },
+      { assetId: 'a2', creatorId: 'c_drsensitive', platform: 'TikTok', scheduledAt: '2025-06-03T20:00', caption: '敏感肌实测笔记', hashtags: '#敏感肌 #成分党', paidPromotion: false },
+      { assetId: 'a3', creatorId: 'c_anny', platform: 'TikTok', scheduledAt: '2025-06-04T21:00', caption: '抗老晚安例程', hashtags: '#抗老 #精华', paidPromotion: true },
     ],
     planConfirmed: true,
     complianceConfirmed: true,
@@ -43,7 +43,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-05-15T08:00:00.000Z',
     brief: {
       title: '春季控油新品抖音种草',
-      platform: '抖音',
+      platform: 'TikTok',
       goal: '为夏季控油爽肤水建立 KOC 口碑。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -70,7 +70,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-05-05T03:00:00.000Z',
     brief: {
       title: '男士护肤 B 站长测评',
-      platform: 'B站',
+      platform: 'TikTok',
       goal: '面向新人男性建立科学护肤心智。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -90,8 +90,8 @@ export const MOCK_TASKS: OranMedTask[] = [
       { id: 'a5', creatorId: 'c_bobo', title: '成分对比 30 分钟测评', source: 'local', thumbnailColor: 'from-amber-300 to-orange-300', status: 'ready' },
     ],
     plan: [
-      { assetId: 'a4', creatorId: 'c_laozhang', platform: 'B站', scheduledAt: '2025-05-15T19:00', caption: '男士新人指南', hashtags: '#男士护肤', paidPromotion: false },
-      { assetId: 'a5', creatorId: 'c_bobo', platform: 'B站', scheduledAt: '2025-05-16T19:00', caption: '深度测评', hashtags: '#测评', paidPromotion: true },
+      { assetId: 'a4', creatorId: 'c_laozhang', platform: 'TikTok', scheduledAt: '2025-05-15T19:00', caption: '男士新人指南', hashtags: '#男士护肤', paidPromotion: false },
+      { assetId: 'a5', creatorId: 'c_bobo', platform: 'TikTok', scheduledAt: '2025-05-16T19:00', caption: '深度测评', hashtags: '#测评', paidPromotion: true },
     ],
     planConfirmed: true,
     complianceConfirmed: true,
@@ -103,7 +103,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-04-20T10:00:00.000Z',
     brief: {
       title: '情人节限定礼盒微博话题',
-      platform: '微博',
+      platform: 'TikTok',
       goal: '借助节日节点提升品牌曝光，打造社交声量。',
       brandName: 'OranBeauty',
       brandCategory: '美妆',
@@ -123,8 +123,8 @@ export const MOCK_TASKS: OranMedTask[] = [
       { id: 'a7', creatorId: 'c_anny', title: '限定色试色合集', source: 'local', thumbnailColor: 'from-fuchsia-300 to-purple-300', status: 'ready' },
     ],
     plan: [
-      { assetId: 'a6', creatorId: 'c_linxi', platform: '微博', scheduledAt: '2025-02-14T10:00', caption: '限定开箱来啦', hashtags: '#情人节礼物', paidPromotion: true },
-      { assetId: 'a7', creatorId: 'c_anny', platform: '微博', scheduledAt: '2025-02-14T12:00', caption: '试色合集', hashtags: '#限定色', paidPromotion: false },
+      { assetId: 'a6', creatorId: 'c_linxi', platform: 'TikTok', scheduledAt: '2025-02-14T10:00', caption: '限定开箱来啦', hashtags: '#情人节礼物', paidPromotion: true },
+      { assetId: 'a7', creatorId: 'c_anny', platform: 'TikTok', scheduledAt: '2025-02-14T12:00', caption: '试色合集', hashtags: '#限定色', paidPromotion: false },
     ],
     planConfirmed: true,
     complianceConfirmed: true,
@@ -136,7 +136,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-05-08T14:00:00.000Z',
     brief: {
       title: '祛痘精华抖音短剧植入',
-      platform: '抖音',
+      platform: 'TikTok',
       goal: '通过短剧剧情植入，建立急救祛痘场景心智。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -164,7 +164,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-05-17T05:00:00.000Z',
     brief: {
       title: '防晒喷雾抖音挑战赛',
-      platform: '抖音',
+      platform: 'TikTok',
       goal: '发起防晒挑战赛，提升夏季产品认知。',
       brandName: 'OranSun',
       brandCategory: '防晒',
@@ -191,7 +191,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-04-18T09:00:00.000Z',
     brief: {
       title: '母亲节送礼指南小红书合集',
-      platform: '小红书',
+      platform: 'TikTok',
       goal: '结合母亲节节点，打造送礼心智。',
       brandName: 'OranBeauty',
       brandCategory: '美妆',
@@ -211,8 +211,8 @@ export const MOCK_TASKS: OranMedTask[] = [
       { id: 'a9', creatorId: 'c_drsensitive', title: '敏感肌妈妈护肤方案', source: 'local', thumbnailColor: 'from-sky-200 to-teal-200', status: 'ready' },
     ],
     plan: [
-      { assetId: 'a8', creatorId: 'c_linxi', platform: '小红书', scheduledAt: '2025-05-10T10:00', caption: '母亲节礼物清单', hashtags: '#母亲节', paidPromotion: true },
-      { assetId: 'a9', creatorId: 'c_drsensitive', platform: '小红书', scheduledAt: '2025-05-11T10:00', caption: '敏感肌妈妈护肤', hashtags: '#敏感肌', paidPromotion: false },
+      { assetId: 'a8', creatorId: 'c_linxi', platform: 'TikTok', scheduledAt: '2025-05-10T10:00', caption: '母亲节礼物清单', hashtags: '#母亲节', paidPromotion: true },
+      { assetId: 'a9', creatorId: 'c_drsensitive', platform: 'TikTok', scheduledAt: '2025-05-11T10:00', caption: '敏感肌妈妈护肤', hashtags: '#敏感肌', paidPromotion: false },
     ],
     planConfirmed: true,
     complianceConfirmed: true,
@@ -224,7 +224,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-05-14T16:00:00.000Z',
     brief: {
       title: '卸妆油 B 站成分深度解析',
-      platform: 'B站',
+      platform: 'TikTok',
       goal: '以专业成分视角建立卸妆油品类信任。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -243,7 +243,7 @@ export const MOCK_TASKS: OranMedTask[] = [
       { id: 'a10', creatorId: 'c_laozhang', title: '卸妆油成分实验室', source: 'local', thumbnailColor: 'from-cyan-300 to-blue-300', status: 'ready' },
     ],
     plan: [
-      { assetId: 'a10', creatorId: 'c_laozhang', platform: 'B站', scheduledAt: '2025-06-15T19:00', caption: '成分实验室', hashtags: '#成分党', paidPromotion: true },
+      { assetId: 'a10', creatorId: 'c_laozhang', platform: 'TikTok', scheduledAt: '2025-06-15T19:00', caption: '成分实验室', hashtags: '#成分党', paidPromotion: true },
     ],
     planConfirmed: true,
     complianceConfirmed: true,
@@ -255,7 +255,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-03-05T11:00:00.000Z',
     brief: {
       title: '新年红运妆容微博话题',
-      platform: '微博',
+      platform: 'TikTok',
       goal: '新年期间打造红运妆容话题，提升品牌声量。',
       brandName: 'OranBeauty',
       brandCategory: '美妆',
@@ -275,8 +275,8 @@ export const MOCK_TASKS: OranMedTask[] = [
       { id: 'a12', creatorId: 'c_yumi', title: '红运口红试色', source: 'local', thumbnailColor: 'from-rose-300 to-red-200', status: 'ready' },
     ],
     plan: [
-      { assetId: 'a11', creatorId: 'c_anny', platform: '微博', scheduledAt: '2025-02-05T10:00', caption: '新年妆容教程', hashtags: '#新年妆容', paidPromotion: true },
-      { assetId: 'a12', creatorId: 'c_yumi', platform: '微博', scheduledAt: '2025-02-06T10:00', caption: '口红试色', hashtags: '#口红试色', paidPromotion: false },
+      { assetId: 'a11', creatorId: 'c_anny', platform: 'TikTok', scheduledAt: '2025-02-05T10:00', caption: '新年妆容教程', hashtags: '#新年妆容', paidPromotion: true },
+      { assetId: 'a12', creatorId: 'c_yumi', platform: 'TikTok', scheduledAt: '2025-02-06T10:00', caption: '口红试色', hashtags: '#口红试色', paidPromotion: false },
     ],
     planConfirmed: true,
     complianceConfirmed: true,
@@ -288,7 +288,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-05-18T03:00:00.000Z',
     brief: {
       title: '面膜节抖音达人直播',
-      platform: '抖音',
+      platform: 'TikTok',
       goal: '面膜节期间通过直播带货提升销量。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -315,7 +315,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-04-22T13:00:00.000Z',
     brief: {
       title: '眼部精华抖音短视频',
-      platform: '抖音',
+      platform: 'TikTok',
       goal: '通过眼部护理场景短视频建立产品认知。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -343,7 +343,7 @@ export const MOCK_TASKS: OranMedTask[] = [
     updatedAt: '2025-02-20T09:00:00.000Z',
     brief: {
       title: '年度爱用物 B 站盘点',
-      platform: 'B站',
+      platform: 'TikTok',
       goal: '年末盘点增加品牌好感度与回购意愿。',
       brandName: 'OranSkin',
       brandCategory: '护肤',
@@ -363,8 +363,8 @@ export const MOCK_TASKS: OranMedTask[] = [
       { id: 'a14', creatorId: 'c_laozhang', title: '男生年度护肤', source: 'local', thumbnailColor: 'from-emerald-300 to-cyan-200', status: 'ready' },
     ],
     plan: [
-      { assetId: 'a13', creatorId: 'c_linxi', platform: 'B站', scheduledAt: '2025-01-20T19:00', caption: '年度爱用盘点', hashtags: '#年度爱用', paidPromotion: false },
-      { assetId: 'a14', creatorId: 'c_laozhang', platform: 'B站', scheduledAt: '2025-01-21T19:00', caption: '男生护肤盘点', hashtags: '#男士护肤', paidPromotion: true },
+      { assetId: 'a13', creatorId: 'c_linxi', platform: 'TikTok', scheduledAt: '2025-01-20T19:00', caption: '年度爱用盘点', hashtags: '#年度爱用', paidPromotion: false },
+      { assetId: 'a14', creatorId: 'c_laozhang', platform: 'TikTok', scheduledAt: '2025-01-21T19:00', caption: '男生护肤盘点', hashtags: '#男士护肤', paidPromotion: true },
     ],
     planConfirmed: true,
     complianceConfirmed: true,
