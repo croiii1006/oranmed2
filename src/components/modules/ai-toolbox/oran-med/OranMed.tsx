@@ -528,9 +528,42 @@ function NewTaskView({
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] font-light text-muted-foreground">
-                    {matching ? '基于 Brief 与人群分析中' : `已选 ${selectedCreatorIds.length} 位`}
-                  </span>
+                  {matching ? (
+                    <span className="text-[11px] font-light text-muted-foreground">基于 Brief 与人群分析中</span>
+                  ) : (
+                    <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-0.5 text-[11px] font-light text-muted-foreground">
+                      <span className={cn(
+                        selectedCreatorIds.length >= brief.targetCreatorCount ? 'text-foreground/70' : 'text-muted-foreground',
+                      )}>
+                        已选 {selectedCreatorIds.length}
+                        <span className="text-muted-foreground/60"> / 目标 {brief.targetCreatorCount}</span>
+                      </span>
+                      {selectedCreatorIds.length > 0 ? (
+                        <>
+                          <span className="text-foreground/20">·</span>
+                          <span>触达 <span className="text-foreground/80">{formatWan(selectionSummary.fans)}</span> 粉丝</span>
+                          <span className="text-foreground/20">·</span>
+                          <span>均播合计 <span className="text-foreground/80">{formatWan(selectionSummary.plays)}</span></span>
+                          {Object.keys(selectionSummary.priceByCurrency).length > 0 ? (
+                            <>
+                              <span className="text-foreground/20">·</span>
+                              <span>
+                                报价 <span className="text-foreground/80">
+                                  {Object.entries(selectionSummary.priceByCurrency)
+                                    .map(([cur, sum]) => formatPrice(sum, cur))
+                                    .join(' + ')}
+                                </span>
+                              </span>
+                            </>
+                          ) : null}
+                          {selectionSummary.missingPrice > 0 ? (
+                            <span className="text-muted-foreground/70">({selectionSummary.missingPrice} 位待询价)</span>
+                          ) : null}
+                        </>
+                      ) : null}
+                    </div>
+                  )}
+
                 </div>
 
                 {matching ? (
