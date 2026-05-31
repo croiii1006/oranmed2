@@ -102,7 +102,39 @@ export interface OranMedTask {
   planConfirmed: boolean;
   complianceConfirmed: boolean;
   rejectionReason?: string;
+  creatorResponses?: Record<string, CreatorResponse>;
 }
+
+export type CreatorTaskDecision = 'pending' | 'accepted' | 'rejected';
+export type CreatorPublishDecision = 'pending' | 'agreed' | 'rejected';
+
+export interface CreatorResponse {
+  taskDecision: CreatorTaskDecision;
+  publishDecision: CreatorPublishDecision;
+  publishedAt?: string;
+  points?: number;
+  billAmount?: number;
+  updatedAt: string;
+}
+
+export type CreatorOnboardingStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
+
+export interface CreatorOnboarding {
+  creatorId: string;
+  name: string;
+  birth?: string;
+  country?: string;
+  city?: string;
+  idNo?: string;
+  idPhoto?: string;
+  scanVerified: boolean;
+  contractSigned: boolean;
+  tiktokHandle?: string;
+  onboardingStatus: CreatorOnboardingStatus;
+  rejectionReason?: string;
+  updatedAt: string;
+}
+
 
 export const emptyBrief = (): Brief => ({
   title: '',
