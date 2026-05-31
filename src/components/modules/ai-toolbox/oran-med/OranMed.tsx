@@ -1715,7 +1715,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
         <span>返回</span>
       </button>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(340px,440px)_1fr]">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(320px,400px)_1fr] xl:grid-cols-[minmax(360px,460px)_1fr] xl:gap-8 2xl:grid-cols-[minmax(400px,520px)_1fr]">
         {/* LEFT */}
         <div className="space-y-5">
           <TaskMiniCard task={currentTask} stacked={assets.length > 0} onClick={() => setDetailOpen(true)} />
