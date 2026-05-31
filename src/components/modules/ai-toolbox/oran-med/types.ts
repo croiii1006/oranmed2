@@ -26,7 +26,7 @@ export interface Brief {
   customFields?: CustomBriefField[];
 }
 
-export type CreatorTier = 'KOL' | 'KOC';
+export type CreatorTier = 'KOL' | 'KOC' | 'MCN';
 
 export type PortraitLicenseStatus = 'authorized' | 'pending' | 'expired' | 'unknown';
 export type AccountStatus = 'available' | 'paused' | 'banned';

@@ -179,7 +179,77 @@ function summarizeCreators(list: Creator[]) {
   return { fans, plays, priceByCurrency, missingPrice };
 }
 
+// ============== Manual filters ==============
+
+export type ManualFilters = {
+  territory: 'all' | 'cn' | 'overseas';
+  gender: 'all' | 'male' | 'female';
+  language: 'all' | string;
+  tier: 'all' | 'KOL' | 'KOC' | 'MCN';
+  category: 'all' | string;
+  followerRange: 'all' | 'lt10w' | '10-50w' | '50-100w' | 'gt100w';
+  playRange: 'all' | 'lt1w' | '1-5w' | '5-20w' | 'gt20w';
+  engagementRange: 'all' | 'lt3' | '3-6' | 'gt6';
+  priceRange: 'all' | 'lt1k' | '1-5k' | '5-20k' | 'gt20k';
+  accountStatus: 'all' | 'available' | 'paused' | 'banned';
+};
+
+export const defaultManualFilters: ManualFilters = {
+  territory: 'all',
+  gender: 'all',
+  language: 'all',
+  tier: 'all',
+  category: 'all',
+  followerRange: 'all',
+  playRange: 'all',
+  engagementRange: 'all',
+  priceRange: 'all',
+  accountStatus: 'all',
+};
+
+function inFollowerBucket(wan: number, bucket: ManualFilters['followerRange']): boolean {
+  switch (bucket) {
+    case 'lt10w': return wan < 10;
+    case '10-50w': return wan >= 10 && wan < 50;
+    case '50-100w': return wan >= 50 && wan < 100;
+    case 'gt100w': return wan >= 100;
+    default: return true;
+  }
+}
+
+function inPlayBucket(wan: number, bucket: ManualFilters['playRange']): boolean {
+  switch (bucket) {
+    case 'lt1w': return wan < 1;
+    case '1-5w': return wan >= 1 && wan < 5;
+    case '5-20w': return wan >= 5 && wan < 20;
+    case 'gt20w': return wan >= 20;
+    default: return true;
+  }
+}
+
+function inEngagementBucket(rate: number, bucket: ManualFilters['engagementRange']): boolean {
+  const pct = rate * 100;
+  switch (bucket) {
+    case 'lt3': return pct < 3;
+    case '3-6': return pct >= 3 && pct < 6;
+    case 'gt6': return pct >= 6;
+    default: return true;
+  }
+}
+
+function inPriceBucket(price: number, bucket: ManualFilters['priceRange']): boolean {
+  switch (bucket) {
+    case 'lt1k': return price < 1000;
+    case '1-5k': return price >= 1000 && price < 5000;
+    case '5-20k': return price >= 5000 && price < 20000;
+    case 'gt20k': return price >= 20000;
+    default: return true;
+  }
+}
+
 // ============== New task ==============
+
+
 
 
 function NewTaskView({
@@ -222,8 +292,7 @@ function NewTaskView({
   );
 
   // Manual selection filters
-  const [manualTerritory, setManualTerritory] = useState<'all' | 'cn' | 'overseas'>('all');
-  const [manualGender, setManualGender] = useState<'all' | 'male' | 'female'>('all');
+  const [manualFilters, setManualFilters] = useState<ManualFilters>(defaultManualFilters);
   const CN_REGIONS = new Set(['CN', 'CHINA', '中国', '中国大陆']);
 
   const handleSmartParse = () => {
@@ -279,14 +348,24 @@ function NewTaskView({
   const recommendedCreators = useMemo(() => {
     const base = CREATORS.filter((c) => c.platform === brief.platform).sort((a, b) => b.matchScore - a.matchScore);
     if (pickMode !== 'manual') return base;
+    const f = manualFilters;
     return base.filter((c) => {
       const region = (c.region || '').trim().toUpperCase();
       const isCN = CN_REGIONS.has(region);
-      const territoryOk = manualTerritory === 'all' || (manualTerritory === 'cn' ? isCN : !isCN);
-      const genderOk = manualGender === 'all' || c.gender === manualGender;
-      return territoryOk && genderOk;
+      if (!(f.territory === 'all' || (f.territory === 'cn' ? isCN : !isCN))) return false;
+      if (!(f.gender === 'all' || c.gender === f.gender)) return false;
+      if (!(f.language === 'all' || (c.languages?.includes(f.language) ?? false))) return false;
+      if (!(f.tier === 'all' || c.tier === f.tier)) return false;
+      if (!(f.category === 'all' || (c.contentCategories?.includes(f.category) ?? false))) return false;
+      if (!inFollowerBucket(parseToWan(c.followers), f.followerRange)) return false;
+      if (!inPlayBucket(parseToWan(c.avgPlay), f.playRange)) return false;
+      if (!inEngagementBucket(c.engagementRate ?? 0, f.engagementRange)) return false;
+      if (!inPriceBucket(c.reportedVideoPrice ?? -1, f.priceRange)) return false;
+      if (!(f.accountStatus === 'all' || c.accountStatus === f.accountStatus)) return false;
+      return true;
     });
-  }, [brief.platform, pickMode, manualTerritory, manualGender]);
+  }, [brief.platform, pickMode, manualFilters]);
+
 
   const selectedCreatorsForSummary = useMemo(
     () => CREATORS.filter((c) => selectedCreatorIds.includes(c.id)),
@@ -517,11 +596,10 @@ function NewTaskView({
                     {pickMode === 'manual' && !matching ? (
                       <ManualFilterDropdown
                         count={recommendedCreators.length}
-                        territory={manualTerritory}
-                        gender={manualGender}
-                        onTerritory={setManualTerritory}
-                        onGender={setManualGender}
+                        filters={manualFilters}
+                        onChange={setManualFilters}
                       />
+
                     ) : (
                       <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
                         {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
@@ -891,26 +969,50 @@ function CustomField({
 
 function ManualFilterDropdown({
   count,
-  territory,
-  gender,
-  onTerritory,
-  onGender,
+  filters,
+  onChange,
 }: {
   count: number;
-  territory: 'all' | 'cn' | 'overseas';
-  gender: 'all' | 'male' | 'female';
-  onTerritory: (v: 'all' | 'cn' | 'overseas') => void;
-  onGender: (v: 'all' | 'male' | 'female') => void;
+  filters: ManualFilters;
+  onChange: (next: ManualFilters) => void;
 }) {
   const chip = (active: boolean) =>
     cn(
-      'rounded-full border px-3 py-1 text-xs font-light transition-colors',
+      'rounded-full border px-2.5 py-0.5 text-[11px] font-light transition-colors',
       active
         ? 'border-foreground bg-foreground text-background'
         : 'border-border/60 bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground',
     );
-  const territoryLabel =
-    territory === 'all' ? '全部达人' : territory === 'cn' ? '中国达人' : '海外达人';
+
+  // Derive options from CREATORS so they always reflect available data
+  const languageOptions = useMemo(() => {
+    const set = new Set<string>();
+    CREATORS.forEach((c) => c.languages?.forEach((l) => set.add(l)));
+    return Array.from(set);
+  }, []);
+  const categoryOptions = useMemo(() => {
+    const set = new Set<string>();
+    CREATORS.forEach((c) => c.contentCategories?.forEach((cat) => set.add(cat)));
+    return Array.from(set).sort();
+  }, []);
+
+  const set = <K extends keyof ManualFilters>(key: K, value: ManualFilters[K]) =>
+    onChange({ ...filters, [key]: value });
+
+  const activeCount = (Object.keys(filters) as (keyof ManualFilters)[]).filter(
+    (k) => filters[k] !== 'all',
+  ).length;
+
+  const triggerLabel =
+    activeCount === 0 ? '全部达人' : `${activeCount} 个筛选`;
+
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div>
+      <div className="mb-1.5 text-[10.5px] font-medium tracking-[0.04em] text-muted-foreground">{title}</div>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
+    </div>
+  );
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -919,34 +1021,101 @@ function ManualFilterDropdown({
           className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/80 px-3 py-1 text-xs font-light text-foreground/80 shadow-sm hover:border-foreground/30"
         >
           <ListFilter className="h-3.5 w-3.5" />
-          <span>{territoryLabel}</span>
+          <span>{triggerLabel}</span>
           <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{count}</span>
           <ChevronDown className="h-3.5 w-3.5 opacity-60" />
         </button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-60 rounded-2xl p-4">
+      <PopoverContent align="start" className="w-[320px] max-h-[480px] overflow-y-auto rounded-2xl p-4">
         <div className="space-y-3">
-          <div>
-            <div className="mb-1.5 text-xs text-muted-foreground">区域</div>
-            <div className="flex flex-wrap gap-1.5">
-              <button type="button" className={chip(territory === 'all')} onClick={() => onTerritory('all')}>全部</button>
-              <button type="button" className={chip(territory === 'cn')} onClick={() => onTerritory('cn')}>中国</button>
-              <button type="button" className={chip(territory === 'overseas')} onClick={() => onTerritory('overseas')}>海外</button>
+          <Section title="地区">
+            <button type="button" className={chip(filters.territory === 'all')} onClick={() => set('territory', 'all')}>全部</button>
+            <button type="button" className={chip(filters.territory === 'cn')} onClick={() => set('territory', 'cn')}>中国</button>
+            <button type="button" className={chip(filters.territory === 'overseas')} onClick={() => set('territory', 'overseas')}>海外</button>
+          </Section>
+
+          <Section title="语言">
+            <button type="button" className={chip(filters.language === 'all')} onClick={() => set('language', 'all')}>全部</button>
+            {languageOptions.map((l) => (
+              <button key={l} type="button" className={chip(filters.language === l)} onClick={() => set('language', l)}>{l}</button>
+            ))}
+          </Section>
+
+          <Section title="达人类型">
+            <button type="button" className={chip(filters.tier === 'all')} onClick={() => set('tier', 'all')}>全部</button>
+            <button type="button" className={chip(filters.tier === 'KOL')} onClick={() => set('tier', 'KOL')}>KOL</button>
+            <button type="button" className={chip(filters.tier === 'KOC')} onClick={() => set('tier', 'KOC')}>KOC</button>
+            <button type="button" className={chip(filters.tier === 'MCN')} onClick={() => set('tier', 'MCN')}>MCN</button>
+          </Section>
+
+          <Section title="内容垂类">
+            <button type="button" className={chip(filters.category === 'all')} onClick={() => set('category', 'all')}>全部</button>
+            {categoryOptions.map((cat) => (
+              <button key={cat} type="button" className={chip(filters.category === cat)} onClick={() => set('category', cat)}>{cat}</button>
+            ))}
+          </Section>
+
+          <Section title="粉丝区间">
+            <button type="button" className={chip(filters.followerRange === 'all')} onClick={() => set('followerRange', 'all')}>全部</button>
+            <button type="button" className={chip(filters.followerRange === 'lt10w')} onClick={() => set('followerRange', 'lt10w')}>{'< 10w'}</button>
+            <button type="button" className={chip(filters.followerRange === '10-50w')} onClick={() => set('followerRange', '10-50w')}>10-50w</button>
+            <button type="button" className={chip(filters.followerRange === '50-100w')} onClick={() => set('followerRange', '50-100w')}>50-100w</button>
+            <button type="button" className={chip(filters.followerRange === 'gt100w')} onClick={() => set('followerRange', 'gt100w')}>{'> 100w'}</button>
+          </Section>
+
+          <Section title="均播区间">
+            <button type="button" className={chip(filters.playRange === 'all')} onClick={() => set('playRange', 'all')}>全部</button>
+            <button type="button" className={chip(filters.playRange === 'lt1w')} onClick={() => set('playRange', 'lt1w')}>{'< 1w'}</button>
+            <button type="button" className={chip(filters.playRange === '1-5w')} onClick={() => set('playRange', '1-5w')}>1-5w</button>
+            <button type="button" className={chip(filters.playRange === '5-20w')} onClick={() => set('playRange', '5-20w')}>5-20w</button>
+            <button type="button" className={chip(filters.playRange === 'gt20w')} onClick={() => set('playRange', 'gt20w')}>{'> 20w'}</button>
+          </Section>
+
+          <Section title="互动率区间">
+            <button type="button" className={chip(filters.engagementRange === 'all')} onClick={() => set('engagementRange', 'all')}>全部</button>
+            <button type="button" className={chip(filters.engagementRange === 'lt3')} onClick={() => set('engagementRange', 'lt3')}>{'< 3%'}</button>
+            <button type="button" className={chip(filters.engagementRange === '3-6')} onClick={() => set('engagementRange', '3-6')}>3-6%</button>
+            <button type="button" className={chip(filters.engagementRange === 'gt6')} onClick={() => set('engagementRange', 'gt6')}>{'> 6%'}</button>
+          </Section>
+
+          <Section title="视频报价区间">
+            <button type="button" className={chip(filters.priceRange === 'all')} onClick={() => set('priceRange', 'all')}>全部</button>
+            <button type="button" className={chip(filters.priceRange === 'lt1k')} onClick={() => set('priceRange', 'lt1k')}>{'< 1k'}</button>
+            <button type="button" className={chip(filters.priceRange === '1-5k')} onClick={() => set('priceRange', '1-5k')}>1-5k</button>
+            <button type="button" className={chip(filters.priceRange === '5-20k')} onClick={() => set('priceRange', '5-20k')}>5-20k</button>
+            <button type="button" className={chip(filters.priceRange === 'gt20k')} onClick={() => set('priceRange', 'gt20k')}>{'> 20k'}</button>
+          </Section>
+
+          <Section title="账号状态">
+            <button type="button" className={chip(filters.accountStatus === 'all')} onClick={() => set('accountStatus', 'all')}>全部</button>
+            <button type="button" className={chip(filters.accountStatus === 'available')} onClick={() => set('accountStatus', 'available')}>可合作</button>
+            <button type="button" className={chip(filters.accountStatus === 'paused')} onClick={() => set('accountStatus', 'paused')}>暂停</button>
+            <button type="button" className={chip(filters.accountStatus === 'banned')} onClick={() => set('accountStatus', 'banned')}>禁用</button>
+          </Section>
+
+          <Section title="性别">
+            <button type="button" className={chip(filters.gender === 'all')} onClick={() => set('gender', 'all')}>全部</button>
+            <button type="button" className={chip(filters.gender === 'male')} onClick={() => set('gender', 'male')}>男</button>
+            <button type="button" className={chip(filters.gender === 'female')} onClick={() => set('gender', 'female')}>女</button>
+          </Section>
+
+          {activeCount > 0 ? (
+            <div className="border-t border-border/50 pt-2.5">
+              <button
+                type="button"
+                onClick={() => onChange(defaultManualFilters)}
+                className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                重置全部筛选
+              </button>
             </div>
-          </div>
-          <div>
-            <div className="mb-1.5 text-xs text-muted-foreground">性别</div>
-            <div className="flex flex-wrap gap-1.5">
-              <button type="button" className={chip(gender === 'all')} onClick={() => onGender('all')}>全部</button>
-              <button type="button" className={chip(gender === 'male')} onClick={() => onGender('male')}>男</button>
-              <button type="button" className={chip(gender === 'female')} onClick={() => onGender('female')}>女</button>
-            </div>
-          </div>
+          ) : null}
         </div>
       </PopoverContent>
     </Popover>
   );
 }
+
 
 function SparkleIcon() {
   return (

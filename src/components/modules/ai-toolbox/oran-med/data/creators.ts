@@ -62,7 +62,8 @@ export const CREATORS: Creator[] = creatorLibraryItems.map((item) => {
   const h = hash(item.id);
   const platform: Platform = PLATFORMS[h % PLATFORMS.length];
   const wan = parseFollowers(item.followers);
-  const tier: Creator['tier'] = wan >= 20 ? 'KOL' : 'KOC';
+  // Deterministic tier: every ~7th creator is MCN, else KOL/KOC by follower size
+  const tier: Creator['tier'] = h % 7 === 0 ? 'MCN' : wan >= 20 ? 'KOL' : 'KOC';
   const avgPlayWan = Math.max(0.5, +(wan * (0.18 + ((h % 30) / 100))).toFixed(1));
   const matchScore = 68 + (h % 28); // 68-95
   const tags = [item.niche, item.region].filter(Boolean);
