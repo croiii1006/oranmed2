@@ -28,6 +28,9 @@ export interface Brief {
 
 export type CreatorTier = 'KOL' | 'KOC';
 
+export type PortraitLicenseStatus = 'authorized' | 'pending' | 'expired' | 'unknown';
+export type AccountStatus = 'available' | 'paused' | 'banned';
+
 export interface Creator {
   id: string;
   name: string;
@@ -42,7 +45,44 @@ export interface Creator {
   avatarUrl?: string;
   region?: string;
   gender?: 'male' | 'female';
+
+  // Identity
+  profileUrl?: string;
+  country?: string;
+  accountRegion?: string;
+  languages?: string[];
+
+  // Performance
+  engagementRate?: number; // 0-1
+  videoCompletionRate?: number; // 0-1
+  followerGrowthRate?: number; // 0-1, last 30d
+  activeFollowerRatio?: number; // 0-1
+  avgLikes?: string;
+  avgComments?: string;
+  avgShares?: string;
+
+  // Content profile
+  contentCategories?: string[];
+  creatorTags?: string[];
+  contentStyleTags?: string[];
+
+  // Voice
+  voiceStyle?: string;
+  voiceLanguage?: string;
+  accent?: string;
+
+  // Commercial
+  reportedVideoPrice?: number;
+  currency?: string;
+  rateValidUntil?: string;
+  negotiable?: boolean;
+
+  // Compliance / status
+  portraitLicenseStatus?: PortraitLicenseStatus;
+  accountStatus?: AccountStatus;
+  dataUpdatedAt?: string;
 }
+
 
 export type AssetSource = 'local' | 'orangen';
 

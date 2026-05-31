@@ -12,6 +12,7 @@ import {
   Database,
   FileText,
   Image as ImageIcon,
+  Info,
   ListChecks,
   ListFilter,
   Play,
@@ -23,9 +24,12 @@ import {
   Wand2,
 } from 'lucide-react';
 
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OranMedProvider, useOranMed } from './context/OranMedContext';
 import { CREATORS } from './data/creators';
+import { CreatorDetailDialog } from './components/CreatorDetailDialog';
+
 import { creatorLibraryItems } from '@/components/modules/skills/creatorLibrary';
 import { SelectedCreatorList } from '@/components/modules/skills/SelectedCreatorList';
 import {
@@ -145,7 +149,13 @@ function NewTaskView({
   const [rawInput, setRawInput] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [parsing, setParsing] = useState(false);
+  const [detailCreatorId, setDetailCreatorId] = useState<string | null>(null);
+  const detailCreator = useMemo(
+    () => (detailCreatorId ? CREATORS.find((c) => c.id === detailCreatorId) ?? null : null),
+    [detailCreatorId],
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const brandName = brief.brandName || '欧莱雅';
   const brandCategory = brief.brandCategory || '美妆护肤';
@@ -522,7 +532,18 @@ function NewTaskView({
                           <div className="absolute right-2.5 top-2.5 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
                             <Check className="h-3 w-3" strokeWidth={3} />
                           </div>
-                        ) : null}
+                        ) : (
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => { e.stopPropagation(); setDetailCreatorId(c.id); }}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); setDetailCreatorId(c.id); } }}
+                            className="absolute right-2.5 top-2.5 z-30 flex h-5 w-5 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity duration-150 hover:text-foreground group-hover:opacity-100 group-focus-visible:opacity-100"
+                            aria-label="查看达人详情"
+                          >
+                            <Info className="h-3 w-3" />
+                          </span>
+                        )}
 
                         <div className="relative z-10 h-[58px] w-[58px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-hover:blur-md group-focus-visible:scale-[1.04] group-focus-visible:opacity-15 group-focus-visible:blur-md">
                           {c.avatarUrl ? (
@@ -543,26 +564,33 @@ function NewTaskView({
                           </div>
                         </div>
 
-                        <div className="pointer-events-none absolute inset-0 z-10 rounded-[18px] bg-white/78 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                          <div className="flex h-full flex-col justify-between">
+                        <div className="pointer-events-none absolute inset-0 z-10 rounded-[18px] bg-white/82 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <div className="flex h-full flex-col justify-between gap-2">
                             <div className="space-y-1">
-                              <div className="text-[10px] font-medium tracking-[0.08em] text-foreground/45">
-                                KOL · {c.platform}
+                              <div className="flex items-center gap-1.5 text-[10px] font-medium tracking-[0.06em] text-foreground/50">
+                                <span>{c.tier} · {c.platform}</span>
+                                {c.country ? <span className="text-foreground/40">· {c.country}</span> : null}
+                                {c.languages?.[0] ? <span className="text-foreground/40">· {c.languages[0]}</span> : null}
                               </div>
                               <div className="text-[13px] font-semibold text-foreground">{c.followers} 粉丝</div>
-                              <div className="text-[11px] text-muted-foreground">均播 {c.avgPlay}</div>
+                              <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10.5px] text-muted-foreground">
+                                <span>均播 {c.avgPlay}</span>
+                                <span>互动 {c.engagementRate != null ? `${(c.engagementRate * 100).toFixed(1)}%` : '—'}</span>
+                                <span>完播 {c.videoCompletionRate != null ? `${(c.videoCompletionRate * 100).toFixed(0)}%` : '—'}</span>
+                                <span className="truncate">报价 {c.reportedVideoPrice != null ? `${c.currency === 'CNY' ? '¥' : '$'}${(c.reportedVideoPrice / 1000).toFixed(1)}k` : '—'}</span>
+                              </div>
                             </div>
 
                             <div className="space-y-1.5">
-                              {c.tags && c.tags.length > 0 ? (
-                                <div className="flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
-                                  {c.tags.slice(0, 2).map((t) => (
-                                    <span key={t} className="rounded-full bg-background/80 px-2 py-0.5">{t}</span>
+                              {(c.contentStyleTags?.length ?? 0) > 0 ? (
+                                <div className="flex flex-wrap gap-1 text-[10px] text-muted-foreground">
+                                  {c.contentStyleTags!.slice(0, 3).map((t) => (
+                                    <span key={t} className="rounded-full bg-background/80 px-1.5 py-0.5">{t}</span>
                                   ))}
                                 </div>
                               ) : null}
                               {pickMode === 'ai' && c.matchReason ? (
-                                <div className="flex items-start gap-1 text-[11px] leading-snug text-foreground/75">
+                                <div className="flex items-start gap-1 text-[10.5px] leading-snug text-foreground/75">
                                   <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-accent" />
                                   <span className="line-clamp-2">{c.matchReason}</span>
                                 </div>
@@ -595,9 +623,16 @@ function NewTaskView({
         </div>
         )}
       </div>
+      <CreatorDetailDialog
+        creator={detailCreator}
+        open={Boolean(detailCreator)}
+        onOpenChange={(o) => { if (!o) setDetailCreatorId(null); }}
+        showMatch={pickMode === 'ai'}
+      />
     </div>
   );
 }
+
 
 // Custom 4-point sparkle with orange gradient
 function PlainField({
@@ -2657,6 +2692,11 @@ function CreatorsCard() {
   const { brief, selectedCreatorIds } = currentTask;
   const [mode, setMode] = useState<'ai' | 'all'>('ai');
   const [platformFilter, setPlatformFilter] = useState<Platform | 'all'>('all');
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detailCreator = useMemo(
+    () => (detailId ? CREATORS.find((c) => c.id === detailId) ?? null : null),
+    [detailId],
+  );
 
   const aiList = useMemo(
     () =>
@@ -2723,12 +2763,20 @@ function CreatorsCard() {
             selected={selectedCreatorIds.includes(c.id)}
             showMatch={mode === 'ai'}
             onToggle={() => toggleCreator(c.id)}
+            onDetail={() => setDetailId(c.id)}
           />
         ))}
       </div>
+      <CreatorDetailDialog
+        creator={detailCreator}
+        open={Boolean(detailCreator)}
+        onOpenChange={(o) => { if (!o) setDetailId(null); }}
+        showMatch={mode === 'ai'}
+      />
     </TaskCard>
   );
 }
+
 
 function ModeTab({
   active,
@@ -2761,50 +2809,78 @@ function CreatorTile({
   selected,
   showMatch,
   onToggle,
+  onDetail,
 }: {
   creator: Creator;
   selected: boolean;
   showMatch: boolean;
   onToggle: () => void;
+  onDetail?: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onToggle}
       className={cn(
-        'group flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-all',
+        'group relative flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-all',
         selected
           ? 'border-accent/60 bg-accent/5 shadow-sm'
           : 'border-border/40 hover:border-border bg-card/40',
       )}
     >
-      <div
-        className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-medium text-white',
-          creator.tier === 'KOL'
-            ? 'bg-gradient-to-br from-rose-400 to-orange-400'
-            : 'bg-gradient-to-br from-sky-400 to-indigo-400',
+      {onDetail ? (
+        <span
+          role="button"
+          tabIndex={0}
+          onClick={(e) => { e.stopPropagation(); onDetail(); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onDetail(); } }}
+          className="absolute right-2 top-2 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground/60 opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+          aria-label="查看达人详情"
+        >
+          <Info className="h-3.5 w-3.5" />
+        </span>
+      ) : null}
+      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+        {creator.avatarUrl ? (
+          <img src={creator.avatarUrl} alt={creator.name} className="h-full w-full object-cover" />
+        ) : (
+          <div className={cn(
+            'flex h-full w-full items-center justify-center text-sm font-medium text-white',
+            creator.tier === 'KOL'
+              ? 'bg-gradient-to-br from-rose-400 to-orange-400'
+              : 'bg-gradient-to-br from-sky-400 to-indigo-400',
+          )}>{creator.name.slice(0, 1)}</div>
         )}
-      >
-        {creator.name.slice(0, 1)}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-medium text-foreground">{creator.name}</span>
           <Badge variant="outline" className="h-5 px-1.5 text-[10px]">{creator.tier}</Badge>
           <span className="text-[10px] text-muted-foreground">{creator.platform}</span>
+          {creator.country ? (
+            <span className="text-[10px] text-muted-foreground/70">· {creator.country}</span>
+          ) : null}
         </div>
-        <div className="mt-0.5 flex items-center gap-3 text-[11px] text-muted-foreground">
+        <div className="mt-0.5 truncate text-[11px] text-muted-foreground/70">{creator.handle}</div>
+        <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
           <span>粉丝 {creator.followers}</span>
           <span>均播 {creator.avgPlay}</span>
+          <span>互动 {creator.engagementRate != null ? `${(creator.engagementRate * 100).toFixed(1)}%` : '—'}</span>
+          <span className="truncate">
+            报价 {creator.reportedVideoPrice != null
+              ? `${creator.currency === 'CNY' ? '¥' : '$'}${(creator.reportedVideoPrice / 1000).toFixed(1)}k`
+              : '—'}
+          </span>
         </div>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          {creator.tags.map((t) => (
-            <span key={t} className="rounded-full bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
-              {t}
-            </span>
-          ))}
-        </div>
+        {(creator.contentStyleTags?.length ?? 0) > 0 ? (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {creator.contentStyleTags!.slice(0, 3).map((t) => (
+              <span key={t} className="rounded-full bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                {t}
+              </span>
+            ))}
+          </div>
+        ) : null}
         {showMatch ? (
           <div className="mt-2 flex items-center gap-1.5 text-[11px] text-accent">
             <Sparkles className="h-3 w-3" />
@@ -2824,6 +2900,7 @@ function CreatorTile({
     </button>
   );
 }
+
 
 // ============== Card 3: Assets ==============
 function AssetsCard() {
