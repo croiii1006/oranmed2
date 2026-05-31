@@ -131,7 +131,56 @@ function OranMedInner() {
   );
 }
 
+// ============== Selection helpers ==============
+
+// Parse follower / play strings like "12.4w" / "182.4K" / "1.2M" / "5万" → number of 万
+function parseToWan(raw?: string): number {
+  if (!raw) return 0;
+  const m = raw.match(/([\d.]+)/);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  if (!Number.isFinite(n)) return 0;
+  const s = raw.toLowerCase();
+  if (raw.includes('万') || s.includes('w')) return n;
+  if (s.includes('k')) return n / 10; // 10K = 1w
+  if (s.includes('m')) return n * 100;
+  return n / 10000; // bare number → assume raw count
+}
+
+function formatWan(n: number): string {
+  if (n <= 0) return '0';
+  if (n >= 10000) return `${(n / 10000).toFixed(1).replace(/\.0$/, '')}亿`;
+  if (n >= 1) return `${n.toFixed(1).replace(/\.0$/, '')}w`;
+  return `${Math.round(n * 10000).toLocaleString()}`;
+}
+
+function formatPrice(n: number, currency?: string): string {
+  const sym = currency === 'CNY' ? '¥' : '$';
+  if (n >= 10000) return `${sym}${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  if (n >= 1000) return `${sym}${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  return `${sym}${Math.round(n).toLocaleString()}`;
+}
+
+function summarizeCreators(list: Creator[]) {
+  let fans = 0;
+  let plays = 0;
+  let missingPrice = 0;
+  const priceByCurrency: Record<string, number> = {};
+  for (const c of list) {
+    fans += parseToWan(c.followers);
+    plays += parseToWan(c.avgPlay);
+    if (c.reportedVideoPrice != null) {
+      const key = c.currency || 'USD';
+      priceByCurrency[key] = (priceByCurrency[key] ?? 0) + c.reportedVideoPrice;
+    } else {
+      missingPrice += 1;
+    }
+  }
+  return { fans, plays, priceByCurrency, missingPrice };
+}
+
 // ============== New task ==============
+
 
 function NewTaskView({
   onOpenWorkbench,
