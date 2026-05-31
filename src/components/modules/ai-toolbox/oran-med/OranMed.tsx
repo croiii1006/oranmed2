@@ -2809,50 +2809,78 @@ function CreatorTile({
   selected,
   showMatch,
   onToggle,
+  onDetail,
 }: {
   creator: Creator;
   selected: boolean;
   showMatch: boolean;
   onToggle: () => void;
+  onDetail?: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onToggle}
       className={cn(
-        'group flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-all',
+        'group relative flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-all',
         selected
           ? 'border-accent/60 bg-accent/5 shadow-sm'
           : 'border-border/40 hover:border-border bg-card/40',
       )}
     >
-      <div
-        className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-medium text-white',
-          creator.tier === 'KOL'
-            ? 'bg-gradient-to-br from-rose-400 to-orange-400'
-            : 'bg-gradient-to-br from-sky-400 to-indigo-400',
+      {onDetail ? (
+        <span
+          role="button"
+          tabIndex={0}
+          onClick={(e) => { e.stopPropagation(); onDetail(); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onDetail(); } }}
+          className="absolute right-2 top-2 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground/60 opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+          aria-label="查看达人详情"
+        >
+          <Info className="h-3.5 w-3.5" />
+        </span>
+      ) : null}
+      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+        {creator.avatarUrl ? (
+          <img src={creator.avatarUrl} alt={creator.name} className="h-full w-full object-cover" />
+        ) : (
+          <div className={cn(
+            'flex h-full w-full items-center justify-center text-sm font-medium text-white',
+            creator.tier === 'KOL'
+              ? 'bg-gradient-to-br from-rose-400 to-orange-400'
+              : 'bg-gradient-to-br from-sky-400 to-indigo-400',
+          )}>{creator.name.slice(0, 1)}</div>
         )}
-      >
-        {creator.name.slice(0, 1)}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-medium text-foreground">{creator.name}</span>
           <Badge variant="outline" className="h-5 px-1.5 text-[10px]">{creator.tier}</Badge>
           <span className="text-[10px] text-muted-foreground">{creator.platform}</span>
+          {creator.country ? (
+            <span className="text-[10px] text-muted-foreground/70">· {creator.country}</span>
+          ) : null}
         </div>
-        <div className="mt-0.5 flex items-center gap-3 text-[11px] text-muted-foreground">
+        <div className="mt-0.5 truncate text-[11px] text-muted-foreground/70">{creator.handle}</div>
+        <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
           <span>粉丝 {creator.followers}</span>
           <span>均播 {creator.avgPlay}</span>
+          <span>互动 {creator.engagementRate != null ? `${(creator.engagementRate * 100).toFixed(1)}%` : '—'}</span>
+          <span className="truncate">
+            报价 {creator.reportedVideoPrice != null
+              ? `${creator.currency === 'CNY' ? '¥' : '$'}${(creator.reportedVideoPrice / 1000).toFixed(1)}k`
+              : '—'}
+          </span>
         </div>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          {creator.tags.map((t) => (
-            <span key={t} className="rounded-full bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
-              {t}
-            </span>
-          ))}
-        </div>
+        {(creator.contentStyleTags?.length ?? 0) > 0 ? (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {creator.contentStyleTags!.slice(0, 3).map((t) => (
+              <span key={t} className="rounded-full bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                {t}
+              </span>
+            ))}
+          </div>
+        ) : null}
         {showMatch ? (
           <div className="mt-2 flex items-center gap-1.5 text-[11px] text-accent">
             <Sparkles className="h-3 w-3" />
@@ -2872,6 +2900,7 @@ function CreatorTile({
     </button>
   );
 }
+
 
 // ============== Card 3: Assets ==============
 function AssetsCard() {
