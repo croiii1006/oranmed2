@@ -12,6 +12,7 @@ import {
   Database,
   FileText,
   Image as ImageIcon,
+  Info,
   ListChecks,
   ListFilter,
   Play,
@@ -22,6 +23,7 @@ import {
   Users,
   Wand2,
 } from 'lucide-react';
+
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OranMedProvider, useOranMed } from './context/OranMedContext';
