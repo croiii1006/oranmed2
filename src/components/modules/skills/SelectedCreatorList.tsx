@@ -52,7 +52,7 @@ export function SelectedCreatorList({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <span className="truncate text-[12px] font-medium text-foreground">{c.name}</span>
-                  <span className="rounded-full bg-muted/60 px-1.5 py-px text-[9px] text-muted-foreground">
+                  <span className="shrink-0 whitespace-nowrap rounded-full bg-muted/60 px-1.5 py-px text-[9px] text-muted-foreground">
                     {territory}·{genderLabel}
                   </span>
                 </div>
