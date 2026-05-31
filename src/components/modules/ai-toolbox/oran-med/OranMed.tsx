@@ -495,7 +495,7 @@ function NewTaskView({
                   </div>
                 ) : (
                 <>
-                <div className="flex-1 min-h-0 overflow-y-auto pr-1 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 content-start">
+                <div className="flex-1 min-h-0 overflow-y-auto pr-1 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 content-start">
                   {recommendedCreators.map((c) => {
                     const selected = selectedCreatorIds.includes(c.id);
                     const matchStyles = (() => {
@@ -512,7 +512,7 @@ function NewTaskView({
                         type="button"
                         onClick={() => toggleCreator(c.id)}
                         className={cn(
-                          'group relative flex min-h-[144px] w-full flex-col items-center overflow-hidden rounded-[18px] border bg-background px-3 py-4 text-center transition-all duration-200',
+                          'group relative flex min-h-[196px] w-full flex-col items-center overflow-hidden rounded-[20px] border bg-background px-4 py-5 text-center transition-all duration-200',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20',
                           selected
                             ? 'border-foreground/35 bg-foreground/[0.03]'
@@ -522,7 +522,7 @@ function NewTaskView({
                         {/* Match score badge — AI mode only */}
                         {pickMode === 'ai' ? (
                           <div
-                            className="pointer-events-none absolute left-2.5 top-2.5 z-30 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
+                            className="pointer-events-none absolute left-3 top-3 z-30 flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
                             style={{ color: matchStyles.color, backgroundColor: matchStyles.bg }}
                           >
                             <span className="inline-block h-1 w-1 rounded-full" style={{ backgroundColor: matchStyles.color }} />
@@ -530,7 +530,7 @@ function NewTaskView({
                           </div>
                         ) : null}
                         {selected ? (
-                          <div className="absolute right-2.5 top-2.5 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
+                          <div className="absolute right-3 top-3 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
                             <Check className="h-3 w-3" strokeWidth={3} />
                           </div>
                         ) : (
@@ -539,14 +539,14 @@ function NewTaskView({
                             tabIndex={0}
                             onClick={(e) => { e.stopPropagation(); setDetailCreatorId(c.id); }}
                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); setDetailCreatorId(c.id); } }}
-                            className="absolute right-2.5 top-2.5 z-30 flex h-5 w-5 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity duration-150 hover:text-foreground group-hover:opacity-100 group-focus-visible:opacity-100"
+                            className="absolute right-3 top-3 z-30 flex h-6 w-6 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity duration-150 hover:text-foreground group-hover:opacity-100 group-focus-visible:opacity-100"
                             aria-label="查看达人详情"
                           >
-                            <Info className="h-3 w-3" />
+                            <MoreHorizontal className="h-3.5 w-3.5" />
                           </span>
                         )}
 
-                        <div className="relative z-10 h-[58px] w-[58px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-hover:blur-md group-focus-visible:scale-[1.04] group-focus-visible:opacity-15 group-focus-visible:blur-md">
+                        <div className="relative z-10 h-[68px] w-[68px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-hover:blur-md group-focus-visible:scale-[1.04] group-focus-visible:opacity-15 group-focus-visible:blur-md">
                           {c.avatarUrl ? (
                             <img src={c.avatarUrl} alt={c.name} className="h-full w-full object-cover" />
                           ) : (
@@ -556,37 +556,44 @@ function NewTaskView({
                           )}
                         </div>
 
-                        <div className="relative z-10 mt-2.5 min-w-0 transition-all duration-200 group-hover:opacity-10 group-hover:blur-md group-focus-visible:opacity-10 group-focus-visible:blur-md">
-                          <div className="truncate text-[13px] font-light tracking-[-0.01em] text-foreground sm:text-sm">
+                        <div className="relative z-10 mt-3 min-w-0 transition-all duration-200 group-hover:opacity-10 group-hover:blur-md group-focus-visible:opacity-10 group-focus-visible:blur-md">
+                          <div className="truncate text-sm font-light tracking-[-0.01em] text-foreground">
                             {c.name}
                           </div>
-                          <div className="mt-0.5 truncate text-[11px] font-light text-muted-foreground/70 sm:text-xs">
+                          <div className="mt-0.5 truncate text-xs font-light text-muted-foreground/70">
                             {c.handle}
                           </div>
                         </div>
 
-                        <div className="pointer-events-none absolute inset-0 z-10 rounded-[18px] bg-white/82 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                          <div className="flex h-full flex-col justify-between gap-2">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-1.5 text-[10px] font-medium tracking-[0.06em] text-foreground/50">
-                                <span>{c.tier} · {c.platform}</span>
-                                {c.country ? <span className="text-foreground/40">· {c.country}</span> : null}
-                                {c.languages?.[0] ? <span className="text-foreground/40">· {c.languages[0]}</span> : null}
-                              </div>
-                              <div className="text-[13px] font-semibold text-foreground">{c.followers} 粉丝</div>
-                              <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10.5px] text-muted-foreground">
-                                <span>均播 {c.avgPlay}</span>
-                                <span>互动 {c.engagementRate != null ? `${(c.engagementRate * 100).toFixed(1)}%` : '—'}</span>
-                                <span>完播 {c.videoCompletionRate != null ? `${(c.videoCompletionRate * 100).toFixed(0)}%` : '—'}</span>
-                                <span className="truncate">报价 {c.reportedVideoPrice != null ? `${c.currency === 'CNY' ? '¥' : '$'}${(c.reportedVideoPrice / 1000).toFixed(1)}k` : '—'}</span>
-                              </div>
+                        <div className="pointer-events-none absolute inset-0 z-10 rounded-[20px] bg-white/85 p-4 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <div className="flex h-full flex-col gap-3">
+                            {/* Header meta */}
+                            <div className="flex items-center gap-1 truncate text-[10.5px] font-medium tracking-[0.04em] text-foreground/55">
+                              <span>{c.tier}</span>
+                              <span className="text-foreground/30">·</span>
+                              <span>{c.platform}</span>
+                              {c.country ? (<><span className="text-foreground/30">·</span><span>{c.country}</span></>) : null}
+                              {c.languages?.[0] ? (<><span className="text-foreground/30">·</span><span className="truncate">{c.languages[0]}</span></>) : null}
                             </div>
 
-                            <div className="space-y-1.5">
+                            {/* Hero number */}
+                            <div className="-mt-1 text-[17px] font-semibold leading-none tracking-[-0.01em] text-foreground">
+                              {c.followers} <span className="text-[12px] font-normal text-muted-foreground">粉丝</span>
+                            </div>
+
+                            {/* Metrics */}
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11.5px] text-muted-foreground">
+                              <span>均播 <span className="text-foreground/85">{c.avgPlay}</span></span>
+                              <span>互动 <span className="text-foreground/85">{c.engagementRate != null ? `${(c.engagementRate * 100).toFixed(1)}%` : '—'}</span></span>
+                              <span>完播 <span className="text-foreground/85">{c.videoCompletionRate != null ? `${(c.videoCompletionRate * 100).toFixed(0)}%` : '—'}</span></span>
+                              <span className="truncate">报价 <span className="text-foreground/85">{c.reportedVideoPrice != null ? `${c.currency === 'CNY' ? '¥' : '$'}${(c.reportedVideoPrice / 1000).toFixed(1)}k` : '—'}</span></span>
+                            </div>
+
+                            <div className="mt-auto space-y-2">
                               {(c.contentStyleTags?.length ?? 0) > 0 ? (
-                                <div className="flex flex-wrap gap-1 text-[10px] text-muted-foreground">
+                                <div className="flex flex-wrap gap-1 text-[10.5px] text-muted-foreground">
                                   {c.contentStyleTags!.slice(0, 3).map((t) => (
-                                    <span key={t} className="rounded-full bg-background/80 px-1.5 py-0.5">{t}</span>
+                                    <span key={t} className="rounded-full bg-muted/60 px-2 py-0.5">{t}</span>
                                   ))}
                                 </div>
                               ) : null}
@@ -603,6 +610,7 @@ function NewTaskView({
                     );
                   })}
                 </div>
+
 
                 </>
                 )}
