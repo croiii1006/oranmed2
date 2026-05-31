@@ -550,12 +550,6 @@ function NewTaskView({
                               {c.name.slice(0, 1)}
                             </div>
                           )}
-                          {/* Selected check — overlaid on avatar bottom-right so it never collides with the more-dots button */}
-                          {selected ? (
-                            <div className="absolute -bottom-0.5 -right-0.5 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm ring-2 ring-background">
-                              <Check className="h-3 w-3" strokeWidth={3} />
-                            </div>
-                          ) : null}
                         </div>
 
                         <div className="relative z-10 mt-2.5 min-w-0 transition-all duration-200 group-hover:opacity-10 group-hover:blur-md group-focus-visible:opacity-10 group-focus-visible:blur-md">
