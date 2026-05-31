@@ -138,7 +138,7 @@ export interface CreatorOnboarding {
 
 export const emptyBrief = (): Brief => ({
   title: '',
-  platform: '小红书',
+  platform: 'TikTok',
   goal: '',
   brandName: '',
   brandCategory: '',
