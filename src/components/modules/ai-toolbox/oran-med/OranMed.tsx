@@ -316,10 +316,10 @@ function NewTaskView({
                 </Select>
               </div>
 
-              {/* Inline meta fields — fill remaining height, responsive columns based on container width */}
+              {/* Inline meta fields — scroll when content exceeds height, fixed min row height to prevent overlap */}
               <div
                 className={cn(
-                  'mt-4 flex-1 min-h-0 grid gap-2 auto-rows-fr',
+                  'mt-4 flex-1 min-h-0 overflow-y-auto pr-1 grid gap-2 auto-rows-[minmax(64px,auto)] content-start',
                   creatorsOpen ? 'grid-cols-2' : 'grid-cols-3',
                 )}
               >
@@ -656,7 +656,7 @@ function PlainField({
   placeholder?: string;
 }) {
   return (
-    <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+    <div className="group flex flex-col gap-1.5 overflow-hidden rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
       <input
         value={value}
@@ -718,7 +718,7 @@ function CustomField({
   };
 
   return (
-    <div className="group relative flex flex-col gap-1.5 rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+    <div className="group relative flex flex-col gap-1.5 overflow-hidden rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <div className="flex items-center gap-1.5">
         <input
           value={field.label}
@@ -922,7 +922,7 @@ function MetaField({
 
   if (type === 'date') {
     return (
-      <div className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+      <div className="group flex flex-col gap-1.5 overflow-hidden rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
         <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
         <input
           type="date"
@@ -1060,7 +1060,7 @@ function MetaField({
     );
 
   return (
-    <div ref={containerRef} className="group flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
+    <div ref={containerRef} className="group flex flex-col gap-1.5 overflow-hidden rounded-lg border border-border/40 bg-muted/40 px-3 py-2 transition-colors focus-within:border-accent/60 hover:border-accent/40">
       <span className="text-[12px] font-light leading-5 text-muted-foreground/70">{label}</span>
       {/* Hidden measurement row */}
       <div
