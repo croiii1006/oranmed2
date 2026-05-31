@@ -179,7 +179,77 @@ function summarizeCreators(list: Creator[]) {
   return { fans, plays, priceByCurrency, missingPrice };
 }
 
+// ============== Manual filters ==============
+
+export type ManualFilters = {
+  territory: 'all' | 'cn' | 'overseas';
+  gender: 'all' | 'male' | 'female';
+  language: 'all' | string;
+  tier: 'all' | 'KOL' | 'KOC' | 'MCN';
+  category: 'all' | string;
+  followerRange: 'all' | 'lt10w' | '10-50w' | '50-100w' | 'gt100w';
+  playRange: 'all' | 'lt1w' | '1-5w' | '5-20w' | 'gt20w';
+  engagementRange: 'all' | 'lt3' | '3-6' | 'gt6';
+  priceRange: 'all' | 'lt1k' | '1-5k' | '5-20k' | 'gt20k';
+  accountStatus: 'all' | 'available' | 'paused' | 'banned';
+};
+
+export const defaultManualFilters: ManualFilters = {
+  territory: 'all',
+  gender: 'all',
+  language: 'all',
+  tier: 'all',
+  category: 'all',
+  followerRange: 'all',
+  playRange: 'all',
+  engagementRange: 'all',
+  priceRange: 'all',
+  accountStatus: 'all',
+};
+
+function inFollowerBucket(wan: number, bucket: ManualFilters['followerRange']): boolean {
+  switch (bucket) {
+    case 'lt10w': return wan < 10;
+    case '10-50w': return wan >= 10 && wan < 50;
+    case '50-100w': return wan >= 50 && wan < 100;
+    case 'gt100w': return wan >= 100;
+    default: return true;
+  }
+}
+
+function inPlayBucket(wan: number, bucket: ManualFilters['playRange']): boolean {
+  switch (bucket) {
+    case 'lt1w': return wan < 1;
+    case '1-5w': return wan >= 1 && wan < 5;
+    case '5-20w': return wan >= 5 && wan < 20;
+    case 'gt20w': return wan >= 20;
+    default: return true;
+  }
+}
+
+function inEngagementBucket(rate: number, bucket: ManualFilters['engagementRange']): boolean {
+  const pct = rate * 100;
+  switch (bucket) {
+    case 'lt3': return pct < 3;
+    case '3-6': return pct >= 3 && pct < 6;
+    case 'gt6': return pct >= 6;
+    default: return true;
+  }
+}
+
+function inPriceBucket(price: number, bucket: ManualFilters['priceRange']): boolean {
+  switch (bucket) {
+    case 'lt1k': return price < 1000;
+    case '1-5k': return price >= 1000 && price < 5000;
+    case '5-20k': return price >= 5000 && price < 20000;
+    case 'gt20k': return price >= 20000;
+    default: return true;
+  }
+}
+
 // ============== New task ==============
+
+
 
 
 function NewTaskView({
