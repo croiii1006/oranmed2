@@ -596,11 +596,10 @@ function NewTaskView({
                     {pickMode === 'manual' && !matching ? (
                       <ManualFilterDropdown
                         count={recommendedCreators.length}
-                        territory={manualTerritory}
-                        gender={manualGender}
-                        onTerritory={setManualTerritory}
-                        onGender={setManualGender}
+                        filters={manualFilters}
+                        onChange={setManualFilters}
                       />
+
                     ) : (
                       <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-light text-muted-foreground">
                         {matching ? '匹配中…' : `${recommendedCreators.length} 位 · ${brief.platform}`}
