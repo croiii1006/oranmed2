@@ -1787,7 +1787,8 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+
               {assets.map((a) => {
                 const c = CREATORS.find((cc) => cc.id === a.creatorId);
                 return (
