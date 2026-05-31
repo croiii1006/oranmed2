@@ -348,14 +348,24 @@ function NewTaskView({
   const recommendedCreators = useMemo(() => {
     const base = CREATORS.filter((c) => c.platform === brief.platform).sort((a, b) => b.matchScore - a.matchScore);
     if (pickMode !== 'manual') return base;
+    const f = manualFilters;
     return base.filter((c) => {
       const region = (c.region || '').trim().toUpperCase();
       const isCN = CN_REGIONS.has(region);
-      const territoryOk = manualTerritory === 'all' || (manualTerritory === 'cn' ? isCN : !isCN);
-      const genderOk = manualGender === 'all' || c.gender === manualGender;
-      return territoryOk && genderOk;
+      if (!(f.territory === 'all' || (f.territory === 'cn' ? isCN : !isCN))) return false;
+      if (!(f.gender === 'all' || c.gender === f.gender)) return false;
+      if (!(f.language === 'all' || (c.languages?.includes(f.language) ?? false))) return false;
+      if (!(f.tier === 'all' || c.tier === f.tier)) return false;
+      if (!(f.category === 'all' || (c.contentCategories?.includes(f.category) ?? false))) return false;
+      if (!inFollowerBucket(parseToWan(c.followers), f.followerRange)) return false;
+      if (!inPlayBucket(parseToWan(c.avgPlay), f.playRange)) return false;
+      if (!inEngagementBucket(c.engagementRate ?? 0, f.engagementRange)) return false;
+      if (!inPriceBucket(c.reportedVideoPrice ?? -1, f.priceRange)) return false;
+      if (!(f.accountStatus === 'all' || c.accountStatus === f.accountStatus)) return false;
+      return true;
     });
-  }, [brief.platform, pickMode, manualTerritory, manualGender]);
+  }, [brief.platform, pickMode, manualFilters]);
+
 
   const selectedCreatorsForSummary = useMemo(
     () => CREATORS.filter((c) => selectedCreatorIds.includes(c.id)),
