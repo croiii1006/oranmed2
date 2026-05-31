@@ -149,7 +149,13 @@ function NewTaskView({
   const [rawInput, setRawInput] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [parsing, setParsing] = useState(false);
+  const [detailCreatorId, setDetailCreatorId] = useState<string | null>(null);
+  const detailCreator = useMemo(
+    () => (detailCreatorId ? CREATORS.find((c) => c.id === detailCreatorId) ?? null : null),
+    [detailCreatorId],
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const brandName = brief.brandName || '欧莱雅';
   const brandCategory = brief.brandCategory || '美妆护肤';
