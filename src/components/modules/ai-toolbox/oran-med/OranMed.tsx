@@ -2692,6 +2692,11 @@ function CreatorsCard() {
   const { brief, selectedCreatorIds } = currentTask;
   const [mode, setMode] = useState<'ai' | 'all'>('ai');
   const [platformFilter, setPlatformFilter] = useState<Platform | 'all'>('all');
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detailCreator = useMemo(
+    () => (detailId ? CREATORS.find((c) => c.id === detailId) ?? null : null),
+    [detailId],
+  );
 
   const aiList = useMemo(
     () =>
@@ -2758,12 +2763,20 @@ function CreatorsCard() {
             selected={selectedCreatorIds.includes(c.id)}
             showMatch={mode === 'ai'}
             onToggle={() => toggleCreator(c.id)}
+            onDetail={() => setDetailId(c.id)}
           />
         ))}
       </div>
+      <CreatorDetailDialog
+        creator={detailCreator}
+        open={Boolean(detailCreator)}
+        onOpenChange={(o) => { if (!o) setDetailId(null); }}
+        showMatch={mode === 'ai'}
+      />
     </TaskCard>
   );
 }
+
 
 function ModeTab({
   active,
