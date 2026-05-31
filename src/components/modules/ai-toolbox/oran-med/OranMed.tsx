@@ -1776,7 +1776,7 @@ function WorkflowView({ onBack, onComplete }: { onBack: () => void; onComplete: 
           </div>
 
           {assets.length === 0 ? (
-            <div className="flex h-[300px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/40 text-center">
+            <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/40 text-center">
               <ImageIcon className="h-6 w-6 text-muted-foreground/60" />
               <div className="text-xs text-muted-foreground">
                 {assetMode === 'orangen'
