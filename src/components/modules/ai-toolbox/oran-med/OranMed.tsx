@@ -2846,7 +2846,7 @@ function CreatorTile({
           className="absolute right-2 top-2 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground/60 opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
           aria-label="查看达人详情"
         >
-          <Info className="h-3.5 w-3.5" />
+          <MoreHorizontal className="h-3.5 w-3.5" />
         </span>
       ) : null}
       <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
