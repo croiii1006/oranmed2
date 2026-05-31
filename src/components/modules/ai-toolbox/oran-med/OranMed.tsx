@@ -532,12 +532,8 @@ function NewTaskView({
                     <span className="text-[11px] font-light text-muted-foreground">基于 Brief 与人群分析中</span>
                   ) : (
                     <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-0.5 text-[11px] font-light text-muted-foreground">
-                      <span className={cn(
-                        selectedCreatorIds.length >= brief.targetCreatorCount ? 'text-foreground/70' : 'text-muted-foreground',
-                      )}>
-                        已选 {selectedCreatorIds.length}
-                        <span className="text-muted-foreground/60"> / 目标 {brief.targetCreatorCount}</span>
-                      </span>
+                      <span className="text-muted-foreground">已选 {selectedCreatorIds.length}</span>
+
                       {selectedCreatorIds.length > 0 ? (
                         <>
                           <span className="text-foreground/20">·</span>
@@ -655,18 +651,16 @@ function NewTaskView({
                         </div>
 
                         {/* Always-on mini metrics — fades out on hover so the overlay can show full details */}
-                        <div className="relative z-10 mt-2 flex flex-col items-center gap-0.5 text-[10.5px] font-light leading-tight text-muted-foreground/80 transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0">
-                          <div className="flex items-center gap-1">
-                            <span className="text-foreground/75">{c.followers}</span>
-                            <span className="text-foreground/25">·</span>
-                            <span>均播 <span className="text-foreground/70">{c.avgPlay}</span></span>
-                          </div>
-                          <div className="text-foreground/70">
+                        <div className="relative z-10 mt-3.5 flex items-center gap-1.5 text-[10.5px] font-light leading-tight text-muted-foreground/80 transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0">
+                          <span className="text-foreground/75">{c.followers} <span className="text-muted-foreground/70">粉丝</span></span>
+                          <span className="text-foreground/20">·</span>
+                          <span className="text-foreground/75">
                             {c.reportedVideoPrice != null
                               ? formatPrice(c.reportedVideoPrice, c.currency)
                               : '报价待询'}
-                          </div>
+                          </span>
                         </div>
+
 
 
 
