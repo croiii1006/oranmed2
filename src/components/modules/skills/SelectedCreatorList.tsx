@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { ChevronDown, X, Film } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronDown, X, Film, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CreatorLibraryItem } from './creatorLibrary';
 import type { CandidateVideo } from './useSkillsEngine';
+import { CREATORS } from '@/components/modules/ai-toolbox/oran-med/data/creators';
+import { CreatorDetailDialog } from '@/components/modules/ai-toolbox/oran-med/components/CreatorDetailDialog';
 
 export interface CreatorExtraDetail {
   label: string;
@@ -40,6 +42,11 @@ export function SelectedCreatorList({
   structuredDetails,
 }: SelectedCreatorListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detailCreator = useMemo(
+    () => (detailId ? CREATORS.find((c) => c.id === detailId) ?? null : null),
+    [detailId],
+  );
 
   if (creators.length === 0) return null;
 
@@ -88,6 +95,19 @@ export function SelectedCreatorList({
               ) : (
                 <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground/60 transition-transform group-hover:text-muted-foreground" />
               )}
+            </button>
+
+            {/* Three-dot — open full creator detail dialog */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDetailId(c.id);
+              }}
+              className="absolute right-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity hover:text-foreground group-hover:opacity-100 focus-visible:opacity-100"
+              aria-label="查看达人详情"
+            >
+              <MoreHorizontal className="h-3 w-3" />
             </button>
 
             {/* Bound video chip */}
@@ -175,6 +195,11 @@ export function SelectedCreatorList({
           </div>
         );
       })}
+      <CreatorDetailDialog
+        creator={detailCreator}
+        open={Boolean(detailCreator)}
+        onOpenChange={(o) => { if (!o) setDetailId(null); }}
+      />
     </div>
   );
 }
