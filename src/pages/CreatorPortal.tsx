@@ -2,8 +2,10 @@ import { useSearchParams } from 'react-router-dom';
 import { useCreatorPortalState } from '@/components/creator-portal/useCreatorPortalState';
 import { CreatorPortalShell } from '@/components/creator-portal/CreatorPortalShell';
 import { OnboardingSection } from '@/components/creator-portal/OnboardingSection';
+import { OnboardingSummaryCard } from '@/components/creator-portal/OnboardingSummaryCard';
 import { TaskInboxSection } from '@/components/creator-portal/TaskInboxSection';
 import { CreatorStatsSection } from '@/components/creator-portal/CreatorStatsSection';
+import { toast } from '@/hooks/use-toast';
 
 export default function CreatorPortal() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,6 +16,7 @@ export default function CreatorPortal() {
     setCurrentCreatorId,
     onboarding,
     patchOnboarding,
+    resetOnboarding,
     inboxTasks,
     getResponse,
     updateTaskResponse,
@@ -26,6 +29,7 @@ export default function CreatorPortal() {
   };
 
   const canAct = onboarding.onboardingStatus === 'approved';
+  const isApproved = onboarding.onboardingStatus === 'approved';
 
   return (
     <div className="h-screen overflow-y-auto bg-muted/30">
@@ -36,7 +40,17 @@ export default function CreatorPortal() {
         onboardingStatus={onboarding.onboardingStatus}
       />
       <main className="mx-auto max-w-[520px] space-y-4 px-4 py-4 pb-12">
-        <OnboardingSection onboarding={onboarding} patch={patchOnboarding} />
+        {isApproved ? (
+          <OnboardingSummaryCard
+            onboarding={onboarding}
+            onReset={() => {
+              resetOnboarding();
+              toast({ title: '已重置为未入驻状态' });
+            }}
+          />
+        ) : (
+          <OnboardingSection onboarding={onboarding} patch={patchOnboarding} />
+        )}
         <TaskInboxSection
           tasks={inboxTasks}
           getResponse={getResponse}
