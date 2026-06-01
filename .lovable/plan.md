@@ -1,56 +1,64 @@
 ## 目标
+当前展开卡片把 12 个字段一视同仁地按 `label · value` 平铺，重要数据（粉丝/均播/互动/完播/报价）淹没在一堆次要字段里。按"重要级别"重排版面，让一眼能抓到的指标先出现，次要的画像/风格信息退到底部。
 
-让用户在「AI 推荐 / 手动选择达人」面板中，一眼看到每位达人的关键数据（粉丝、均播、报价），并把已选达人的关键指标累加汇总，便于评估预算与触达量。
+## 信息层级
 
-## 改动范围
+**L1 — 身份头部（已有）**：头像、姓名、海外·女、handle
+保持现状。
 
-仅前端展示，限定在 `src/components/modules/ai-toolbox/oran-med/OranMed.tsx` 的达人选择面板（约 444–626 行）。不改业务逻辑、不动数据结构。
+**L2 — 核心数据（Hero metrics）**
+- 粉丝 `124.8K`
+- 均播 `14.6万`
 
-## 设计
+用 2 列大数字网格呈现：数值用 `15-16px font-semibold tracking-tight`，下方 `10px text-muted` 小标签。视觉上明显比下面的指标重。
 
-### 1. 卡片上常亮的关键指标
-当前粉丝/均播/报价/互动率只在 hover 蒙层里展示。改为：
-- 卡片底部新增一行常亮的「微型指标条」：粉丝 · 均播 · 报价。
-- 字号小、低对比度，不抢头像与名字焦点。
-- Hover 蒙层保留完整指标（互动/完播/标签/匹配理由）。
+**L3 — 表现指标（KPI row）**
+- 互动 `5.8%`
+- 完播 `69%`
+- 报价 `$3.7k`
+
+3 列等宽小卡，`12px` 数值 + `10px` 标签，背景 `bg-muted/30 rounded-md`，让它们成一组。
+
+**L4 — 画像标签（Meta）**
+- 领域：彩妆教程
+- 地区：AU
+- 画像：KOC · TikTok · 美国 · English
+
+合并成一行 chip 流：`[彩妆教程] [AU] [KOC] [TikTok] [English]`，淡灰底圆角小标签，不再用 label/value 两列。
+
+**L5 — 风格 & 账号（Footer）**
+- 风格：开箱、口播
+- 账号：@chloe.makeupbook
+
+最弱化：`10px text-muted-foreground/70`，单行截断，紧贴底部。账号其实头部已有，可直接删除这一行。
+
+## 视觉示意
 
 ```text
-┌─────────────────────┐
-│        avatar       │
-│        Name         │
-│       @handle       │
-│  12.4w · 均播 2.1w  │ ← 新增
-│       ¥8.0k         │
-└─────────────────────┘
+┌──────────────────────────────┐
+│ [img] Chloe Sim…  海外·女  × │
+│       @chloe.makeupbook      │
+├──────────────────────────────┤
+│   124.8K            14.6万   │   ← L2 hero
+│   粉丝              均播      │
+├──────────────────────────────┤
+│ ┌─────┐ ┌─────┐ ┌──────┐    │   ← L3 KPI
+│ │5.8% │ │ 69% │ │$3.7k │    │
+│ │互动 │ │完播 │ │报价  │    │
+│ └─────┘ └─────┘ └──────┘    │
+│                              │
+│ 彩妆教程·AU·KOC·TikTok·EN   │   ← L4 chips
+│                              │
+│ 开箱、口播                    │   ← L5 footer
+└──────────────────────────────┘
 ```
 
-### 2. 已选达人的累加汇总条
-在面板顶部「已选 X 位」右侧不再只显示数字，改为浮现一条汇总信息（仅当 `selectedCreatorIds.length > 0`）：
+## 改动点
+- `src/components/modules/skills/SelectedCreatorList.tsx`：展开区从单一 `DetailRow` 列表，改为三段式（Hero / KPI / Meta+Footer）。新增可选 props 让调用方传入分组数据，或在内部按字段语义分组渲染。
+- `src/components/modules/ai-toolbox/oran-med/OranMed.tsx`：调整 `extraDetails` 结构以匹配新分组（hero / kpi / meta / footer），不再扁平传 7 行。
+- skills 模块其他调用方（`SetupSummary.tsx`）保持向后兼容：未传分组数据时回退到旧的 `DetailRow` 列表。
 
-```text
-已选 3 位 · 触达 38.6w 粉丝 · 预估均播 7.2w · 报价合计 ¥24.0k
-```
-
-放置位置：保留现有 header 行，把右侧文本扩展为一个紧凑的汇总条；空间不足时换行到 header 下方一行（h-5，font-light，text-[11px]）。
-
-汇总规则：
-- 粉丝合计：解析 `c.followers`（形如 `12.4w`）累加，结果统一格式化为 `w / 万`。
-- 均播合计：同上解析 `c.avgPlay` 累加。
-- 报价合计：累加 `c.reportedVideoPrice`，按币种分组（CNY → `¥`，USD → `$`），如同时存在多种币种则分别展示，例如 `¥18.0k + $1.2k`。
-- 未填报价的达人在合计行加 `(N 位待询价)` 提示，避免误导。
-
-### 3. 与目标人数的对比
-header 右侧汇总条前增加一个细微的进度提示：`3 / 目标 5`，达到/超出目标时变为 `foreground/70`，未达成保持 `muted-foreground`。数据来自 `brief.targetCreatorCount`。
-
-## 技术细节
-
-- 新增纯函数 `parseFollowersToWan(str)`、`formatWan(n)`：处理 `w/W/万/K/M` 单位（已在 `data/creators.ts` 有 `parseFollowers`，可在 OranMed 内复用一个本地版本，避免改公共导出）。
-- 新增 `summarizeSelected(creators)`：返回 `{ fans, plays, priceByCurrency, missingPrice }`。
-- 渲染层只在 header 与卡片内插入展示，不引入新组件文件。
-- 不修改 `Creator` 类型、不动 `creators.ts` 数据生成逻辑。
-
-## 不做的事
-
-- 不新增筛选/排序按钮。
-- 不改右侧抽屉 `CreatorDetailDialog`。
-- 不改后续步骤（资产/计划）中已选达人列表的展示——本次仅限选择阶段。
+## 范围外
+- 不改折叠态的卡片样式
+- 不改 CreatorDetailDialog
+- 不改数据源
