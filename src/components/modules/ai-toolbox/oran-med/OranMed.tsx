@@ -2100,6 +2100,38 @@ function JumpToOranGenCard({
             </div>
             <SelectedCreatorList
               creators={creatorLibraryItems.filter((it) => creatorIds.includes(it.id))}
+              extraDetails={Object.fromEntries(
+                selectedCreators.map((c) => {
+                  const pct = (v?: number) => (v == null ? '—' : `${(v * 100).toFixed(1)}%`);
+                  const priceStr =
+                    c.reportedVideoPrice == null
+                      ? '—'
+                      : `${c.currency === 'CNY' ? '¥' : c.currency === 'USD' ? '$' : ''}${c.reportedVideoPrice.toLocaleString()}`;
+                  return [
+                    c.id,
+                    [
+                      { label: '层级', value: c.tier },
+                      { label: '平台', value: c.platform },
+                      { label: '国家', value: c.country ?? '—' },
+                      { label: '语言', value: c.languages?.join(' / ') ?? '—' },
+                      { label: '互动率', value: pct(c.engagementRate) },
+                      { label: '完播率', value: pct(c.videoCompletionRate) },
+                      { label: '粉丝增长', value: pct(c.followerGrowthRate) },
+                      { label: '活跃粉丝', value: pct(c.activeFollowerRatio) },
+                      { label: '点赞', value: c.avgLikes ?? '—' },
+                      { label: '评论', value: c.avgComments ?? '—' },
+                      { label: '分享', value: c.avgShares ?? '—' },
+                      { label: '风格', value: c.contentStyleTags?.join('、') ?? '—' },
+                      { label: '声音', value: c.voiceStyle ?? '—' },
+                      { label: '口音', value: c.accent ?? '—' },
+                      { label: '报价', value: priceStr },
+                      { label: '议价', value: c.negotiable == null ? '—' : c.negotiable ? '可议价' : '不议价' },
+                      { label: '有效期', value: c.rateValidUntil ?? '—' },
+                      { label: '更新', value: c.dataUpdatedAt ?? '—' },
+                    ],
+                  ];
+                }),
+              )}
             />
           </div>
         )}
