@@ -56,8 +56,8 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
       : boundCount > 0
         ? `已选 ${boundCount} 位达人`
         : creators.length > 0
-          ? '选择达人复刻'
-          : '复刻';
+          ? '选择达人'
+          : '选择达人';
 
     const triggerClass = size === 'lg'
       ? cn(
