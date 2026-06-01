@@ -82,9 +82,21 @@ export function useCreatorPortalState(initialCreatorId?: string) {
   );
 
   const onboarding = useMemo<CreatorOnboarding>(() => {
-    return (
-      onboardings[currentCreator.id] ?? defaultOnboarding(currentCreator.id, currentCreator.name)
-    );
+    const def = defaultOnboarding(currentCreator.id, currentCreator.name);
+    const stored = onboardings[currentCreator.id];
+    if (!stored) return def;
+    // Merge: keep stored status/flags but backfill any missing identity fields from defaults
+    return {
+      ...def,
+      ...stored,
+      name: stored.name || def.name,
+      birth: stored.birth || def.birth,
+      country: stored.country || def.country,
+      city: stored.city || def.city,
+      idNo: stored.idNo || def.idNo,
+      idPhoto: stored.idPhoto || def.idPhoto,
+      tiktokHandle: stored.tiktokHandle || def.tiktokHandle,
+    };
   }, [onboardings, currentCreator]);
 
   const patchOnboarding = useCallback(
