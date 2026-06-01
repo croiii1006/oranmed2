@@ -3756,7 +3756,12 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
           const statusDot = STATUS_DOT[t.status];
           const firstCreator = CREATORS.find((c) => c.id === t.selectedCreatorIds[0]);
           const avatarLabel = (firstCreator?.name || t.brief.brandName || 'M').slice(0, 1);
-          const briefPreview = t.brief.goal?.trim() || '输入 Brief 内容';
+          const briefPreview =
+            t.brief.goal?.trim() ||
+            t.brief.styleRequirements?.trim() ||
+            t.brief.audience?.trim() ||
+            t.brief.brandTags?.trim() ||
+            '尚未填写 Brief 描述，点击进入任务补充推广目标与卖点。';
           return (
             <button
               key={t.id}
