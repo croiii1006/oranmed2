@@ -97,6 +97,19 @@ export function SelectedCreatorList({
               )}
             </button>
 
+            {/* Three-dot — open full creator detail dialog */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDetailId(c.id);
+              }}
+              className="absolute right-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity hover:text-foreground group-hover:opacity-100 focus-visible:opacity-100"
+              aria-label="查看达人详情"
+            >
+              <MoreHorizontal className="h-3 w-3" />
+            </button>
+
             {/* Bound video chip */}
             {boundVideo && (
               <div className="mt-1.5 flex items-center gap-1 truncate rounded-md bg-foreground/[0.04] px-1.5 py-0.5 text-[10px] text-foreground/70">
