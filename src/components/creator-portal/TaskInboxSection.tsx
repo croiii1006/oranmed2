@@ -1,10 +1,16 @@
+import { Paperclip, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import type {
-  CreatorResponse,
-  OranMedTask,
+import { cn } from '@/lib/utils';
+import {
+  STATUS_LABEL,
+  STATUS_TONE,
+  type CreatorResponse,
+  type CreatorPublishDecision,
+  type CreatorTaskDecision,
+  type OranMedTask,
 } from '@/components/modules/ai-toolbox/oran-med/types';
 
 interface Props {
@@ -14,20 +20,32 @@ interface Props {
   canAct: boolean;
 }
 
+const TASK_DECISION_LABEL: Record<CreatorTaskDecision, string> = {
+  pending: '待处理',
+  accepted: '已接受',
+  rejected: '已拒绝',
+};
+
+const PUBLISH_DECISION_LABEL: Record<CreatorPublishDecision, string> = {
+  pending: '待处理',
+  agreed: '已同意',
+  rejected: '已拒绝',
+};
+
 export function TaskInboxSection({ tasks, getResponse, updateResponse, canAct }: Props) {
   return (
-    <Card>
+    <Card className="border-border/60">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">我的任务</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {!canAct && (
-          <div className="rounded-md bg-amber-50 p-2 text-xs text-amber-700">
+          <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-300">
             完成入驻认证后才能接收任务。
           </div>
         )}
         {tasks.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+          <div className="rounded-md border border-dashed border-border/60 p-6 text-center text-xs text-muted-foreground">
             暂无品牌任务推送
           </div>
         ) : (
@@ -37,29 +55,39 @@ export function TaskInboxSection({ tasks, getResponse, updateResponse, canAct }:
             return (
               <div
                 key={task.id}
-                className="space-y-2 rounded-lg border border-border bg-card p-3"
+                className="space-y-2.5 rounded-lg border border-border/60 bg-card p-3 transition-colors hover:border-foreground/20"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="text-sm font-medium">{task.brief.title || '未命名任务'}</div>
-                    <div className="text-xs text-muted-foreground">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-foreground">
+                      {task.brief.title || '未命名任务'}
+                    </div>
+                    <div className="mt-0.5 truncate text-xs text-muted-foreground">
                       {task.brief.brandName || '—'} · {task.brief.platform}
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px]">
-                    {task.status}
+                  <Badge
+                    variant="secondary"
+                    className={cn('shrink-0 border-0 text-[10px]', STATUS_TONE[task.status])}
+                  >
+                    {STATUS_LABEL[task.status]}
                   </Badge>
                 </div>
 
                 {task.assets[0] && (
-                  <div className="rounded-md bg-muted/40 p-2 text-xs text-muted-foreground">
-                    📎 {task.assets[0].title}
+                  <div className="flex items-center gap-1.5 truncate rounded-md bg-muted/40 px-2 py-1.5 text-[11px] text-muted-foreground">
+                    <Paperclip className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{task.assets[0].title}</span>
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <StatusLine label="任务" value={r.taskDecision} />
-                  <StatusLine label="发布" value={r.publishDecision} />
+                  <StatusLine label="任务" value={TASK_DECISION_LABEL[r.taskDecision]} tone={r.taskDecision} />
+                  <StatusLine
+                    label="发布"
+                    value={PUBLISH_DECISION_LABEL[r.publishDecision]}
+                    tone={r.publishDecision === 'agreed' ? 'accepted' : r.publishDecision}
+                  />
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -124,8 +152,9 @@ export function TaskInboxSection({ tasks, getResponse, updateResponse, canAct }:
                     </Button>
                   )}
                   {r.publishedAt && (
-                    <div className="text-[11px] text-emerald-600">
-                      ✓ 已发布 · 积分 +{r.points ?? 0} · 账单 ¥{r.billAmount ?? 0}
+                    <div className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle2 className="h-3 w-3" />
+                      已发布 · 积分 +{r.points ?? 0} · 账单 ¥{r.billAmount ?? 0}
                     </div>
                   )}
                 </div>
@@ -138,17 +167,25 @@ export function TaskInboxSection({ tasks, getResponse, updateResponse, canAct }:
   );
 }
 
-function StatusLine({ label, value }: { label: string; value: string }) {
-  const tone =
-    value === 'accepted' || value === 'agreed'
-      ? 'text-emerald-600'
-      : value === 'rejected'
-        ? 'text-rose-600'
+function StatusLine({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: 'pending' | 'accepted' | 'rejected';
+}) {
+  const toneClass =
+    tone === 'accepted'
+      ? 'text-emerald-600 dark:text-emerald-400'
+      : tone === 'rejected'
+        ? 'text-rose-600 dark:text-rose-400'
         : 'text-muted-foreground';
   return (
     <div>
-      <span className="text-muted-foreground">{label}：</span>
-      <span className={tone}>{value}</span>
+      <span className="text-muted-foreground/70">{label}：</span>
+      <span className={toneClass}>{value}</span>
     </div>
   );
 }
