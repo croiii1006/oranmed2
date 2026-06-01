@@ -9,6 +9,7 @@ import {
   writeOnboardings,
   writeTasks,
 } from './storage';
+import { buildCreatorMockTasks } from './mockTasks';
 import type {
   CreatorOnboarding,
   CreatorResponse,
