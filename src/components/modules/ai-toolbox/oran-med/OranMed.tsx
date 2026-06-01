@@ -2102,32 +2102,21 @@ function JumpToOranGenCard({
               creators={creatorLibraryItems.filter((it) => creatorIds.includes(it.id))}
               extraDetails={Object.fromEntries(
                 selectedCreators.map((c) => {
-                  const pct = (v?: number) => (v == null ? '—' : `${(v * 100).toFixed(1)}%`);
+                  const meta = [c.tier, c.platform, c.country, c.languages?.[0]].filter(Boolean).join(' · ');
                   const priceStr =
-                    c.reportedVideoPrice == null
-                      ? '—'
-                      : `${c.currency === 'CNY' ? '¥' : c.currency === 'USD' ? '$' : ''}${c.reportedVideoPrice.toLocaleString()}`;
+                    c.reportedVideoPrice != null
+                      ? `${c.currency === 'CNY' ? '¥' : '$'}${(c.reportedVideoPrice / 1000).toFixed(1)}k`
+                      : '—';
                   return [
                     c.id,
                     [
-                      { label: '层级', value: c.tier },
-                      { label: '平台', value: c.platform },
-                      { label: '国家', value: c.country ?? '—' },
-                      { label: '语言', value: c.languages?.join(' / ') ?? '—' },
-                      { label: '互动率', value: pct(c.engagementRate) },
-                      { label: '完播率', value: pct(c.videoCompletionRate) },
-                      { label: '粉丝增长', value: pct(c.followerGrowthRate) },
-                      { label: '活跃粉丝', value: pct(c.activeFollowerRatio) },
-                      { label: '点赞', value: c.avgLikes ?? '—' },
-                      { label: '评论', value: c.avgComments ?? '—' },
-                      { label: '分享', value: c.avgShares ?? '—' },
-                      { label: '风格', value: c.contentStyleTags?.join('、') ?? '—' },
-                      { label: '声音', value: c.voiceStyle ?? '—' },
-                      { label: '口音', value: c.accent ?? '—' },
+                      { label: '画像', value: meta || '—' },
+                      { label: '粉丝', value: `${c.followers}` },
+                      { label: '均播', value: c.avgPlay ?? '—' },
+                      { label: '互动', value: c.engagementRate != null ? `${(c.engagementRate * 100).toFixed(1)}%` : '—' },
+                      { label: '完播', value: c.videoCompletionRate != null ? `${(c.videoCompletionRate * 100).toFixed(0)}%` : '—' },
                       { label: '报价', value: priceStr },
-                      { label: '议价', value: c.negotiable == null ? '—' : c.negotiable ? '可议价' : '不议价' },
-                      { label: '有效期', value: c.rateValidUntil ?? '—' },
-                      { label: '更新', value: c.dataUpdatedAt ?? '—' },
+                      { label: '风格', value: c.contentStyleTags?.slice(0, 3).join('、') ?? '—' },
                     ],
                   ];
                 }),
