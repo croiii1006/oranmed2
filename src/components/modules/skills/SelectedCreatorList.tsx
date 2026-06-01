@@ -195,6 +195,11 @@ export function SelectedCreatorList({
           </div>
         );
       })}
+      <CreatorDetailDialog
+        creator={detailCreator}
+        open={Boolean(detailCreator)}
+        onOpenChange={(o) => { if (!o) setDetailId(null); }}
+      />
     </div>
   );
 }
