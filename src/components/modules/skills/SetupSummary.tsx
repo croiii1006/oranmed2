@@ -72,6 +72,28 @@ export function SetupSummary({
             creators={selectedCreators}
             candidateVideos={candidateVideos}
             bindings={creatorVideoBindings}
+            structuredDetails={Object.fromEntries(
+              selectedCreators.map((c) => {
+                const territory =
+                  c.region.trim().toUpperCase() === 'CN' || c.region.includes('中国')
+                    ? '中国'
+                    : '海外';
+                const chips = [c.niche, c.region, territory].filter(
+                  (v, i, arr) => v && arr.indexOf(v) === i,
+                );
+                return [
+                  c.id,
+                  {
+                    hero: [
+                      { label: '粉丝', value: c.followers },
+                      { label: '均播', value: c.avgViews },
+                    ],
+                    chips,
+                    footer: c.handle,
+                  },
+                ];
+              }),
+            )}
           />
         ) : null}
       </div>
