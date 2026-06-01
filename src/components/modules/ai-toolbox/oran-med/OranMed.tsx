@@ -2111,8 +2111,6 @@ function JumpToOranGenCard({
                     c.id,
                     [
                       { label: '画像', value: meta || '—' },
-                      { label: '粉丝', value: `${c.followers}` },
-                      { label: '均播', value: c.avgPlay ?? '—' },
                       { label: '互动', value: c.engagementRate != null ? `${(c.engagementRate * 100).toFixed(1)}%` : '—' },
                       { label: '完播', value: c.videoCompletionRate != null ? `${(c.videoCompletionRate * 100).toFixed(0)}%` : '—' },
                       { label: '报价', value: priceStr },
