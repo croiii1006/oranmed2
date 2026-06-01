@@ -89,7 +89,6 @@ export function SetupSummary({
                       { label: '均播', value: c.avgViews },
                     ],
                     chips,
-                    footer: c.handle,
                   },
                 ];
               }),
