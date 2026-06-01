@@ -1,47 +1,32 @@
-## Goal
+## 目标
 
-Fix two layout issues in `SelectedCreatorList.tsx` card header:
+在品牌端「任务详情」弹窗里，点击达人列表行进入达人子页面（`view.kind === 'creator'`）时，呈现的信息要与「手动选择达人」时弹出的 `CreatorDetailDialog` 完全一致（基础身份 / 表现指标 / 内容画像 / 商务 & 合规等多分组卡片），而不是当前只展示层级、粉丝、平均播放、标签、推荐理由的极简 6 行布局。
 
-1. Name `Chloe Simmo...` and handle `@chloe.makeupbook · 124...` get truncated too aggressively.
-2. The three-dot button (详情) overlaps the X / ChevronDown toggle in the top-right corner.
+## 改动范围
 
-## Changes
+只改前端展示，不改数据、状态机、任务/达人 ID 映射。
 
-**File:** `src/components/modules/skills/SelectedCreatorList.tsx`
+### 1. 抽出可复用的「达人详情内容块」
 
-### 1. De-crowd the top-right corner
+将 `src/components/modules/ai-toolbox/oran-med/components/CreatorDetailDialog.tsx` 中 Dialog body 内的视觉内容（头像头部 + Section / Row 分组：基础身份、表现指标、内容画像、声音、商务 & 合规、推荐理由、数据更新时间）抽到一个新组件：
 
-Today: `MoreHorizontal` is `absolute right-1.5 top-1.5`, sitting on top of the inline `ChevronDown` / `X` toggle that lives inside the expand button.
+```text
+src/components/modules/ai-toolbox/oran-med/components/CreatorDetailContent.tsx
+```
 
-Fix: keep only **one** affordance per zone.
+- 接收 `creator: Creator` 与 `showMatch?: boolean`。
+- 不包含 `Dialog` / `DialogHeader` 外壳，纯内容，方便在任务详情子页中内嵌。
+- `CreatorDetailDialog.tsx` 改为内部直接渲染 `<CreatorDetailContent />`，外部 API 不变，所有现有调用方（OranMed.tsx、CreatorSelectionDialog、SelectedCreatorList）零修改。
 
-- Remove the `ChevronDown` / `X` icon from the right side of the header row entirely. Expand/collapse stays triggered by clicking the avatar/name area (already the case).
-- Keep the three-dot `MoreHorizontal` as the single top-right icon, always reserving its slot (no overlap with text). It opens `CreatorDetailDialog` as today.
-- Add a small collapse affordance only when expanded: a thin "收起" text button at the bottom of the expanded block, or a chevron flipped inline next to the footer — not in the top-right.
+### 2. 任务详情中达人子页面替换为完整卡片
 
-This frees the top-right for just the three-dot and removes the visual collision.
+文件：`src/components/modules/ai-toolbox/oran-med/OranMed.tsx`，约 4185–4210 行（`{view.kind === 'creator' && activeCreator && (...)}` 分支）。
 
-### 2. Stop truncating name + handle so early
+- 移除当前的简化 header + 2 列 DetailRow 网格。
+- 改为渲染 `<CreatorDetailContent creator={activeCreator} showMatch />`，与手动选择达人时的弹窗内容完全一致。
+- 顶部「返回任务详情」面包屑、Dialog 标题（达人姓名）、状态徽章保持不变。
 
-Root causes:
-- Card is fixed `w-[220px]`.
-- Header row reserves space for: avatar (36px) + name + `海外·女` chip + toggle icon, leaving very little for the name.
-- Handle row also includes `· {followers} 粉丝`, forcing the handle to truncate.
+## 验收
 
-Fixes:
-- Widen the card to `w-[244px]` (still fits 2-up in the surrounding flex-wrap container).
-- Move the `海外·女` chip out of the name row — render it on a second meta line together with `{followers} 粉丝`, so the name has the full row width minus avatar + three-dot slot.
-- Drop `· {followers} 粉丝` from the handle line so the handle gets the full width.
-- Result: line 1 = full name, line 2 = `@handle`, line 3 (muted, smaller) = `海外·女 · 124.8K 粉丝`.
-- Keep `truncate` on name and handle as a safety net for extreme cases, but typical names like `Chloe Simmons` will now fit.
-
-### 3. Minor polish
-
-- Bump three-dot from `h-5 w-5` to `h-6 w-6` so it's an easier target and visually balanced with the new header.
-- Make three-dot always visible at low opacity (e.g. `opacity-60`) instead of `opacity-0` + hover-only, so users discover it without hovering. Keeps hover behavior to brighten on hover.
-
-## Out of scope
-
-- No changes to `CreatorDetailDialog` itself.
-- No changes to `CreatorSelectionDialog` cards (already handled in prior turn).
-- No changes to data shape or `structuredDetails` rendering inside the expanded block.
+- 任务详情中点击任一达人 → 子页内容与「手动选择达人」点开的卡片视觉一致：含国家/语言/粉丝/活跃占比/近30天增长、平均播放/互动率/完播率/平均点赞评论分享、内容品类/风格/声音、报价/可议价/报价有效期、肖像授权状态、账号状态、数据更新时间、推荐理由。
+- 手动选择达人弹窗与达人库列表中的 `CreatorDetailDialog` 仍然正常工作（因为只是把内部 body 抽成子组件复用）。
