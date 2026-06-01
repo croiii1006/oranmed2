@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ChevronDown, X, Film, MoreHorizontal } from 'lucide-react';
+import { Film, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CreatorLibraryItem } from './creatorLibrary';
 import type { CandidateVideo } from './useSkillsEngine';
