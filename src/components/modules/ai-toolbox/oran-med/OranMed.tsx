@@ -4183,30 +4183,7 @@ function TaskDetailDialog({
               )}
 
               {view.kind === 'creator' && activeCreator && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/20 p-3">
-                    {activeCreator.avatarUrl ? (
-                      <img src={activeCreator.avatarUrl} alt={activeCreator.name} className="h-12 w-12 rounded-full object-cover" />
-                    ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-muted to-muted/60 text-sm font-light text-foreground/60">
-                        {activeCreator.name.slice(0, 1)}
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-foreground">{activeCreator.name}</div>
-                      <div className="truncate text-[11px] text-muted-foreground">{activeCreator.handle} · {activeCreator.platform}</div>
-                    </div>
-                    <Badge variant="secondary" className="text-[10px]">匹配度 {activeCreator.matchScore}</Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border/50 bg-muted/20 p-3 text-xs">
-                    <DetailRow label="层级" value={activeCreator.tier} />
-                    <DetailRow label="平台" value={activeCreator.platform} />
-                    <DetailRow label="粉丝量" value={activeCreator.followers} />
-                    <DetailRow label="平均播放" value={activeCreator.avgPlay} />
-                    <DetailRow label="标签" value={activeCreator.tags.join(' · ') || '—'} span2 />
-                    <DetailRow label="推荐理由" value={activeCreator.matchReason || '—'} span2 />
-                  </div>
-                </div>
+                <CreatorDetailContent creator={activeCreator} showMatch />
               )}
 
               {view.kind === 'asset' && activeAsset && (
