@@ -50,7 +50,12 @@ export function CreatorSelectionDialog({
   const [genderFilter, setGenderFilter] = useState<GenderFilter>('all');
   const [showTopFade, setShowTopFade] = useState(false);
   const [showBottomFade, setShowBottomFade] = useState(false);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const detailCreator = useMemo(
+    () => (detailId ? CREATORS.find((c) => c.id === detailId) ?? null : null),
+    [detailId],
+  );
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
