@@ -1,64 +1,47 @@
-## 目标
-当前展开卡片把 12 个字段一视同仁地按 `label · value` 平铺，重要数据（粉丝/均播/互动/完播/报价）淹没在一堆次要字段里。按"重要级别"重排版面，让一眼能抓到的指标先出现，次要的画像/风格信息退到底部。
+## Goal
 
-## 信息层级
+Fix two layout issues in `SelectedCreatorList.tsx` card header:
 
-**L1 — 身份头部（已有）**：头像、姓名、海外·女、handle
-保持现状。
+1. Name `Chloe Simmo...` and handle `@chloe.makeupbook · 124...` get truncated too aggressively.
+2. The three-dot button (详情) overlaps the X / ChevronDown toggle in the top-right corner.
 
-**L2 — 核心数据（Hero metrics）**
-- 粉丝 `124.8K`
-- 均播 `14.6万`
+## Changes
 
-用 2 列大数字网格呈现：数值用 `15-16px font-semibold tracking-tight`，下方 `10px text-muted` 小标签。视觉上明显比下面的指标重。
+**File:** `src/components/modules/skills/SelectedCreatorList.tsx`
 
-**L3 — 表现指标（KPI row）**
-- 互动 `5.8%`
-- 完播 `69%`
-- 报价 `$3.7k`
+### 1. De-crowd the top-right corner
 
-3 列等宽小卡，`12px` 数值 + `10px` 标签，背景 `bg-muted/30 rounded-md`，让它们成一组。
+Today: `MoreHorizontal` is `absolute right-1.5 top-1.5`, sitting on top of the inline `ChevronDown` / `X` toggle that lives inside the expand button.
 
-**L4 — 画像标签（Meta）**
-- 领域：彩妆教程
-- 地区：AU
-- 画像：KOC · TikTok · 美国 · English
+Fix: keep only **one** affordance per zone.
 
-合并成一行 chip 流：`[彩妆教程] [AU] [KOC] [TikTok] [English]`，淡灰底圆角小标签，不再用 label/value 两列。
+- Remove the `ChevronDown` / `X` icon from the right side of the header row entirely. Expand/collapse stays triggered by clicking the avatar/name area (already the case).
+- Keep the three-dot `MoreHorizontal` as the single top-right icon, always reserving its slot (no overlap with text). It opens `CreatorDetailDialog` as today.
+- Add a small collapse affordance only when expanded: a thin "收起" text button at the bottom of the expanded block, or a chevron flipped inline next to the footer — not in the top-right.
 
-**L5 — 风格 & 账号（Footer）**
-- 风格：开箱、口播
-- 账号：@chloe.makeupbook
+This frees the top-right for just the three-dot and removes the visual collision.
 
-最弱化：`10px text-muted-foreground/70`，单行截断，紧贴底部。账号其实头部已有，可直接删除这一行。
+### 2. Stop truncating name + handle so early
 
-## 视觉示意
+Root causes:
+- Card is fixed `w-[220px]`.
+- Header row reserves space for: avatar (36px) + name + `海外·女` chip + toggle icon, leaving very little for the name.
+- Handle row also includes `· {followers} 粉丝`, forcing the handle to truncate.
 
-```text
-┌──────────────────────────────┐
-│ [img] Chloe Sim…  海外·女  × │
-│       @chloe.makeupbook      │
-├──────────────────────────────┤
-│   124.8K            14.6万   │   ← L2 hero
-│   粉丝              均播      │
-├──────────────────────────────┤
-│ ┌─────┐ ┌─────┐ ┌──────┐    │   ← L3 KPI
-│ │5.8% │ │ 69% │ │$3.7k │    │
-│ │互动 │ │完播 │ │报价  │    │
-│ └─────┘ └─────┘ └──────┘    │
-│                              │
-│ 彩妆教程·AU·KOC·TikTok·EN   │   ← L4 chips
-│                              │
-│ 开箱、口播                    │   ← L5 footer
-└──────────────────────────────┘
-```
+Fixes:
+- Widen the card to `w-[244px]` (still fits 2-up in the surrounding flex-wrap container).
+- Move the `海外·女` chip out of the name row — render it on a second meta line together with `{followers} 粉丝`, so the name has the full row width minus avatar + three-dot slot.
+- Drop `· {followers} 粉丝` from the handle line so the handle gets the full width.
+- Result: line 1 = full name, line 2 = `@handle`, line 3 (muted, smaller) = `海外·女 · 124.8K 粉丝`.
+- Keep `truncate` on name and handle as a safety net for extreme cases, but typical names like `Chloe Simmons` will now fit.
 
-## 改动点
-- `src/components/modules/skills/SelectedCreatorList.tsx`：展开区从单一 `DetailRow` 列表，改为三段式（Hero / KPI / Meta+Footer）。新增可选 props 让调用方传入分组数据，或在内部按字段语义分组渲染。
-- `src/components/modules/ai-toolbox/oran-med/OranMed.tsx`：调整 `extraDetails` 结构以匹配新分组（hero / kpi / meta / footer），不再扁平传 7 行。
-- skills 模块其他调用方（`SetupSummary.tsx`）保持向后兼容：未传分组数据时回退到旧的 `DetailRow` 列表。
+### 3. Minor polish
 
-## 范围外
-- 不改折叠态的卡片样式
-- 不改 CreatorDetailDialog
-- 不改数据源
+- Bump three-dot from `h-5 w-5` to `h-6 w-6` so it's an easier target and visually balanced with the new header.
+- Make three-dot always visible at low opacity (e.g. `opacity-60`) instead of `opacity-0` + hover-only, so users discover it without hovering. Keeps hover behavior to brighten on hover.
+
+## Out of scope
+
+- No changes to `CreatorDetailDialog` itself.
+- No changes to `CreatorSelectionDialog` cards (already handled in prior turn).
+- No changes to data shape or `structuredDetails` rendering inside the expanded block.
