@@ -4,7 +4,7 @@ import type {
   OranMedTask,
 } from '@/components/modules/ai-toolbox/oran-med/types';
 
-export const TASKS_KEY = 'oran-med:tasks:v2';
+export const TASKS_KEY = 'oran-med:tasks:v3';
 export const CREATORS_KEY = 'oran-med:creators:v1';
 export const CURRENT_CREATOR_KEY = 'oran-med:current-creator:v1';
 
