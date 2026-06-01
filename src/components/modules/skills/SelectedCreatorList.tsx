@@ -90,6 +90,9 @@ export function SelectedCreatorList({
                 <DetailRow label="粉丝" value={c.followers} />
                 <DetailRow label="均播" value={c.avgViews} />
                 <DetailRow label="账号" value={c.handle} />
+                {extraDetails?.[c.id]?.map((d) => (
+                  <DetailRow key={d.label} label={d.label} value={d.value} />
+                ))}
               </div>
             ) : null}
           </div>
