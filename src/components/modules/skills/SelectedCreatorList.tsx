@@ -185,6 +185,16 @@ export function SelectedCreatorList({
                 </div>
               )
             ) : null}
+
+            {expanded ? (
+              <button
+                type="button"
+                onClick={() => setExpandedId(null)}
+                className="mt-2 self-end text-[10px] text-muted-foreground/70 transition-colors hover:text-foreground"
+              >
+                收起
+              </button>
+            ) : null}
           </div>
         );
       })}
