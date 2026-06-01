@@ -186,6 +186,8 @@ export function useCreatorPortalState(initialCreatorId?: string) {
     setCurrentCreatorId,
     onboarding,
     patchOnboarding,
+    resetOnboarding,
+    resetToApproved,
     inboxTasks,
     getResponse,
     updateTaskResponse,
