@@ -102,6 +102,34 @@ export function useCreatorPortalState(initialCreatorId?: string) {
     [currentCreator],
   );
 
+  const resetOnboarding = useCallback(() => {
+    setOnboardings((prev) => {
+      const next = {
+        ...prev,
+        [currentCreator.id]: {
+          ...defaultOnboarding(currentCreator.id, currentCreator.name),
+          scanVerified: false,
+          contractSigned: false,
+          tiktokHandle: '',
+          onboardingStatus: 'draft' as const,
+        },
+      };
+      writeOnboardings(next);
+      return next;
+    });
+  }, [currentCreator]);
+
+  const resetToApproved = useCallback(() => {
+    setOnboardings((prev) => {
+      const next = {
+        ...prev,
+        [currentCreator.id]: defaultOnboarding(currentCreator.id, currentCreator.name),
+      };
+      writeOnboardings(next);
+      return next;
+    });
+  }, [currentCreator]);
+
   // Tasks where this creator was selected and brand has submitted (reviewing/approved)
   const inboxTasks = useMemo(
     () =>
