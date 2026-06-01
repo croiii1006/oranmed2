@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, ChevronDown, SlidersHorizontal, Users } from 'lucide-react';
+import { Check, ChevronDown, MoreHorizontal, SlidersHorizontal, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import type { CreatorGender, CreatorLibraryItem } from './creatorLibrary';
+import { CREATORS } from '@/components/modules/ai-toolbox/oran-med/data/creators';
+import { CreatorDetailDialog } from '@/components/modules/ai-toolbox/oran-med/components/CreatorDetailDialog';
 
 type TerritoryFilter = 'all' | 'cn' | 'overseas';
 type GenderFilter = 'all' | CreatorGender;
