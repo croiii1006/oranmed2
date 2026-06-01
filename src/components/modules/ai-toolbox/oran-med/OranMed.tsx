@@ -2100,22 +2100,36 @@ function JumpToOranGenCard({
             </div>
             <SelectedCreatorList
               creators={creatorLibraryItems.filter((it) => creatorIds.includes(it.id))}
-              extraDetails={Object.fromEntries(
+              structuredDetails={Object.fromEntries(
                 selectedCreators.map((c) => {
-                  const meta = [c.tier, c.platform, c.country, c.languages?.[0]].filter(Boolean).join(' · ');
+                  const pct1 = (v?: number) => (v == null ? '—' : `${(v * 100).toFixed(1)}%`);
+                  const pct0 = (v?: number) => (v == null ? '—' : `${(v * 100).toFixed(0)}%`);
                   const priceStr =
                     c.reportedVideoPrice != null
                       ? `${c.currency === 'CNY' ? '¥' : '$'}${(c.reportedVideoPrice / 1000).toFixed(1)}k`
                       : '—';
+                  const chips = [
+                    c.contentCategories?.[0],
+                    c.country,
+                    c.tier,
+                    c.platform,
+                    c.languages?.[0],
+                  ].filter((x): x is string => Boolean(x));
                   return [
                     c.id,
-                    [
-                      { label: '画像', value: meta || '—' },
-                      { label: '互动', value: c.engagementRate != null ? `${(c.engagementRate * 100).toFixed(1)}%` : '—' },
-                      { label: '完播', value: c.videoCompletionRate != null ? `${(c.videoCompletionRate * 100).toFixed(0)}%` : '—' },
-                      { label: '报价', value: priceStr },
-                      { label: '风格', value: c.contentStyleTags?.slice(0, 3).join('、') ?? '—' },
-                    ],
+                    {
+                      hero: [
+                        { label: '粉丝', value: c.followers },
+                        { label: '均播', value: c.avgPlay },
+                      ],
+                      kpi: [
+                        { label: '互动', value: pct1(c.engagementRate) },
+                        { label: '完播', value: pct0(c.videoCompletionRate) },
+                        { label: '报价', value: priceStr },
+                      ],
+                      chips,
+                      footer: c.contentStyleTags?.slice(0, 3).join('、'),
+                    },
                   ];
                 }),
               )}

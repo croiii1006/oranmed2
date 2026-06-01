@@ -9,13 +9,26 @@ export interface CreatorExtraDetail {
   value: string;
 }
 
+export interface CreatorStructuredDetails {
+  /** 2-column big metrics (e.g. 粉丝、均播) */
+  hero?: CreatorExtraDetail[];
+  /** Small KPI tiles (e.g. 互动、完播、报价) */
+  kpi?: CreatorExtraDetail[];
+  /** Inline chips (e.g. 领域、地区、画像) — values only, no labels */
+  chips?: string[];
+  /** Footer faint text (e.g. 风格) */
+  footer?: string;
+}
+
 interface SelectedCreatorListProps {
   creators: CreatorLibraryItem[];
   className?: string;
   candidateVideos?: CandidateVideo[];
   bindings?: Record<string, string>;
-  /** Optional extra rows shown in the expanded detail area, keyed by creator id */
+  /** Legacy flat detail rows, used as fallback when no structured data */
   extraDetails?: Record<string, CreatorExtraDetail[]>;
+  /** Structured details, grouped by visual importance */
+  structuredDetails?: Record<string, CreatorStructuredDetails>;
 }
 
 export function SelectedCreatorList({
@@ -24,6 +37,7 @@ export function SelectedCreatorList({
   candidateVideos = [],
   bindings = {},
   extraDetails,
+  structuredDetails,
 }: SelectedCreatorListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -38,6 +52,7 @@ export function SelectedCreatorList({
         const genderLabel = c.gender === 'female' ? '女' : '男';
         const boundVideoId = bindings[c.id];
         const boundVideo = boundVideoId ? candidateVideos.find((v) => v.id === boundVideoId) : null;
+        const sd = structuredDetails?.[c.id];
 
         return (
           <div
@@ -84,16 +99,78 @@ export function SelectedCreatorList({
             )}
 
             {expanded ? (
-              <div className="mt-2.5 space-y-1 border-t border-border/40 pt-2 text-[11px] text-foreground/80">
-                <DetailRow label="领域" value={c.niche} />
-                <DetailRow label="地区" value={c.region} />
-                <DetailRow label="粉丝" value={c.followers} />
-                <DetailRow label="均播" value={c.avgViews} />
-                <DetailRow label="账号" value={c.handle} />
-                {extraDetails?.[c.id]?.map((d) => (
-                  <DetailRow key={d.label} label={d.label} value={d.value} />
-                ))}
-              </div>
+              sd ? (
+                <div className="mt-2.5 space-y-2.5 border-t border-border/40 pt-2.5">
+                  {/* L2 Hero */}
+                  {sd.hero && sd.hero.length > 0 ? (
+                    <div
+                      className={cn(
+                        'grid gap-2',
+                        sd.hero.length === 1 ? 'grid-cols-1' : 'grid-cols-2',
+                      )}
+                    >
+                      {sd.hero.map((h) => (
+                        <div key={h.label} className="min-w-0">
+                          <div className="truncate text-[15px] font-semibold leading-none tracking-tight text-foreground">
+                            {h.value}
+                          </div>
+                          <div className="mt-1 text-[10px] text-muted-foreground/70">{h.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {/* L3 KPI tiles */}
+                  {sd.kpi && sd.kpi.length > 0 ? (
+                    <div
+                      className="grid gap-1"
+                      style={{ gridTemplateColumns: `repeat(${sd.kpi.length}, minmax(0, 1fr))` }}
+                    >
+                      {sd.kpi.map((k) => (
+                        <div
+                          key={k.label}
+                          className="min-w-0 rounded-md bg-muted/40 px-1.5 py-1 text-center"
+                        >
+                          <div className="truncate text-[11.5px] font-medium leading-none text-foreground/90">
+                            {k.value}
+                          </div>
+                          <div className="mt-0.5 text-[9px] text-muted-foreground/70">{k.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {/* L4 Chips */}
+                  {sd.chips && sd.chips.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {sd.chips.map((chip) => (
+                        <span
+                          key={chip}
+                          className="rounded-full bg-muted/60 px-1.5 py-px text-[9.5px] text-muted-foreground"
+                        >
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {/* L5 Footer */}
+                  {sd.footer ? (
+                    <div className="truncate text-[10px] text-muted-foreground/70">{sd.footer}</div>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="mt-2.5 space-y-1 border-t border-border/40 pt-2 text-[11px] text-foreground/80">
+                  <DetailRow label="领域" value={c.niche} />
+                  <DetailRow label="地区" value={c.region} />
+                  <DetailRow label="粉丝" value={c.followers} />
+                  <DetailRow label="均播" value={c.avgViews} />
+                  <DetailRow label="账号" value={c.handle} />
+                  {extraDetails?.[c.id]?.map((d) => (
+                    <DetailRow key={d.label} label={d.label} value={d.value} />
+                  ))}
+                </div>
+              )
             ) : null}
           </div>
         );
