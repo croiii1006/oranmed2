@@ -4,11 +4,18 @@ import { cn } from '@/lib/utils';
 import type { CreatorLibraryItem } from './creatorLibrary';
 import type { CandidateVideo } from './useSkillsEngine';
 
+export interface CreatorExtraDetail {
+  label: string;
+  value: string;
+}
+
 interface SelectedCreatorListProps {
   creators: CreatorLibraryItem[];
   className?: string;
   candidateVideos?: CandidateVideo[];
   bindings?: Record<string, string>;
+  /** Optional extra rows shown in the expanded detail area, keyed by creator id */
+  extraDetails?: Record<string, CreatorExtraDetail[]>;
 }
 
 export function SelectedCreatorList({
@@ -16,6 +23,7 @@ export function SelectedCreatorList({
   className,
   candidateVideos = [],
   bindings = {},
+  extraDetails,
 }: SelectedCreatorListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
