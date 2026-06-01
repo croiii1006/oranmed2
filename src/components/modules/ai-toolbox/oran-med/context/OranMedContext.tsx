@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { newDraftTask, type Brief, type ContentAsset, type OranMedTask, type PublishPlanItem, type TaskStatus } from '../types';
 import { MOCK_TASKS } from '../data/mockTasks';
 
-const STORAGE_KEY = 'oran-med:tasks:v2';
+const STORAGE_KEY = 'oran-med:tasks:v3';
 const CURRENT_KEY = 'oran-med:current:v2';
 
 interface OranMedContextValue {
