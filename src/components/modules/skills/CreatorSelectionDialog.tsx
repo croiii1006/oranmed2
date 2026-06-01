@@ -349,6 +349,11 @@ export function CreatorSelectionDialog({
           </Button>
         </div>
       </DialogContent>
+      <CreatorDetailDialog
+        creator={detailCreator}
+        open={Boolean(detailCreator)}
+        onOpenChange={(o) => { if (!o) setDetailId(null); }}
+      />
     </Dialog>
   );
 }
