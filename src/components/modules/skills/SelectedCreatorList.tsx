@@ -71,24 +71,37 @@ export function SelectedCreatorList({
                 : 'border-border/40 hover:border-foreground/15 hover:bg-muted/30',
             )}
           >
-            <button
-              type="button"
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => setExpandedId(expanded ? null : c.id)}
-              className="flex items-start gap-2 pr-7 text-left focus-visible:outline-none"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setExpandedId(expanded ? null : c.id);
+                }
+              }}
+              className="flex cursor-pointer items-start gap-2 pr-7 text-left focus-visible:outline-none"
             >
               <div className="h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-muted">
                 <img src={c.avatarUrl} alt={c.name} className="h-full w-full object-cover" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[12px] font-medium text-foreground">{c.name}</div>
-                <div className="mt-0.5 truncate text-[10px] text-muted-foreground/80">
+                <a
+                  href={`https://www.tiktok.com/${c.handle.startsWith('@') ? c.handle : '@' + c.handle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-0.5 block truncate text-[10px] text-muted-foreground/80 transition-colors hover:text-foreground hover:underline"
+                >
                   {c.handle}
-                </div>
+                </a>
                 <div className="mt-0.5 truncate text-[9.5px] text-muted-foreground/60">
                   {territory}·{genderLabel} · {c.followers} 粉丝
                 </div>
               </div>
-            </button>
+            </div>
 
             {/* Three-dot — open full creator detail dialog */}
             <button
