@@ -16,14 +16,24 @@ import type {
 } from '@/components/modules/ai-toolbox/oran-med/types';
 import { creatorLibraryItems } from '@/components/modules/skills/creatorLibrary';
 
-const defaultOnboarding = (creatorId: string, name: string): CreatorOnboarding => ({
-  creatorId,
-  name,
-  scanVerified: false,
-  contractSigned: false,
-  onboardingStatus: 'draft',
-  updatedAt: new Date().toISOString(),
-});
+// Demo: every creator starts as 已通过 so we can showcase the full publish flow
+const defaultOnboarding = (creatorId: string, name: string): CreatorOnboarding => {
+  const creator = creatorLibraryItems.find((c) => c.id === creatorId);
+  return {
+    creatorId,
+    name,
+    birth: '1998-06',
+    country: creator?.region === 'CN' ? '中国' : 'United States',
+    city: creator?.region === 'CN' ? '上海' : 'Los Angeles',
+    idNo: 'P' + creatorId.replace(/\D/g, '').padEnd(9, '0'),
+    idPhoto: 'passport_front.jpg',
+    scanVerified: true,
+    contractSigned: true,
+    tiktokHandle: creator?.handle ?? '@demo',
+    onboardingStatus: 'approved',
+    updatedAt: new Date().toISOString(),
+  };
+};
 
 export function useCreatorPortalState(initialCreatorId?: string) {
   const [tasks, setTasks] = useState<OranMedTask[]>(() => readTasks());
