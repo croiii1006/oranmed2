@@ -4150,36 +4150,6 @@ function TaskDetailDialog({
                     )}
                   </section>
 
-                  <section>
-                    <h4 className="mb-2 text-xs font-medium text-muted-foreground">
-                      发布计划 <span className="text-foreground">({task.plan.length})</span>
-                    </h4>
-                    {task.plan.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">尚未填写发布计划</p>
-                    ) : (
-                      <div className="space-y-1.5">
-                        {task.plan.map((p, i) => {
-                          const cr = CREATORS.find((c) => c.id === p.creatorId);
-                          return (
-                            <button
-                              key={i}
-                              onClick={() => setView({ kind: 'plan', index: i })}
-                              className="block w-full rounded-lg border border-border/40 px-3 py-2 text-left text-xs transition-colors hover:border-foreground/30 hover:bg-muted/30"
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-foreground">{cr?.name || p.creatorId}</span>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[10px] text-muted-foreground">{p.scheduledAt || '未排期'}</span>
-                                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                                </div>
-                              </div>
-                              {p.caption && <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">{p.caption}</p>}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </section>
                 </div>
               )}
 
