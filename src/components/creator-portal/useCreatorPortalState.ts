@@ -9,6 +9,7 @@ import {
   writeOnboardings,
   writeTasks,
 } from './storage';
+import { buildCreatorMockTasks } from './mockTasks';
 import type {
   CreatorOnboarding,
   CreatorResponse,
@@ -131,15 +132,16 @@ export function useCreatorPortalState(initialCreatorId?: string) {
   }, [currentCreator]);
 
   // Tasks where this creator was selected and brand has submitted (reviewing/approved)
-  const inboxTasks = useMemo(
-    () =>
-      tasks.filter(
-        (t) =>
-          t.selectedCreatorIds.includes(currentCreator.id) &&
-          (t.status === 'approved' || t.status === 'reviewing' || t.status === 'published'),
-      ),
-    [tasks, currentCreator],
-  );
+  // If brand-side has no tasks for this creator, inject demo mocks covering all stages.
+  const inboxTasks = useMemo(() => {
+    const real = tasks.filter(
+      (t) =>
+        t.selectedCreatorIds.includes(currentCreator.id) &&
+        (t.status === 'approved' || t.status === 'reviewing' || t.status === 'published'),
+    );
+    if (real.length > 0) return real;
+    return buildCreatorMockTasks(currentCreator.id);
+  }, [tasks, currentCreator]);
 
   const getResponse = useCallback(
     (task: OranMedTask): CreatorResponse => {
