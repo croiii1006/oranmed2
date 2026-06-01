@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { ChevronDown, X, Film } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronDown, X, Film, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CreatorLibraryItem } from './creatorLibrary';
 import type { CandidateVideo } from './useSkillsEngine';
+import { CREATORS } from '@/components/modules/ai-toolbox/oran-med/data/creators';
+import { CreatorDetailDialog } from '@/components/modules/ai-toolbox/oran-med/components/CreatorDetailDialog';
 
 export interface CreatorExtraDetail {
   label: string;
