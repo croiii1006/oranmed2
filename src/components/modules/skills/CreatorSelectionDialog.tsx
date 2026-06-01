@@ -221,7 +221,11 @@ export function CreatorSelectionDialog({
               <div className="grid grid-cols-1 gap-3 pb-4 sm:grid-cols-3">
                 {filteredItems.map((item) => {
                   const selected = selectedIds.includes(item.id);
-                  const genderLabel = item.gender === 'female' ? '女性' : '男性';
+                  const enriched = CREATORS.find((cc) => cc.id === item.id);
+                  const priceStr =
+                    enriched?.reportedVideoPrice != null
+                      ? `${enriched.currency === 'CNY' ? '¥' : '$'}${(enriched.reportedVideoPrice / 1000).toFixed(1)}k`
+                      : '报价待询';
 
                   return (
                     <button
@@ -229,7 +233,7 @@ export function CreatorSelectionDialog({
                       type="button"
                       onClick={() => onToggle(item.id)}
                       className={cn(
-                        'group relative flex min-h-[144px] w-full flex-col items-center overflow-hidden rounded-[18px] border bg-background px-3 py-4 text-center transition-all duration-200',
+                        'group relative flex min-h-[176px] w-full flex-col items-center overflow-hidden rounded-[18px] border bg-background px-3 py-4 text-center transition-all duration-200',
                         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20',
                         selected
                           ? 'border-foreground/35 bg-foreground/[0.03] '
@@ -237,10 +241,26 @@ export function CreatorSelectionDialog({
                       )}
                     >
                       {selected ? (
-                        <div className="absolute right-2.5 top-2.5 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
+                        <div className="absolute right-2.5 top-2.5 z-30 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background shadow-sm">
                           <Check className="h-3 w-3" strokeWidth={3} />
                         </div>
-                      ) : null}
+                      ) : (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => { e.stopPropagation(); setDetailId(item.id); }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.stopPropagation();
+                              setDetailId(item.id);
+                            }
+                          }}
+                          className="absolute right-2.5 top-2.5 z-30 flex h-6 w-6 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity duration-150 hover:text-foreground group-hover:opacity-100 group-focus-visible:opacity-100"
+                          aria-label="查看达人详情"
+                        >
+                          <MoreHorizontal className="h-3.5 w-3.5" />
+                        </span>
+                      )}
 
                       <div className="relative z-10 h-[58px] w-[58px] overflow-hidden rounded-full bg-muted transition-all duration-200 group-hover:scale-[1.04] group-hover:opacity-15 group-hover:blur-md group-focus-visible:scale-[1.04] group-focus-visible:opacity-15 group-focus-visible:blur-md">
                         <img src={item.avatarUrl} alt={item.name} className="h-full w-full object-cover" />
@@ -255,23 +275,41 @@ export function CreatorSelectionDialog({
                         </div>
                       </div>
 
-                      <div className="pointer-events-none absolute inset-0 z-10 rounded-[18px] bg-white/78 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                        <div className="flex h-full flex-col justify-between">
-                          <div className="space-y-1">
-                            <div className="text-[10px] font-medium tracking-[0.08em] text-foreground/45">
-                              CREATOR INFO
-                            </div>
-                            <div className="text-[13px] font-semibold text-foreground">{item.followers} 粉丝</div>
-                            <div className="text-[11px] text-muted-foreground">均播 {item.avgViews}</div>
+                      {/* Always-on mini metrics — matches OranMed default row */}
+                      <div className="relative z-10 mt-3 flex items-center gap-1.5 text-[10.5px] font-light leading-tight text-muted-foreground/80 transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0">
+                        <span className="text-foreground/75">{item.followers} <span className="text-muted-foreground/70">粉丝</span></span>
+                        <span className="text-foreground/20">·</span>
+                        <span className="text-foreground/75">{priceStr}</span>
+                      </div>
+
+                      {/* Hover overlay — mirrors OranMed creator card */}
+                      <div className="pointer-events-none absolute inset-0 z-10 rounded-[18px] bg-white/85 p-3 text-left opacity-0 shadow-[0_16px_32px_rgba(255,255,255,0.28)] backdrop-blur-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                        <div className="flex h-full flex-col gap-2.5">
+                          <div className="flex items-center gap-1 truncate text-[10.5px] font-medium tracking-[0.04em] text-foreground/55">
+                            {enriched?.tier ? <span>{enriched.tier}</span> : null}
+                            {enriched?.platform ? (<><span className="text-foreground/30">·</span><span>{enriched.platform}</span></>) : null}
+                            {enriched?.country ? (<><span className="text-foreground/30">·</span><span>{enriched.country}</span></>) : null}
+                            {enriched?.languages?.[0] ? (<><span className="text-foreground/30">·</span><span className="truncate">{enriched.languages[0]}</span></>) : null}
                           </div>
 
-                          <div className="space-y-1.5">
-                            <div className="flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
-                              <span className="rounded-full bg-background/80 px-2 py-0.5">{item.region}</span>
-                              <span className="rounded-full bg-background/80 px-2 py-0.5">{genderLabel}</span>
-                            </div>
-                            <div className="truncate text-[11px] text-foreground/75">{item.niche}</div>
+                          <div className="-mt-0.5 text-[15px] font-semibold leading-none tracking-[-0.01em] text-foreground">
+                            {item.followers} <span className="text-[11px] font-normal text-muted-foreground">粉丝</span>
                           </div>
+
+                          <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+                            <span>均播 <span className="text-foreground/85">{item.avgViews}</span></span>
+                            <span>互动 <span className="text-foreground/85">{enriched?.engagementRate != null ? `${(enriched.engagementRate * 100).toFixed(1)}%` : '—'}</span></span>
+                            <span>完播 <span className="text-foreground/85">{enriched?.videoCompletionRate != null ? `${(enriched.videoCompletionRate * 100).toFixed(0)}%` : '—'}</span></span>
+                            <span className="truncate">报价 <span className="text-foreground/85">{priceStr}</span></span>
+                          </div>
+
+                          {(enriched?.contentStyleTags?.length ?? 0) > 0 ? (
+                            <div className="mt-auto flex flex-wrap gap-1 text-[10px] text-muted-foreground">
+                              {enriched!.contentStyleTags!.slice(0, 3).map((t) => (
+                                <span key={t} className="rounded-full bg-muted/60 px-1.5 py-0.5">{t}</span>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     </button>
