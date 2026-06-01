@@ -65,7 +65,7 @@ export function SelectedCreatorList({
           <div
             key={c.id}
             className={cn(
-              'group relative flex w-[220px] flex-col rounded-xl border bg-background/80 px-2.5 py-2 text-left align-top transition-all',
+              'group relative flex w-[244px] flex-col rounded-xl border bg-background/80 px-2.5 py-2 text-left align-top transition-all',
               expanded
                 ? 'border-foreground/25 bg-foreground/[0.02] shadow-sm'
                 : 'border-border/40 hover:border-foreground/15 hover:bg-muted/30',
@@ -74,27 +74,20 @@ export function SelectedCreatorList({
             <button
               type="button"
               onClick={() => setExpandedId(expanded ? null : c.id)}
-              className="flex items-center gap-2 text-left focus-visible:outline-none"
+              className="flex items-start gap-2 pr-7 text-left focus-visible:outline-none"
             >
               <div className="h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-muted">
                 <img src={c.avatarUrl} alt={c.name} className="h-full w-full object-cover" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="truncate text-[12px] font-medium text-foreground">{c.name}</span>
-                  <span className="shrink-0 whitespace-nowrap rounded-full bg-muted/60 px-1.5 py-px text-[9px] text-muted-foreground">
-                    {territory}·{genderLabel}
-                  </span>
-                </div>
+                <div className="truncate text-[12px] font-medium text-foreground">{c.name}</div>
                 <div className="mt-0.5 truncate text-[10px] text-muted-foreground/80">
-                  {c.handle} · {c.followers} 粉丝
+                  {c.handle}
+                </div>
+                <div className="mt-0.5 truncate text-[9.5px] text-muted-foreground/60">
+                  {territory}·{genderLabel} · {c.followers} 粉丝
                 </div>
               </div>
-              {expanded ? (
-                <X className="h-3 w-3 shrink-0 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground/60 transition-transform group-hover:text-muted-foreground" />
-              )}
             </button>
 
             {/* Three-dot — open full creator detail dialog */}
@@ -104,10 +97,10 @@ export function SelectedCreatorList({
                 e.stopPropagation();
                 setDetailId(c.id);
               }}
-              className="absolute right-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-0 shadow-sm backdrop-blur transition-opacity hover:text-foreground group-hover:opacity-100 focus-visible:opacity-100"
+              className="absolute right-1.5 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-background/80 text-muted-foreground opacity-60 shadow-sm backdrop-blur transition-opacity hover:text-foreground hover:opacity-100 focus-visible:opacity-100"
               aria-label="查看达人详情"
             >
-              <MoreHorizontal className="h-3 w-3" />
+              <MoreHorizontal className="h-3.5 w-3.5" />
             </button>
 
             {/* Bound video chip */}
