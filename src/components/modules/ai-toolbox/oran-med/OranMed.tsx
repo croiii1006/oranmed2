@@ -3761,7 +3761,7 @@ function WorkbenchView({ onBack, onOpenWorkflow }: { onBack: () => void; onOpenW
             t.brief.styleRequirements?.trim() ||
             t.brief.audience?.trim() ||
             t.brief.brandTags?.trim() ||
-            '尚未填写 Brief 描述，点击进入任务补充推广目标与卖点。';
+            '点击填写其他任务信息（目标、人群、风格等均为选填）。';
           return (
             <button
               key={t.id}
