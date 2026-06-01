@@ -28,7 +28,7 @@ export default function CreatorPortal() {
   const canAct = onboarding.onboardingStatus === 'approved';
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="h-screen overflow-y-auto bg-muted/30">
       <CreatorPortalShell
         creators={creators}
         currentCreator={currentCreator}
