@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { ShieldCheck, FileSignature, Send, ChevronDown, RotateCcw } from 'lucide-react';
+import { ShieldCheck, FileSignature, Send, RotateCcw } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,22 +30,23 @@ interface Props {
 }
 
 export function CreatorProfileCard({ creator, onboarding, onReset }: Props) {
-  const [open, setOpen] = useState(false);
   const steps = [
     { icon: ShieldCheck, label: '扫脸认证', done: onboarding.scanVerified },
     { icon: FileSignature, label: '合同签署', done: onboarding.contractSigned },
     {
       icon: Send,
       label: '入驻提交',
-      done: onboarding.onboardingStatus === 'approved' || onboarding.onboardingStatus === 'submitted',
+      done:
+        onboarding.onboardingStatus === 'approved' ||
+        onboarding.onboardingStatus === 'submitted',
     },
   ];
 
   return (
     <div className="relative overflow-hidden rounded-[24px] border border-white/40 bg-muted/30 p-5 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl">
-      {/* Decorative accent */}
       <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-accent/20 to-transparent blur-2xl" />
 
+      {/* Profile head */}
       <div className="relative flex items-start gap-3">
         <Avatar className="h-14 w-14 ring-2 ring-white/60">
           <AvatarImage src={creator.avatarUrl} alt={creator.name} />
@@ -57,22 +57,26 @@ export function CreatorProfileCard({ creator, onboarding, onReset }: Props) {
             <div className="truncate text-sm font-medium text-foreground">{creator.name}</div>
             <Badge
               variant="secondary"
-              className={cn('shrink-0 border-0 text-[10px]', STATUS_TONE[onboarding.onboardingStatus])}
+              className={cn(
+                'shrink-0 border-0 text-[10px]',
+                STATUS_TONE[onboarding.onboardingStatus],
+              )}
             >
               {STATUS_LABEL[onboarding.onboardingStatus]}
             </Badge>
           </div>
           <div className="mt-0.5 truncate text-[11px] text-muted-foreground">{creator.handle}</div>
-          <div className="mt-1.5 flex items-center gap-2 text-[10px] text-muted-foreground">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-muted-foreground">
             <span>{creator.region}</span>
             <span className="text-border">·</span>
             <span>{creator.niche}</span>
             <span className="text-border">·</span>
-            <span>{creator.followers} 粉丝</span>
+            <span>{creator.followers}</span>
           </div>
         </div>
       </div>
 
+      {/* Onboarding steps */}
       <div className="mt-4 grid grid-cols-3 gap-1.5">
         {steps.map((s) => (
           <div
@@ -90,17 +94,21 @@ export function CreatorProfileCard({ creator, onboarding, onReset }: Props) {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="mt-3 flex w-full items-center justify-between rounded-md px-1 py-1 text-[11px] text-muted-foreground hover:text-foreground"
-      >
-        <span>认证资料</span>
-        <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
-      </button>
-
-      {open && (
-        <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1.5 rounded-md border border-border/60 bg-card/80 p-3 text-[11px]">
+      {/* Identity info — always visible */}
+      <div className="mt-4 rounded-xl border border-border/60 bg-card/80 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-[11px] font-medium text-foreground">认证资料</span>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
+            onClick={onReset}
+          >
+            <RotateCcw className="mr-1 h-3 w-3" />
+            重置
+          </Button>
+        </div>
+        <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px]">
           <Row label="姓名" value={onboarding.name} />
           <Row label="出生年月" value={onboarding.birth} />
           <Row label="国家" value={onboarding.country} />
@@ -109,18 +117,6 @@ export function CreatorProfileCard({ creator, onboarding, onReset }: Props) {
           <Row label="证件照" value={onboarding.idPhoto} />
           <Row label="TikTok" value={onboarding.tiktokHandle} full />
         </dl>
-      )}
-
-      <div className="mt-3 flex justify-end">
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-7 px-2 text-[10px] text-muted-foreground hover:text-foreground"
-          onClick={onReset}
-        >
-          <RotateCcw className="mr-1 h-3 w-3" />
-          重置演示
-        </Button>
       </div>
     </div>
   );
@@ -128,8 +124,8 @@ export function CreatorProfileCard({ creator, onboarding, onReset }: Props) {
 
 function Row({ label, value, full }: { label: string; value?: string; full?: boolean }) {
   return (
-    <div className={cn('flex flex-col', full && 'col-span-2')}>
-      <dt className="text-muted-foreground/70">{label}</dt>
+    <div className={cn('flex flex-col gap-0.5', full && 'col-span-2')}>
+      <dt className="text-[10px] uppercase tracking-wider text-muted-foreground/70">{label}</dt>
       <dd className="truncate text-foreground">{value || '—'}</dd>
     </div>
   );
