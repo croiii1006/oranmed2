@@ -42,6 +42,11 @@ export function SelectedCreatorList({
   structuredDetails,
 }: SelectedCreatorListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detailCreator = useMemo(
+    () => (detailId ? CREATORS.find((c) => c.id === detailId) ?? null : null),
+    [detailId],
+  );
 
   if (creators.length === 0) return null;
 
