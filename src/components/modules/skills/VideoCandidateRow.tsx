@@ -159,16 +159,16 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
           className={cn(
             'sticky top-0 z-10 flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 backdrop-blur transition-colors',
             allCreatorsBound
-              ? 'border-primary/40 bg-primary/10 shadow-sm'
+              ? 'border-[hsl(20_95%_55%)]/40 bg-[hsl(20_95%_55%)]/10 shadow-sm'
               : 'border-border/40 bg-background/95 shadow-sm',
           )}
         >
           <span className={cn('text-xs flex items-center gap-1.5', allCreatorsBound ? 'text-foreground font-medium' : 'text-muted-foreground')}>
             {allCreatorsBound ? (
               <>
-                <Check className="w-3.5 h-3.5 text-primary" />
+                <Check className="w-3.5 h-3.5 text-[hsl(20_95%_55%)]" />
                 全部绑定完成，点击右侧进入下一步
-                <ArrowRight className="w-3.5 h-3.5 text-primary animate-pulse" />
+                <ArrowRight className="w-3.5 h-3.5 text-[hsl(20_95%_55%)] animate-pulse" />
               </>
             ) : (
               <>
@@ -183,7 +183,7 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
             className={cn(
               'inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-all',
               allCreatorsBound
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_0_3px_hsl(var(--primary)/0.18)] hover:shadow-[0_0_0_4px_hsl(var(--primary)/0.25)]'
+                ? 'bg-[hsl(20_95%_55%)] text-white hover:bg-[hsl(20_95%_50%)] shadow-[0_0_0_3px_hsl(20_95%_55%/0.22)] hover:shadow-[0_0_0_4px_hsl(20_95%_55%/0.3)]'
                 : 'bg-muted text-muted-foreground/60 cursor-not-allowed',
             )}
           >
