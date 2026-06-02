@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, ChevronRight, Copy, Check, FileText, Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -146,6 +146,12 @@ const agentTabs: {id: AgentTab;label: string;avatar: string;name: string;}[] = [
 
 export function RightWorkspace(props: RightWorkspaceProps) {
   const { view, onClose, activeAgentTab = '01', onAgentTabChange } = props;
+
+  useEffect(() => {
+    if (view === 'agents' && activeAgentTab === '02' && !props.memoryEnabled) {
+      onAgentTabChange?.('03');
+    }
+  }, [view, activeAgentTab, props.memoryEnabled, onAgentTabChange]);
 
   if (view === 'none') return null;
 
@@ -348,7 +354,13 @@ export function RightWorkspace(props: RightWorkspaceProps) {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => onAgentTabChange?.(tab.id)}
+                  onClick={() => {
+                    if (tab.id === '02' && !props.memoryEnabled) {
+                      onAgentTabChange?.('03');
+                      return;
+                    }
+                    onAgentTabChange?.(tab.id);
+                  }}
                   className={cn("flex flex-col items-center gap-1 px-4 text-xs transition-all border-foreground/80 border border-solid py-[2px]",
                   isActive ?
                   'bg-background text-foreground font-medium shadow-[3px_3px_0px_0px_hsl(var(--foreground)/0.8)] translate-x-[-1px] translate-y-[-1px]' :
