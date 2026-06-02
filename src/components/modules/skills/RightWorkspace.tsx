@@ -147,6 +147,12 @@ const agentTabs: {id: AgentTab;label: string;avatar: string;name: string;}[] = [
 export function RightWorkspace(props: RightWorkspaceProps) {
   const { view, onClose, activeAgentTab = '01', onAgentTabChange } = props;
 
+  useEffect(() => {
+    if (view === 'agents' && activeAgentTab === '02' && !props.memoryEnabled) {
+      onAgentTabChange?.('03');
+    }
+  }, [view, activeAgentTab, props.memoryEnabled, onAgentTabChange]);
+
   if (view === 'none') return null;
 
   const renderAgentContent = () => {
