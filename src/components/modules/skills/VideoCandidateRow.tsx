@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink, Copy, Volume2, VolumeX, Eye, Heart, ShoppingCart, TrendingUp, X, CalendarDays, Sparkles, ChevronDown, Check, Users } from 'lucide-react';
+import { ExternalLink, Copy, Volume2, VolumeX, Eye, Heart, ShoppingCart, TrendingUp, X, CalendarDays, Sparkles, ChevronDown, Check, Users, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -155,22 +155,40 @@ export function VideoCandidateRow({ videos, onSelect, onPreview, selectedVideoId
   return (
     <div className="space-y-3">
       {showConfirmBar && (
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-background/95 px-3 py-2 shadow-sm backdrop-blur">
-          <span className="text-xs text-muted-foreground">
-            已为 <span className="font-medium text-foreground">{boundCreatorCount}/{creators.length}</span> 位达人绑定视频
+        <div
+          className={cn(
+            'sticky top-0 z-10 flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 backdrop-blur transition-colors',
+            allCreatorsBound
+              ? 'border-primary/40 bg-primary/10 shadow-sm'
+              : 'border-border/40 bg-background/95 shadow-sm',
+          )}
+        >
+          <span className={cn('text-xs flex items-center gap-1.5', allCreatorsBound ? 'text-foreground font-medium' : 'text-muted-foreground')}>
+            {allCreatorsBound ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-primary" />
+                全部绑定完成，点击右侧进入下一步
+                <ArrowRight className="w-3.5 h-3.5 text-primary animate-pulse" />
+              </>
+            ) : (
+              <>
+                已为 <span className="font-medium text-foreground">{boundCreatorCount}/{creators.length}</span> 位达人绑定视频
+              </>
+            )}
           </span>
           <button
             type="button"
             onClick={onConfirmBindings}
             disabled={!allCreatorsBound}
             className={cn(
-              'inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
+              'inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-all',
               allCreatorsBound
-                ? 'bg-foreground text-background hover:bg-foreground/90'
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_0_3px_hsl(var(--primary)/0.18)] hover:shadow-[0_0_0_4px_hsl(var(--primary)/0.25)]'
                 : 'bg-muted text-muted-foreground/60 cursor-not-allowed',
             )}
           >
-            <Check className="w-3 h-3" /> 确认进入下一步
+            确认进入下一步
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}

@@ -1,32 +1,30 @@
-## 目标
+## 问题
+当前"确认进入下一步"按钮位于 `VideoCandidateRow.tsx` 顶部的 sticky 条里，尺寸小（`text-[11px]`、`px-3 py-1`、胶囊形）、颜色低调（黑底），又紧贴细文案，所以即便绑定完成也容易被忽略。
 
-在品牌端「任务详情」弹窗里，点击达人列表行进入达人子页面（`view.kind === 'creator'`）时，呈现的信息要与「手动选择达人」时弹出的 `CreatorDetailDialog` 完全一致（基础身份 / 表现指标 / 内容画像 / 商务 & 合规等多分组卡片），而不是当前只展示层级、粉丝、平均播放、标签、推荐理由的极简 6 行布局。
+## 推荐方案（可叠加）
 
-## 改动范围
+**1. 放大并强化按钮本身**
+- 尺寸：`px-4 py-2`、字号升到 `text-sm`、圆角改为 `rounded-md`
+- 颜色：使用主色（`bg-primary text-primary-foreground`）替代黑底，避免和左侧文字色块"撞色"
+- 完成时加一个柔和呼吸动画 / 轻微脉冲阴影（`shadow-[0_0_0_3px_hsl(var(--primary)/0.15)]` + `animate-pulse` 缓速版），把视线吸过来
 
-只改前端展示，不改数据、状态机、任务/达人 ID 映射。
+**2. 改变 sticky 条的视觉权重**
+- 全部绑定完成后，整条背景从 `bg-background/95` 切到淡主色背景（`bg-primary/8`）+ 主色描边，让"可以下一步了"这件事在状态层面就被感知到
+- 未完成时保持中性灰，完成时才"亮起来"
 
-### 1. 抽出可复用的「达人详情内容块」
+**3. 增加引导文案与图示**
+- 完成时左侧文案从"已为 2/2 位达人绑定视频"改为"全部绑定完成，点击进入下一步 →"，并加一个向右的箭头指向按钮
+- 按钮文案内的 `Check` 图标在完成时替换为 `ArrowRight`，强化"前进"语义
 
-将 `src/components/modules/ai-toolbox/oran-med/components/CreatorDetailDialog.tsx` 中 Dialog body 内的视觉内容（头像头部 + Section / Row 分组：基础身份、表现指标、内容画像、声音、商务 & 合规、推荐理由、数据更新时间）抽到一个新组件：
+**4. 位置/形态备选**
+- 方案 A：保持顶部 sticky 条，但按上面 1-3 强化
+- 方案 B：再加一个**底部浮动确认条**（完成时从下方滑入），覆盖更广的视觉范围，适合长列表往下滚时也能看到
 
-```text
-src/components/modules/ai-toolbox/oran-med/components/CreatorDetailContent.tsx
-```
+## 建议先实施
+默认采用 **方案 1 + 2 + 3**（顶部条强化 + 完成态亮起 + 文案/箭头引导），改动小、风险低、效果立竿见影。如果你觉得列表很长仍然容易错过，再叠加方案 4B 的底部浮动条。
 
-- 接收 `creator: Creator` 与 `showMatch?: boolean`。
-- 不包含 `Dialog` / `DialogHeader` 外壳，纯内容，方便在任务详情子页中内嵌。
-- `CreatorDetailDialog.tsx` 改为内部直接渲染 `<CreatorDetailContent />`，外部 API 不变，所有现有调用方（OranMed.tsx、CreatorSelectionDialog、SelectedCreatorList）零修改。
+## 技术改动点
+- 仅修改 `src/components/modules/skills/VideoCandidateRow.tsx` 中 `showConfirmBar` 区块（156–176 行）
+- 使用现有设计 token（`--primary`、`--primary-foreground`），不引入新颜色
 
-### 2. 任务详情中达人子页面替换为完整卡片
-
-文件：`src/components/modules/ai-toolbox/oran-med/OranMed.tsx`，约 4185–4210 行（`{view.kind === 'creator' && activeCreator && (...)}` 分支）。
-
-- 移除当前的简化 header + 2 列 DetailRow 网格。
-- 改为渲染 `<CreatorDetailContent creator={activeCreator} showMatch />`，与手动选择达人时的弹窗内容完全一致。
-- 顶部「返回任务详情」面包屑、Dialog 标题（达人姓名）、状态徽章保持不变。
-
-## 验收
-
-- 任务详情中点击任一达人 → 子页内容与「手动选择达人」点开的卡片视觉一致：含国家/语言/粉丝/活跃占比/近30天增长、平均播放/互动率/完播率/平均点赞评论分享、内容品类/风格/声音、报价/可议价/报价有效期、肖像授权状态、账号状态、数据更新时间、推荐理由。
-- 手动选择达人弹窗与达人库列表中的 `CreatorDetailDialog` 仍然正常工作（因为只是把内部 body 抽成子组件复用）。
+请确认采用哪个组合，我再进入构建。
