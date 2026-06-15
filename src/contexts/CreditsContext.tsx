@@ -87,8 +87,13 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
     addRecord(label, amount, '已退还');
   }, [addRecord]);
 
+  const addGift = useCallback((amount: number, label: string = '赠送积分') => {
+    setGiftCredits(prev => prev + amount);
+    addRecord(label, amount, '已获取');
+  }, [addRecord]);
+
   return (
-    <CreditsContext.Provider value={{ credits, subscriptionCredits, topupCredits, giftCredits, usageHistory, deduct, refund, canAfford, shortfall }}>
+    <CreditsContext.Provider value={{ credits, subscriptionCredits, topupCredits, giftCredits, usageHistory, deduct, refund, addGift, canAfford, shortfall }}>
       {children}
     </CreditsContext.Provider>
   );
