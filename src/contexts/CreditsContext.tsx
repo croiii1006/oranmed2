@@ -17,6 +17,7 @@ interface CreditsContextValue {
   usageHistory: UsageRecord[];
   deduct: (amount: number, label?: string) => boolean;
   refund: (amount: number, label?: string) => void;
+  addGift: (amount: number, label?: string) => void;
   canAfford: (amount: number) => boolean;
   shortfall: (amount: number) => number;
 }
