@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Check, X, Sparkles, Gift, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvite } from '@/contexts/InviteContext';
+import { useCredits } from '@/contexts/CreditsContext';
 import logoDark from '@/assets/logo_dark.svg';
 import { DEFAULT_PATH } from '@/navigation';
 
