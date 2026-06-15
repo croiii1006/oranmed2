@@ -1,4 +1,5 @@
-import { Globe, Database, Zap, LogOut } from 'lucide-react';
+import { Globe, Database, Zap, LogOut, Gift } from 'lucide-react';
+import { InviteDialog } from '@/components/invite/InviteDialog';
 import logoDark from '@/assets/logo_dark.svg';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
