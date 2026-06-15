@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Check, X, Sparkles, Gift, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvite } from '@/contexts/InviteContext';
+import { useCredits } from '@/contexts/CreditsContext';
 import logoDark from '@/assets/logo_dark.svg';
 import { DEFAULT_PATH } from '@/navigation';
 
@@ -16,6 +17,7 @@ export default function RegisterDemo() {
   const [searchParams] = useSearchParams();
   const urlCode = searchParams.get('invite_code') ?? '';
   const { inviteeReward, defaultNewUserCredits, validateCode } = useInvite();
+  const { addGift } = useCredits();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,8 +39,10 @@ export default function RegisterDemo() {
       return;
     }
     if (status === 'valid') {
+      addGift(inviteeReward, `新用户注册赠送 · 邀请码 ${code}`);
       toast.success(`注册成功！你获得 ${inviteeReward} 积分（含 ${defaultNewUserCredits} 新用户积分 + ${inviteeReward - defaultNewUserCredits} 邀请奖励积分）`);
     } else {
+      addGift(defaultNewUserCredits, '新用户注册赠送');
       toast.success(`注册成功！你获得 ${defaultNewUserCredits} 默认新用户积分`);
     }
     setTimeout(() => navigate(DEFAULT_PATH), 1200);
