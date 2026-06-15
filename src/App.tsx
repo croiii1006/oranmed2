@@ -8,8 +8,10 @@ import { ReplicatePrefillProvider } from "@/contexts/ReplicatePrefillContext";
 import { OranGenPrefillProvider } from "@/contexts/OranGenPrefillContext";
 import { OranSimulationPrefillProvider } from "@/contexts/OranSimulationPrefillContext";
 import { CreditsProvider } from "@/contexts/CreditsContext";
+import { InviteProvider } from "@/contexts/InviteContext";
 import Index from "./pages/Index";
 import CreatorPortal from "./pages/CreatorPortal";
+import RegisterDemo from "./pages/RegisterDemo";
 import NotFound from "./pages/NotFound";
 import { DEFAULT_PATH, getDefaultPathForModule, getPathForModuleItem, isKnownModule } from "@/navigation";
 
