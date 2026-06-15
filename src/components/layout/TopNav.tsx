@@ -41,7 +41,7 @@ export function TopNav() {
         <Button
             variant="ghost"
             size="sm"
-            className="text-[hsl(20_95%_55%)] hover:text-[hsl(20_95%_50%)] hover:bg-[hsl(20_95%_55%)]/10 flex items-center gap-1.5 border border-[hsl(20_95%_55%)]/40 rounded-lg"
+            className="text-muted-foreground hover:text-foreground hover:bg-foreground/10 flex items-center gap-1.5"
             onClick={() => setInviteOpen(true)}>
           <Gift className="w-4 h-4" />
           <span className="text-xs font-medium">邀请好友</span>
