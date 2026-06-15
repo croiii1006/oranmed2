@@ -34,19 +34,48 @@ export default function RegisterDemo() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
+
+    // 1) 基础字段校验：失败 → 不写入积分
     if (!email || !password) {
-      toast.error('请填写邮箱和密码');
+      toast.error('注册失败：请填写邮箱和密码', { description: '本次未发放任何积分。' });
       return;
     }
-    if (status === 'valid') {
-      addGift(inviteeReward, `新用户注册赠送 · 邀请码 ${code}`);
-      toast.success(`注册成功！你获得 ${inviteeReward} 积分（含 ${defaultNewUserCredits} 新用户积分 + ${inviteeReward - defaultNewUserCredits} 邀请奖励积分）`);
-    } else {
-      addGift(defaultNewUserCredits, '新用户注册赠送');
-      toast.success(`注册成功！你获得 ${defaultNewUserCredits} 默认新用户积分`);
+
+    // 2) 邀请码校验：填写但无效 → 不写入积分（即不发放默认新用户积分）
+    if (code && status === 'invalid') {
+      toast.error('注册失败：邀请码无效', {
+        description: '请清空邀请码或修正后重试，本次未发放任何积分。',
+      });
+      return;
     }
-    setTimeout(() => navigate(DEFAULT_PATH), 1200);
+
+    // 3) 提交后再写入积分（validate-then-commit），任何异常则回滚
+    let creditedAmount = 0;
+    let creditedLabel = '';
+    try {
+      if (status === 'valid') {
+        creditedAmount = inviteeReward;
+        creditedLabel = `新用户注册赠送 · 邀请码 ${code}`;
+        addGift(creditedAmount, creditedLabel);
+        toast.success(`注册成功！你获得 ${inviteeReward} 积分`, {
+          description: `含 ${defaultNewUserCredits} 新用户积分 + ${inviteeReward - defaultNewUserCredits} 邀请奖励积分`,
+        });
+      } else {
+        creditedAmount = defaultNewUserCredits;
+        creditedLabel = '新用户注册赠送';
+        addGift(creditedAmount, creditedLabel);
+        toast.success(`注册成功！你获得 ${defaultNewUserCredits} 默认新用户积分`);
+      }
+      setTimeout(() => navigate(DEFAULT_PATH), 1200);
+    } catch (err) {
+      // 回滚：发生异常时扣回刚发放的积分
+      if (creditedAmount > 0) {
+        addGift(-creditedAmount, `回滚 · ${creditedLabel}`);
+      }
+      toast.error('注册失败：系统异常', { description: '已回滚本次积分发放，请稍后重试。' });
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
