@@ -1,4 +1,5 @@
-import { Globe, Database, Zap, LogOut } from 'lucide-react';
+import { Globe, Database, Zap, LogOut, Gift } from 'lucide-react';
+import { InviteDialog } from '@/components/invite/InviteDialog';
 import logoDark from '@/assets/logo_dark.svg';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ export function TopNav() {
   const { t, i18n } = useTranslation();
   const { drawerOpen, setDrawerOpen } = useMemory();
   const [accountOpen, setAccountOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const { credits, subscriptionCredits, topupCredits, giftCredits } = useCredits();
 
   const toggleLanguage = () => {
@@ -35,6 +37,16 @@ export function TopNav() {
 
       {/* Right: User Actions */}
       <div className="flex items-center gap-2">
+        {/* Invite Friends */}
+        <Button
+            variant="ghost"
+            size="sm"
+            className="text-[hsl(20_95%_55%)] hover:text-[hsl(20_95%_50%)] hover:bg-[hsl(20_95%_55%)]/10 flex items-center gap-1.5 border border-[hsl(20_95%_55%)]/40 rounded-lg"
+            onClick={() => setInviteOpen(true)}>
+          <Gift className="w-4 h-4" />
+          <span className="text-xs font-medium">邀请好友</span>
+        </Button>
+
         {/* Memory Library */}
         <Button
             variant="ghost"
@@ -154,6 +166,7 @@ export function TopNav() {
     </header>
     <MemoryLibraryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
     <AccountDialog open={accountOpen} onOpenChange={setAccountOpen} />
+    <InviteDialog open={inviteOpen} onOpenChange={setInviteOpen} />
     </>);
 
 }
