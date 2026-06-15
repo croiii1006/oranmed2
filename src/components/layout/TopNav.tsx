@@ -18,6 +18,7 @@ export function TopNav() {
   const { t, i18n } = useTranslation();
   const { drawerOpen, setDrawerOpen } = useMemory();
   const [accountOpen, setAccountOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const { credits, subscriptionCredits, topupCredits, giftCredits } = useCredits();
 
   const toggleLanguage = () => {
