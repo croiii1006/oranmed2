@@ -166,6 +166,7 @@ export function TopNav() {
     </header>
     <MemoryLibraryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
     <AccountDialog open={accountOpen} onOpenChange={setAccountOpen} />
+    <InviteDialog open={inviteOpen} onOpenChange={setInviteOpen} />
     </>);
 
 }
