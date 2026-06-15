@@ -17,6 +17,7 @@ export default function RegisterDemo() {
   const [searchParams] = useSearchParams();
   const urlCode = searchParams.get('invite_code') ?? '';
   const { inviteeReward, defaultNewUserCredits, validateCode } = useInvite();
+  const { addGift } = useCredits();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
