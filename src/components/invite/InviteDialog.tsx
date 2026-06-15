@@ -73,11 +73,11 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl font-medium">
+          <DialogTitle className="flex items-center gap-2 text-xl font-medium text-foreground/70">
             <Gift className="w-5 h-5 text-[hsl(20_95%_55%)]" />
             邀请好友 · 双方得积分
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-muted-foreground">
             把你的专属邀请码或链接分享给好友，好友注册成功你和好友都能拿积分。
           </DialogDescription>
         </DialogHeader>
@@ -89,13 +89,13 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
         >
           <Sparkles className="w-5 h-5 text-[hsl(20_95%_55%)] mt-0.5 shrink-0" />
           <div className="flex-1 text-sm">
-            <div className="font-medium text-foreground mb-1">奖励规则</div>
+            <div className="font-medium text-muted-foreground mb-1">奖励规则</div>
             <div className="text-muted-foreground leading-relaxed">
               好友通过你的邀请码注册成功：你得{' '}
               <span className="font-semibold text-[hsl(20_95%_45%)]">{inviterReward}</span> 积分，好友得{' '}
               <span className="font-semibold text-[hsl(20_95%_45%)]">{inviteeReward}</span> 积分。
               <br />
-              每位用户作为邀请人累计最多获得 <span className="font-medium text-foreground">{rewardLimit}</span> 次奖励，
+              每位用户作为邀请人累计最多获得 <span className="font-medium text-muted-foreground">{rewardLimit}</span> 次奖励，
               达上限后好友仍可获得 {defaultNewUserCredits} 默认新用户积分。
             </div>
           </div>
@@ -105,9 +105,9 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
         <div className="space-y-2">
           <label className="text-xs text-muted-foreground">你的专属邀请码</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-12 rounded-lg border border-border bg-muted/30 flex items-center justify-center font-mono text-2xl tracking-[0.3em] font-semibold text-foreground">
-              {inviteCode}
-            </div>
+          <div className="flex-1 h-12 rounded-lg border border-border bg-muted/30 flex items-center justify-center font-mono text-2xl tracking-[0.3em] font-semibold text-foreground/60">
+            {inviteCode}
+          </div>
             <Button
               onClick={() => copy(inviteCode, '邀请码')}
               className="h-12 px-4 gap-1.5"
