@@ -156,7 +156,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
         <div className="grid grid-cols-3 gap-3">
           <div className="rounded-lg border border-border bg-card p-3">
             <div className="text-xs text-muted-foreground">剩余奖励次数</div>
-            <div className="text-xl font-semibold text-foreground mt-1">
+            <div className="text-xl font-semibold text-foreground/60 mt-1">
               {remainingRewards}
               <span className="text-sm font-normal text-muted-foreground">/{rewardLimit}</span>
             </div>
@@ -167,7 +167,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
           </div>
           <div className="rounded-lg border border-border bg-card p-3">
             <div className="text-xs text-muted-foreground">已邀请人数</div>
-            <div className="text-xl font-semibold text-foreground mt-1">
+            <div className="text-xl font-semibold text-foreground/60 mt-1">
               {invitedCount}
               <Users className="w-3.5 h-3.5 inline ml-1 text-muted-foreground" />
             </div>
@@ -219,7 +219,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
                           {r.inviteeName.slice(0, 1).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-foreground truncate">{r.inviteeName}</div>
+                          <div className="text-muted-foreground truncate">{r.inviteeName}</div>
                           <div className="text-[11px] text-muted-foreground">
                             {new Date(r.registeredAt).toLocaleString('zh-CN', { hour12: false })}
                           </div>
