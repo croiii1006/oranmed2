@@ -37,6 +37,16 @@ export function TopNav() {
 
       {/* Right: User Actions */}
       <div className="flex items-center gap-2">
+        {/* Invite Friends */}
+        <Button
+            variant="ghost"
+            size="sm"
+            className="text-[hsl(20_95%_55%)] hover:text-[hsl(20_95%_50%)] hover:bg-[hsl(20_95%_55%)]/10 flex items-center gap-1.5 border border-[hsl(20_95%_55%)]/40 rounded-lg"
+            onClick={() => setInviteOpen(true)}>
+          <Gift className="w-4 h-4" />
+          <span className="text-xs font-medium">邀请好友</span>
+        </Button>
+
         {/* Memory Library */}
         <Button
             variant="ghost"
