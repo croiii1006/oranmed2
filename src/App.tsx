@@ -51,6 +51,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <CreditsProvider>
+        <InviteProvider>
         <TikTokInspirationProvider>
           <ReplicatePrefillProvider>
             <OranSimulationPrefillProvider>
@@ -60,6 +61,7 @@ const App = () => (
                 <BrowserRouter>
                   <Routes>
                     <Route path="/" element={<Navigate to={DEFAULT_PATH} replace />} />
+                    <Route path="/register" element={<RegisterDemo />} />
                     <Route path="/creator-portal" element={<CreatorPortal />} />
                     <Route
                       path="/ai-toolbox/oran-gen"
@@ -78,6 +80,7 @@ const App = () => (
             </OranSimulationPrefillProvider>
           </ReplicatePrefillProvider>
         </TikTokInspirationProvider>
+        </InviteProvider>
       </CreditsProvider>
     </TooltipProvider>
   </QueryClientProvider>
