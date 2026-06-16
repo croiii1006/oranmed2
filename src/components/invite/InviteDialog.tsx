@@ -247,26 +247,26 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
         {/* 邀请记录 */}
         {records.length > 0 && (
           <div className="space-y-2">
-            <div className="text-xs text-muted-foreground">邀请记录</div>
-            <div className="rounded-lg border border-border overflow-hidden">
-              <div className="max-h-48 overflow-y-auto divide-y divide-border">
+            <div className="text-[11px] text-muted-foreground/70">邀请记录</div>
+            <div className="rounded-xl bg-muted/20 overflow-hidden">
+              <div className="max-h-48 overflow-y-auto divide-y divide-border/50">
                 {records.map((r) => {
                   const s = statusLabel(r.status);
                   return (
-                    <div key={r.id} className="flex items-center justify-between px-3 py-2 text-sm">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">
+                    <div key={r.id} className="flex items-center justify-between px-3 py-2.5 text-sm">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center text-[10px] font-medium shrink-0 text-muted-foreground">
                           {r.inviteeName.slice(0, 1).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-muted-foreground truncate">{r.inviteeName}</div>
-                          <div className="text-[11px] text-muted-foreground">
+                          <div className="text-muted-foreground truncate text-[13px]">{r.inviteeName}</div>
+                          <div className="text-[11px] text-muted-foreground/60">
                             {new Date(r.registeredAt).toLocaleString('zh-CN', { hour12: false })}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground/60">
                           {r.inviterCredits > 0 ? `+${r.inviterCredits}` : '+0'}
                         </span>
                         <Badge variant="outline" className={cn('text-[10px] font-normal', s.cls)}>
