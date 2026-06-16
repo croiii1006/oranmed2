@@ -102,94 +102,95 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
           </div>
         </div>
 
-        {/* 邀请码 */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">你的专属邀请码</label>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 h-10 rounded-md bg-muted/40 flex items-center px-4 font-mono text-lg tracking-[0.25em] font-medium text-foreground/70">
-              {inviteCode}
+        {/* 分享工具 */}
+        <div className="rounded-xl bg-muted/20 p-4 space-y-3">
+          {/* 邀请码 */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">你的专属邀请码</label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-10 rounded-md bg-muted/40 flex items-center px-4 font-mono text-lg tracking-[0.25em] font-medium text-foreground/70">
+                {inviteCode}
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => copy(inviteCode, '邀请码', 'code')}
+                className={cn(
+                  'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                  copiedKey === 'code'
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+                )}
+              >
+                {copiedKey === 'code' ? (
+                  <Check className="w-3.5 h-3.5 animate-scale-in" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                {copiedKey === 'code' ? '已复制' : '复制'}
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              onClick={() => copy(inviteCode, '邀请码', 'code')}
-              className={cn(
-                'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
-                copiedKey === 'code'
-                  ? 'text-emerald-500 bg-emerald-500/10'
-                  : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
-              )}
-            >
-              {copiedKey === 'code' ? (
-                <Check className="w-3.5 h-3.5 animate-scale-in" />
-              ) : (
-                <Copy className="w-3.5 h-3.5" />
-              )}
-              {copiedKey === 'code' ? '已复制' : '复制'}
-            </Button>
           </div>
-        </div>
 
-        {/* 邀请链接 */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">邀请链接</label>
-          <div className="flex items-center gap-2">
-            <Input
+          {/* 邀请链接 */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">邀请链接</label>
+            <div className="flex items-center gap-2">
+              <Input
+                readOnly
+                value={inviteUrl}
+                className="font-mono text-xs h-10 border-0 bg-muted/40 focus-visible:ring-0"
+              />
+              <Button
+                variant="ghost"
+                onClick={() => copy(inviteUrl, '邀请链接', 'link')}
+                className={cn(
+                  'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                  copiedKey === 'link'
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+                )}
+              >
+                {copiedKey === 'link' ? (
+                  <Check className="w-3.5 h-3.5 animate-scale-in" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                {copiedKey === 'link' ? '已复制' : '复制'}
+              </Button>
+            </div>
+          </div>
+
+          {/* 分享文案 */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">
+              分享文案 <span className="text-[11px] text-muted-foreground/70">（微信 / 飞书 / Telegram 等）</span>
+            </label>
+            <Textarea
               readOnly
-              value={inviteUrl}
-              className="font-mono text-xs h-10 border-0 bg-muted/40 focus-visible:ring-0"
+              value={shareText}
+              className="text-xs leading-relaxed min-h-[88px] resize-none border-0 bg-muted/40 focus-visible:ring-0"
             />
-            <Button
-              variant="ghost"
-              onClick={() => copy(inviteUrl, '邀请链接', 'link')}
-              className={cn(
-                'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
-                copiedKey === 'link'
-                  ? 'text-emerald-500 bg-emerald-500/10'
-                  : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
-              )}
-            >
-              {copiedKey === 'link' ? (
-                <Check className="w-3.5 h-3.5 animate-scale-in" />
-              ) : (
-                <Copy className="w-3.5 h-3.5" />
-              )}
-              {copiedKey === 'link' ? '已复制' : '复制'}
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                onClick={() => copy(shareText, '分享文案', 'text')}
+                className={cn(
+                  'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                  copiedKey === 'text'
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+                )}
+              >
+                {copiedKey === 'text' ? (
+                  <Check className="w-3.5 h-3.5 animate-scale-in" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                {copiedKey === 'text' ? '已复制' : '复制完整分享文案'}
+              </Button>
+            </div>
           </div>
         </div>
-
-        {/* 分享文案 */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">
-            分享文案 <span className="text-[11px] text-muted-foreground/70">（微信 / 飞书 / Telegram 等）</span>
-          </label>
-          <Textarea
-            readOnly
-            value={shareText}
-            className="text-xs leading-relaxed min-h-[96px] resize-none border-0 bg-muted/40 focus-visible:ring-0"
-          />
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              onClick={() => copy(shareText, '分享文案', 'text')}
-              className={cn(
-                'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
-                copiedKey === 'text'
-                  ? 'text-emerald-500 bg-emerald-500/10'
-                  : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
-              )}
-            >
-              {copiedKey === 'text' ? (
-                <Check className="w-3.5 h-3.5 animate-scale-in" />
-              ) : (
-                <Copy className="w-3.5 h-3.5" />
-              )}
-              {copiedKey === 'text' ? '已复制' : '复制完整分享文案'}
-            </Button>
-          </div>
-        </div>
-
-        <Separator />
 
         {/* 剩余额度与统计 */}
         <div className="grid grid-cols-3 gap-3">
