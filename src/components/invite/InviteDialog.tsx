@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Copy, Gift, Link2, MessageSquareShare, Sparkles, Users, Check, AlertCircle } from 'lucide-react';
+import { Copy, Gift, Sparkles, Users, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvite, type InviteRecordStatus } from '@/contexts/InviteContext';
 import { cn } from '@/lib/utils';
