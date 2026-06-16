@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-
 import { Copy, Gift, Users, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvite, type InviteRecordStatus } from '@/contexts/InviteContext';
@@ -15,8 +14,6 @@ interface InviteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-
 
 function statusLabel(status: InviteRecordStatus) {
   switch (status) {
