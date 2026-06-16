@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Copy, Gift, Link2, MessageSquareShare, Sparkles, Users, Check, AlertCircle } from 'lucide-react';
+import { Copy, Gift, Sparkles, Users, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvite, type InviteRecordStatus } from '@/contexts/InviteContext';
 import { cn } from '@/lib/utils';
@@ -102,52 +102,60 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
         </div>
 
         {/* 邀请码 */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground">你的专属邀请码</label>
           <div className="flex items-center gap-2">
-          <div className="flex-1 h-12 rounded-lg border border-border bg-muted/30 flex items-center justify-center font-mono text-2xl tracking-[0.3em] font-semibold text-foreground/60">
-            {inviteCode}
-          </div>
+            <div className="flex-1 h-10 rounded-md bg-muted/40 flex items-center px-4 font-mono text-lg tracking-[0.25em] font-medium text-foreground/70">
+              {inviteCode}
+            </div>
             <Button
+              variant="ghost"
               onClick={() => copy(inviteCode, '邀请码')}
-              className="h-12 px-4 gap-1.5"
-              style={{ background: ORANGE, color: '#fff' }}
+              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
             >
-              <Copy className="w-4 h-4" /> 复制
+              <Copy className="w-3.5 h-3.5" /> 复制
             </Button>
           </div>
         </div>
 
         {/* 邀请链接 */}
-        <div className="space-y-2">
-          <label className="text-xs text-muted-foreground flex items-center gap-1">
-            <Link2 className="w-3 h-3" /> 邀请链接
-          </label>
+        <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground">邀请链接</label>
           <div className="flex items-center gap-2">
-            <Input readOnly value={inviteUrl} className="font-mono text-xs" />
+            <Input
+              readOnly
+              value={inviteUrl}
+              className="font-mono text-xs h-10 border-0 bg-muted/40 focus-visible:ring-0"
+            />
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => copy(inviteUrl, '邀请链接')}
-              className="gap-1.5 border-[hsl(20_95%_55%)]/40 text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10 hover:text-[hsl(20_95%_45%)]"
+              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
             >
-              <Copy className="w-4 h-4" /> 复制
+              <Copy className="w-3.5 h-3.5" /> 复制
             </Button>
           </div>
         </div>
 
         {/* 分享文案 */}
-        <div className="space-y-2">
-          <label className="text-xs text-muted-foreground flex items-center gap-1">
-            <MessageSquareShare className="w-3 h-3" /> 分享文案（一键复制，发到微信 / 飞书 / Telegram 等）
+        <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground">
+            分享文案 <span className="text-[11px] text-muted-foreground/70">（微信 / 飞书 / Telegram 等）</span>
           </label>
-          <Textarea readOnly value={shareText} className="text-xs leading-relaxed min-h-[110px] resize-none" />
-          <Button
-            onClick={() => copy(shareText, '分享文案')}
-            className="w-full gap-1.5"
-            style={{ background: ORANGE, color: '#fff' }}
-          >
-            <Copy className="w-4 h-4" /> 复制完整分享文案
-          </Button>
+          <Textarea
+            readOnly
+            value={shareText}
+            className="text-xs leading-relaxed min-h-[96px] resize-none border-0 bg-muted/40 focus-visible:ring-0"
+          />
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              onClick={() => copy(shareText, '分享文案')}
+              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
+            >
+              <Copy className="w-3.5 h-3.5" /> 复制完整分享文案
+            </Button>
+          </div>
         </div>
 
         <Separator />
