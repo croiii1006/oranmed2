@@ -7,6 +7,9 @@ import { Stage2KYC } from './stages/Stage2KYC';
 import { Stage3Pricing } from './stages/Stage3Pricing';
 import { Stage4Review } from './stages/Stage4Review';
 import { Stage5Contract } from './stages/Stage5Contract';
+import { useCreatorPortalState } from '@/components/creator-portal/useCreatorPortalState';
+import { TaskInboxSection } from '@/components/creator-portal/TaskInboxSection';
+import { CreatorStatsSection } from '@/components/creator-portal/CreatorStatsSection';
 
 export function OnboardingFlow() {
   const { state, patch, goTo, reset } = useOnboardingFlow();
@@ -22,6 +25,7 @@ export function OnboardingFlow() {
   })();
 
   const goNext = (n: 2 | 3 | 4 | 5 | 6) => goTo(n);
+  const isDone = state.currentStep === 6;
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-muted/40 via-background to-muted/20">
@@ -32,15 +36,15 @@ export function OnboardingFlow() {
       />
 
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl px-8 py-10">
+        <div className={`mx-auto ${isDone ? 'max-w-5xl' : 'max-w-3xl'} px-8 py-10`}>
           {/* Top hint */}
           <div className="mb-6 flex items-center justify-between">
             <div>
               <div className="text-[10.5px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                ORAN MED · Onboarding
+                ORAN MED · {isDone ? 'Task Hall' : 'Onboarding'}
               </div>
               <h1 className="mt-1.5 text-[15px] font-medium tracking-tight text-foreground">
-                完成 5 步入驻流程以接收品牌任务
+                {isDone ? '任务大厅' : '完成 5 步入驻流程以接收品牌任务'}
               </h1>
             </div>
             <Button
@@ -68,28 +72,44 @@ export function OnboardingFlow() {
           {state.currentStep === 5 && (
             <Stage5Contract state={state} patch={patch} onComplete={() => goNext(6)} />
           )}
-          {state.currentStep === 6 && <Completion />}
+          {isDone && <TaskHall />}
         </div>
       </main>
     </div>
   );
 }
 
-function Completion() {
+function TaskHall() {
+  const { inboxTasks, getResponse, updateTaskResponse, stats } = useCreatorPortalState();
+
   return (
-    <section className="animate-in fade-in zoom-in-95 duration-500 rounded-2xl border border-border/60 bg-card p-12 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02),0_8px_28px_-12px_rgba(0,0,0,0.06)]">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-accent">
-        <Sparkles className="h-7 w-7" strokeWidth={1.5} />
-      </div>
-      <h2 className="mt-5 text-xl font-medium tracking-tight text-foreground">
-        入驻完成
-      </h2>
-      <p className="mx-auto mt-2 max-w-md text-[12.5px] leading-relaxed text-muted-foreground">
-        恭喜！您已完成全部入驻流程，平台将很快为您推送匹配的品牌任务。
-      </p>
-      <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-[11.5px] text-emerald-600">
-        <Check className="h-3.5 w-3.5" /> 合同已生效 · 任务大厅即将开放
-      </div>
-    </section>
+    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-6">
+      <section className="rounded-2xl border border-border/60 bg-card p-6 shadow-[0_1px_2px_rgba(0,0,0,0.02),0_8px_28px_-12px_rgba(0,0,0,0.06)]">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
+            <Sparkles className="h-5 w-5" strokeWidth={1.5} />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-[14px] font-medium tracking-tight text-foreground">
+              入驻完成,欢迎来到任务大厅
+            </h2>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">
+              平台将持续为您推送匹配的品牌任务,请及时处理。
+            </p>
+          </div>
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] text-emerald-600">
+            <Check className="h-3 w-3" /> 合同已生效
+          </div>
+        </div>
+      </section>
+
+      <CreatorStatsSection stats={stats} />
+      <TaskInboxSection
+        tasks={inboxTasks}
+        getResponse={getResponse}
+        updateResponse={updateTaskResponse}
+        canAct
+      />
+    </div>
   );
 }
