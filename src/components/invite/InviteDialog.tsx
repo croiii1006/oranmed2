@@ -114,7 +114,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
                 className={cn(
                   'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
                   copiedKey === 'code'
-                    ? 'text-emerald-500 bg-emerald-500/10'
+                    ? 'text-[hsl(20_95%_45%)] bg-[hsl(20_95%_55%)]/10'
                     : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
                 )}
               >
@@ -143,7 +143,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
                 className={cn(
                   'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
                   copiedKey === 'link'
-                    ? 'text-emerald-500 bg-emerald-500/10'
+                    ? 'text-[hsl(20_95%_45%)] bg-[hsl(20_95%_55%)]/10'
                     : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
                 )}
               >
@@ -174,7 +174,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
                 className={cn(
                   'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
                   copiedKey === 'text'
-                    ? 'text-emerald-500 bg-emerald-500/10'
+                    ? 'text-[hsl(20_95%_45%)] bg-[hsl(20_95%_55%)]/10'
                     : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
                 )}
               >
