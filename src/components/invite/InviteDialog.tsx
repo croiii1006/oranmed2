@@ -87,16 +87,15 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
 
         {/* 奖励规则 */}
         <div
-          className="rounded-xl border p-4"
-          style={{ borderColor: 'hsl(20 95% 55% / 0.3)', background: 'hsl(20 95% 55% / 0.06)' }}
+          className="rounded-xl border p-3.5"
+          style={{ borderColor: 'hsl(20 95% 55% / 0.2)', background: 'hsl(20 95% 55% / 0.04)' }}
         >
           <div className="text-sm">
             <div className="font-medium text-muted-foreground mb-1">奖励规则</div>
-            <div className="text-muted-foreground leading-relaxed">
+            <div className="text-muted-foreground/80 leading-relaxed text-[13px]">
               好友通过你的邀请码注册成功：你得{' '}
               <span className="font-semibold text-[hsl(20_95%_45%)]">{inviterReward}</span> 积分，好友得{' '}
               <span className="font-semibold text-[hsl(20_95%_45%)]">{inviteeReward}</span> 积分。
-              <br />
               每位用户作为邀请人累计最多获得 <span className="font-medium text-muted-foreground">{rewardLimit}</span> 次奖励，
               达上限后好友仍可获得 {defaultNewUserCredits} 默认新用户积分。
             </div>
