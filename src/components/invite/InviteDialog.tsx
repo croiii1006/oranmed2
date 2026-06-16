@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Copy, Gift, Users, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvite, type InviteRecordStatus } from '@/contexts/InviteContext';
@@ -15,8 +14,6 @@ interface InviteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const ORANGE = 'hsl(20 95% 55%)';
 
 function statusLabel(status: InviteRecordStatus) {
   switch (status) {
@@ -47,11 +44,14 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
     simulateInvite,
   } = useInvite();
   const [simName, setSimName] = useState('');
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const copy = async (text: string, label: string) => {
+  const copy = async (text: string, label: string, key: string) => {
     try {
       await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
       toast.success(`${label}已复制`);
+      setTimeout(() => setCopiedKey((prev) => (prev === key ? null : prev)), 1500);
     } catch {
       toast.error('复制失败，请手动复制');
     }
@@ -71,7 +71,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto space-y-5">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-medium text-foreground/70">
             <Gift className="w-5 h-5 text-[hsl(20_95%_55%)]" />
@@ -84,113 +84,143 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
 
         {/* 奖励规则 */}
         <div
-          className="rounded-xl border p-4"
-          style={{ borderColor: 'hsl(20 95% 55% / 0.3)', background: 'hsl(20 95% 55% / 0.06)' }}
+          className="rounded-xl border p-3.5"
+          style={{ borderColor: 'hsl(20 95% 55% / 0.2)', background: 'hsl(20 95% 55% / 0.04)' }}
         >
           <div className="text-sm">
             <div className="font-medium text-muted-foreground mb-1">奖励规则</div>
-            <div className="text-muted-foreground leading-relaxed">
+            <div className="text-muted-foreground/80 leading-relaxed text-[13px]">
               好友通过你的邀请码注册成功：你得{' '}
               <span className="font-semibold text-[hsl(20_95%_45%)]">{inviterReward}</span> 积分，好友得{' '}
               <span className="font-semibold text-[hsl(20_95%_45%)]">{inviteeReward}</span> 积分。
-              <br />
               每位用户作为邀请人累计最多获得 <span className="font-medium text-muted-foreground">{rewardLimit}</span> 次奖励，
               达上限后好友仍可获得 {defaultNewUserCredits} 默认新用户积分。
             </div>
           </div>
         </div>
 
-        {/* 邀请码 */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">你的专属邀请码</label>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 h-10 rounded-md bg-muted/40 flex items-center px-4 font-mono text-lg tracking-[0.25em] font-medium text-foreground/70">
-              {inviteCode}
+        {/* 分享工具 */}
+        <div className="rounded-xl bg-muted/20 p-4 space-y-3">
+          {/* 邀请码 */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">你的专属邀请码</label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-10 rounded-md bg-muted/40 flex items-center px-4 font-mono text-lg tracking-[0.25em] font-medium text-foreground/70">
+                {inviteCode}
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => copy(inviteCode, '邀请码', 'code')}
+                className={cn(
+                  'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                  copiedKey === 'code'
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+                )}
+              >
+                {copiedKey === 'code' ? (
+                  <Check className="w-3.5 h-3.5 animate-scale-in" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                {copiedKey === 'code' ? '已复制' : '复制'}
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              onClick={() => copy(inviteCode, '邀请码')}
-              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
-            >
-              <Copy className="w-3.5 h-3.5" /> 复制
-            </Button>
           </div>
-        </div>
 
-        {/* 邀请链接 */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">邀请链接</label>
-          <div className="flex items-center gap-2">
-            <Input
+          {/* 邀请链接 */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">邀请链接</label>
+            <div className="flex items-center gap-2">
+              <Input
+                readOnly
+                value={inviteUrl}
+                className="font-mono text-xs h-10 border-0 bg-muted/40 focus-visible:ring-0"
+              />
+              <Button
+                variant="ghost"
+                onClick={() => copy(inviteUrl, '邀请链接', 'link')}
+                className={cn(
+                  'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                  copiedKey === 'link'
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+                )}
+              >
+                {copiedKey === 'link' ? (
+                  <Check className="w-3.5 h-3.5 animate-scale-in" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                {copiedKey === 'link' ? '已复制' : '复制'}
+              </Button>
+            </div>
+          </div>
+
+          {/* 分享文案 */}
+          <div className="space-y-1.5">
+            <label className="text-xs text-muted-foreground">
+              分享文案 <span className="text-[11px] text-muted-foreground/70">（微信 / 飞书 / Telegram 等）</span>
+            </label>
+            <Textarea
               readOnly
-              value={inviteUrl}
-              className="font-mono text-xs h-10 border-0 bg-muted/40 focus-visible:ring-0"
+              value={shareText}
+              className="text-xs leading-relaxed min-h-[88px] resize-none border-0 bg-muted/40 focus-visible:ring-0"
             />
-            <Button
-              variant="ghost"
-              onClick={() => copy(inviteUrl, '邀请链接')}
-              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
-            >
-              <Copy className="w-3.5 h-3.5" /> 复制
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                onClick={() => copy(shareText, '分享文案', 'text')}
+                className={cn(
+                  'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                  copiedKey === 'text'
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+                )}
+              >
+                {copiedKey === 'text' ? (
+                  <Check className="w-3.5 h-3.5 animate-scale-in" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                {copiedKey === 'text' ? '已复制' : '复制完整分享文案'}
+              </Button>
+            </div>
           </div>
         </div>
-
-        {/* 分享文案 */}
-        <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">
-            分享文案 <span className="text-[11px] text-muted-foreground/70">（微信 / 飞书 / Telegram 等）</span>
-          </label>
-          <Textarea
-            readOnly
-            value={shareText}
-            className="text-xs leading-relaxed min-h-[96px] resize-none border-0 bg-muted/40 focus-visible:ring-0"
-          />
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              onClick={() => copy(shareText, '分享文案')}
-              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
-            >
-              <Copy className="w-3.5 h-3.5" /> 复制完整分享文案
-            </Button>
-          </div>
-        </div>
-
-        <Separator />
 
         {/* 剩余额度与统计 */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-lg border border-border bg-card p-3">
-            <div className="text-xs text-muted-foreground">剩余奖励次数</div>
-            <div className="text-xl font-semibold text-foreground/60 mt-1">
+          <div className="rounded-xl bg-muted/30 p-3">
+            <div className="text-[11px] text-muted-foreground/70">剩余奖励次数</div>
+            <div className="text-lg font-semibold text-foreground/60 mt-1">
               {remainingRewards}
-              <span className="text-sm font-normal text-muted-foreground">/{rewardLimit}</span>
+              <span className="text-xs font-normal text-muted-foreground/60">/{rewardLimit}</span>
             </div>
             <Progress
               value={(rewardedCount / rewardLimit) * 100}
               className="h-1 mt-2"
             />
           </div>
-          <div className="rounded-lg border border-border bg-card p-3">
-            <div className="text-xs text-muted-foreground">已邀请人数</div>
-            <div className="text-xl font-semibold text-foreground/60 mt-1">
+          <div className="rounded-xl bg-muted/30 p-3">
+            <div className="text-[11px] text-muted-foreground/70">已邀请人数</div>
+            <div className="text-lg font-semibold text-foreground/60 mt-1">
               {invitedCount}
-              <Users className="w-3.5 h-3.5 inline ml-1 text-muted-foreground" />
+              <Users className="w-3 h-3 inline ml-1 text-muted-foreground/50" />
             </div>
           </div>
-          <div className="rounded-lg border border-border bg-card p-3">
-            <div className="text-xs text-muted-foreground">累计获得积分</div>
-            <div className="text-xl font-semibold text-[hsl(20_95%_45%)] mt-1">
+          <div className="rounded-xl bg-muted/30 p-3">
+            <div className="text-[11px] text-muted-foreground/70">累计获得积分</div>
+            <div className="text-lg font-semibold text-[hsl(20_95%_45%)] mt-1">
               +{totalEarnedCredits}
             </div>
           </div>
         </div>
 
         {/* Demo: 模拟 */}
-        <div className="rounded-lg border border-dashed border-border bg-muted/20 p-3 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <AlertCircle className="w-3.5 h-3.5" />
+        <div className="rounded-xl bg-muted/20 p-3.5 space-y-2">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70">
+            <AlertCircle className="w-3 h-3" />
             Demo 演示：模拟好友通过你的邀请码注册成功
           </div>
           <div className="flex items-center gap-2">
@@ -198,14 +228,14 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
               value={simName}
               onChange={(e) => setSimName(e.target.value)}
               placeholder="好友昵称（选填）"
-              className="text-sm"
+              className="text-sm h-9 bg-muted/40 border-0"
             />
-            <Button variant="secondary" onClick={handleSimulate} className="gap-1.5 shrink-0">
-              <Check className="w-4 h-4" /> 模拟注册成功
+            <Button variant="secondary" onClick={handleSimulate} className="gap-1.5 shrink-0 h-9 text-xs">
+              <Check className="w-3.5 h-3.5" /> 模拟注册成功
             </Button>
           </div>
           {isCapped && (
-            <div className="text-xs text-[hsl(20_95%_45%)]">
+            <div className="text-[11px] text-[hsl(20_95%_45%)]">
               你已达到 {rewardLimit} 次奖励上限，后续好友注册不再发放邀请奖励，但 ta 仍可获得 {defaultNewUserCredits} 默认新用户积分。
             </div>
           )}
@@ -214,26 +244,26 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
         {/* 邀请记录 */}
         {records.length > 0 && (
           <div className="space-y-2">
-            <div className="text-xs text-muted-foreground">邀请记录</div>
-            <div className="rounded-lg border border-border overflow-hidden">
-              <div className="max-h-48 overflow-y-auto divide-y divide-border">
+            <div className="text-[11px] text-muted-foreground/70">邀请记录</div>
+            <div className="rounded-xl bg-muted/20 overflow-hidden">
+              <div className="max-h-48 overflow-y-auto divide-y divide-border/50">
                 {records.map((r) => {
                   const s = statusLabel(r.status);
                   return (
-                    <div key={r.id} className="flex items-center justify-between px-3 py-2 text-sm">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">
+                    <div key={r.id} className="flex items-center justify-between px-3 py-2.5 text-sm">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center text-[10px] font-medium shrink-0 text-muted-foreground">
                           {r.inviteeName.slice(0, 1).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-muted-foreground truncate">{r.inviteeName}</div>
-                          <div className="text-[11px] text-muted-foreground">
+                          <div className="text-muted-foreground truncate text-[13px]">{r.inviteeName}</div>
+                          <div className="text-[11px] text-muted-foreground/60">
                             {new Date(r.registeredAt).toLocaleString('zh-CN', { hour12: false })}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground/60">
                           {r.inviterCredits > 0 ? `+${r.inviterCredits}` : '+0'}
                         </span>
                         <Badge variant="outline" className={cn('text-[10px] font-normal', s.cls)}>
