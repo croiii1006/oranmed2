@@ -112,10 +112,20 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
             </div>
             <Button
               variant="ghost"
-              onClick={() => copy(inviteCode, '邀请码')}
-              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
+              onClick={() => copy(inviteCode, '邀请码', 'code')}
+              className={cn(
+                'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                copiedKey === 'code'
+                  ? 'text-emerald-500 bg-emerald-500/10'
+                  : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+              )}
             >
-              <Copy className="w-3.5 h-3.5" /> 复制
+              {copiedKey === 'code' ? (
+                <Check className="w-3.5 h-3.5 animate-scale-in" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+              {copiedKey === 'code' ? '已复制' : '复制'}
             </Button>
           </div>
         </div>
@@ -131,10 +141,20 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
             />
             <Button
               variant="ghost"
-              onClick={() => copy(inviteUrl, '邀请链接')}
-              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
+              onClick={() => copy(inviteUrl, '邀请链接', 'link')}
+              className={cn(
+                'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                copiedKey === 'link'
+                  ? 'text-emerald-500 bg-emerald-500/10'
+                  : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+              )}
             >
-              <Copy className="w-3.5 h-3.5" /> 复制
+              {copiedKey === 'link' ? (
+                <Check className="w-3.5 h-3.5 animate-scale-in" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+              {copiedKey === 'link' ? '已复制' : '复制'}
             </Button>
           </div>
         </div>
@@ -152,10 +172,20 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
           <div className="flex justify-end">
             <Button
               variant="ghost"
-              onClick={() => copy(shareText, '分享文案')}
-              className="h-9 px-3 text-xs gap-1.5 text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10"
+              onClick={() => copy(shareText, '分享文案', 'text')}
+              className={cn(
+                'h-9 px-3 text-xs gap-1.5 transition-all duration-200',
+                copiedKey === 'text'
+                  ? 'text-emerald-500 bg-emerald-500/10'
+                  : 'text-muted-foreground hover:text-[hsl(20_95%_45%)] hover:bg-[hsl(20_95%_55%)]/10'
+              )}
             >
-              <Copy className="w-3.5 h-3.5" /> 复制完整分享文案
+              {copiedKey === 'text' ? (
+                <Check className="w-3.5 h-3.5 animate-scale-in" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+              {copiedKey === 'text' ? '已复制' : '复制完整分享文案'}
             </Button>
           </div>
         </div>
