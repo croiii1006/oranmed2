@@ -16,7 +16,7 @@ interface InviteDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const ORANGE = 'hsl(20 95% 55%)';
+
 
 function statusLabel(status: InviteRecordStatus) {
   switch (status) {
