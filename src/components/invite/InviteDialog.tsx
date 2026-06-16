@@ -47,11 +47,14 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
     simulateInvite,
   } = useInvite();
   const [simName, setSimName] = useState('');
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const copy = async (text: string, label: string) => {
+  const copy = async (text: string, label: string, key: string) => {
     try {
       await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
       toast.success(`${label}已复制`);
+      setTimeout(() => setCopiedKey((prev) => (prev === key ? null : prev)), 1500);
     } catch {
       toast.error('复制失败，请手动复制');
     }
