@@ -194,36 +194,36 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
 
         {/* 剩余额度与统计 */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-lg border border-border bg-card p-3">
-            <div className="text-xs text-muted-foreground">剩余奖励次数</div>
-            <div className="text-xl font-semibold text-foreground/60 mt-1">
+          <div className="rounded-xl bg-muted/30 p-3">
+            <div className="text-[11px] text-muted-foreground/70">剩余奖励次数</div>
+            <div className="text-lg font-semibold text-foreground/60 mt-1">
               {remainingRewards}
-              <span className="text-sm font-normal text-muted-foreground">/{rewardLimit}</span>
+              <span className="text-xs font-normal text-muted-foreground/60">/{rewardLimit}</span>
             </div>
             <Progress
               value={(rewardedCount / rewardLimit) * 100}
               className="h-1 mt-2"
             />
           </div>
-          <div className="rounded-lg border border-border bg-card p-3">
-            <div className="text-xs text-muted-foreground">已邀请人数</div>
-            <div className="text-xl font-semibold text-foreground/60 mt-1">
+          <div className="rounded-xl bg-muted/30 p-3">
+            <div className="text-[11px] text-muted-foreground/70">已邀请人数</div>
+            <div className="text-lg font-semibold text-foreground/60 mt-1">
               {invitedCount}
-              <Users className="w-3.5 h-3.5 inline ml-1 text-muted-foreground" />
+              <Users className="w-3 h-3 inline ml-1 text-muted-foreground/50" />
             </div>
           </div>
-          <div className="rounded-lg border border-border bg-card p-3">
-            <div className="text-xs text-muted-foreground">累计获得积分</div>
-            <div className="text-xl font-semibold text-[hsl(20_95%_45%)] mt-1">
+          <div className="rounded-xl bg-muted/30 p-3">
+            <div className="text-[11px] text-muted-foreground/70">累计获得积分</div>
+            <div className="text-lg font-semibold text-[hsl(20_95%_45%)] mt-1">
               +{totalEarnedCredits}
             </div>
           </div>
         </div>
 
         {/* Demo: 模拟 */}
-        <div className="rounded-lg border border-dashed border-border bg-muted/20 p-3 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <AlertCircle className="w-3.5 h-3.5" />
+        <div className="rounded-xl bg-muted/20 p-3.5 space-y-2">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70">
+            <AlertCircle className="w-3 h-3" />
             Demo 演示：模拟好友通过你的邀请码注册成功
           </div>
           <div className="flex items-center gap-2">
@@ -231,14 +231,14 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
               value={simName}
               onChange={(e) => setSimName(e.target.value)}
               placeholder="好友昵称（选填）"
-              className="text-sm"
+              className="text-sm h-9 bg-muted/40 border-0"
             />
-            <Button variant="secondary" onClick={handleSimulate} className="gap-1.5 shrink-0">
-              <Check className="w-4 h-4" /> 模拟注册成功
+            <Button variant="secondary" onClick={handleSimulate} className="gap-1.5 shrink-0 h-9 text-xs">
+              <Check className="w-3.5 h-3.5" /> 模拟注册成功
             </Button>
           </div>
           {isCapped && (
-            <div className="text-xs text-[hsl(20_95%_45%)]">
+            <div className="text-[11px] text-[hsl(20_95%_45%)]">
               你已达到 {rewardLimit} 次奖励上限，后续好友注册不再发放邀请奖励，但 ta 仍可获得 {defaultNewUserCredits} 默认新用户积分。
             </div>
           )}
