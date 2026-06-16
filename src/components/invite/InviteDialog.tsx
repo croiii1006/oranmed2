@@ -74,7 +74,7 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto space-y-5">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-medium text-foreground/70">
             <Gift className="w-5 h-5 text-[hsl(20_95%_55%)]" />
