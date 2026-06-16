@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Copy, Gift, Sparkles, Users, Check, AlertCircle } from 'lucide-react';
+import { Copy, Gift, Users, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useInvite, type InviteRecordStatus } from '@/contexts/InviteContext';
 import { cn } from '@/lib/utils';
@@ -84,11 +84,10 @@ export function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
 
         {/* 奖励规则 */}
         <div
-          className="rounded-xl border p-4 flex items-start gap-3"
+          className="rounded-xl border p-4"
           style={{ borderColor: 'hsl(20 95% 55% / 0.3)', background: 'hsl(20 95% 55% / 0.06)' }}
         >
-          <Sparkles className="w-5 h-5 text-[hsl(20_95%_55%)] mt-0.5 shrink-0" />
-          <div className="flex-1 text-sm">
+          <div className="text-sm">
             <div className="font-medium text-muted-foreground mb-1">奖励规则</div>
             <div className="text-muted-foreground leading-relaxed">
               好友通过你的邀请码注册成功：你得{' '}
